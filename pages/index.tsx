@@ -5,9 +5,7 @@ import BoundsPanel from "../components/BoundsPanel";
 import LinesPanel from "../components/LinesPanel";
 import Loading from "../components/Loading";
 import MainMarquee from "../components/MainMarquee";
-import RequestLocationPermission from "../components/RequestLocationPermission";
 import useBounds from "../hooks/useBounds";
-import useGeolocation from "../hooks/useGeolocation";
 import useNearbyStation from "../hooks/useNearbyStation";
 import useRefreshNextStations from "../hooks/useRefreshNextStations";
 import useStationList from "../hooks/useStationList";
@@ -34,7 +32,6 @@ export default function Home() {
   const [selectedLine, setSelectedLine] = useState<Line>();
   const [selectedBound, setSelectedBound] = useState<Station | null>();
 
-  const permissionGranted = useGeolocation();
   const [station, fetchLinesLoading, hasFetchLinesError] = useNearbyStation();
   const [stations, fetchStations, fetchStationsLoading, hasFetchStationsError] =
     useStationList();
@@ -52,10 +49,6 @@ export default function Home() {
       fetchStations(selectedLine.id);
     }
   }, [fetchStations, selectedLine]);
-
-  if (!permissionGranted) {
-    return <RequestLocationPermission />;
-  }
 
   if (fetchLinesLoading || fetchStationsLoading) {
     return <Loading />;
