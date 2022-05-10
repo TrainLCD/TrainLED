@@ -1,4 +1,7 @@
+import { ApolloProvider } from "@apollo/client";
+import { AppProps } from "next/app";
 import { createGlobalStyle } from "styled-components";
+import apolloClient from "../lib/apolloClient";
 
 const GlobalStyle = createGlobalStyle`
 @font-face {
@@ -12,6 +15,7 @@ body {
   margin: 0;
   font-family: 'JF-Dot-jiskan24';
   background-color: #212121;
+  color: white;
 }
 
 html, body, #__next {
@@ -28,12 +32,12 @@ a {
 }
 `;
 
-function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <>
+    <ApolloProvider client={apolloClient}>
       <GlobalStyle />
       <Component {...pageProps} />
-    </>
+    </ApolloProvider>
   );
 }
 
