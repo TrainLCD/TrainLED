@@ -1,7 +1,40 @@
-import '../styles/globals.css'
+import { createGlobalStyle } from "styled-components";
 
-function MyApp({ Component, pageProps }) {
-  return <Component {...pageProps} />
+const GlobalStyle = createGlobalStyle`
+@font-face {
+	font-family: 'JF-Dot-jiskan24';
+	src: url(/JF-Dot-jiskan24.ttf);
 }
 
-export default MyApp
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: 'JF-Dot-jiskan24';
+  background-color: #212121;
+}
+
+html, body, #__next {
+  height: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+`;
+
+function MyApp({ Component, pageProps }) {
+  return (
+    <>
+      <GlobalStyle />
+      <Component {...pageProps} />
+    </>
+  );
+}
+
+export default MyApp;
