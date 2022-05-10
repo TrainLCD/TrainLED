@@ -1,11 +1,11 @@
-import { Line, Station } from "../models/StationAPI";
+import type { Line, Station } from "../models/StationAPI";
 
 export const isYamanoteLine = (lineId: number | undefined): boolean =>
   lineId === 11302;
 
 const isOsakaLoopLine = (lineId: number): boolean => lineId === 11623;
 
-export const getIsLoopLine = (line: Line | null | undefined): boolean => {
+export const getIsLoopLine = (line: Line | undefined): boolean => {
   if (!line) {
     return false;
   }
@@ -47,11 +47,8 @@ export const inboundStationForLoopLine = (
   if (!selectedLine) {
     return null;
   }
-  const leftStations = stations
-    .slice()
-    .reverse()
-    .slice(stations.length - index, stations.length);
-  const foundStations = leftStations
+  const nextStations = stations.slice().reverse();
+  const foundStations = nextStations
     .map((s) => ({
       station: s,
       boundFor: isYamanoteLine(selectedLine.id)
@@ -63,15 +60,14 @@ export const inboundStationForLoopLine = (
   const foundStation: { boundFor: string; station: Station } | undefined =
     foundStations[0];
   if (!foundStation) {
-    const afterStations = stations.slice();
-    const joinedStations = [...leftStations, ...afterStations];
-    const newLeftStations = index
+    const joinedStations = [...nextStations, ...stations];
+    const newNextStations = index
       ? joinedStations.slice(
           joinedStations.length - index,
           joinedStations.length
         )
       : joinedStations.slice().reverse().slice(1); // 大崎にいた場合品川方面になってしまうため
-    const newFoundStations = newLeftStations
+    const newFoundStations = newNextStations
       .map((s) => ({
         station: s,
         boundFor: isYamanoteLine(selectedLine.id)
@@ -92,10 +88,10 @@ export const outboundStationForLoopLine = (
   if (!selectedLine) {
     return null;
   }
-  const leftStations = index
+  const nextStations = index
     ? stations.slice().slice(index)
     : stations.slice(index);
-  const foundStations = leftStations
+  const foundStations = nextStations
     .map((s) => ({
       station: s,
       boundFor: isYamanoteLine(selectedLine.id)
@@ -110,14 +106,14 @@ export const outboundStationForLoopLine = (
     const afterStations = isYamanoteLine(selectedLine.id)
       ? stations.slice().reverse()
       : stations.slice();
-    const joinedStations = [...leftStations, ...afterStations];
-    const newLeftStations = index
+    const joinedStations = [...nextStations, ...afterStations];
+    const newNextStations = index
       ? joinedStations
           .slice()
           .reverse()
           .slice(joinedStations.length - index, joinedStations.length)
       : joinedStations.slice().reverse().slice(1); // 大崎にいた場合品川方面になってしまうため
-    const newFoundStations = newLeftStations
+    const newFoundStations = newNextStations
       .map((s) => ({
         station: s,
         boundFor: isYamanoteLine(selectedLine.id)

@@ -1,7 +1,7 @@
 import { ApolloError, useLazyQuery } from "@apollo/client";
 import gql from "graphql-tag";
 import { useCallback, useEffect, useState } from "react";
-import { Station, StationsByLineIdData } from "../models/StationAPI";
+import type { Station, StationsByLineIdData } from "../models/StationAPI";
 
 const useStationList = (): [
   Station[],

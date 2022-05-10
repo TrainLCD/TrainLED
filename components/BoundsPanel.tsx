@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Station } from "../models/StationAPI";
+import type { Station } from "../models/StationAPI";
 import Button from "./Button";
 import { List, ListItem } from "./List";
 
@@ -8,7 +8,7 @@ const Title = styled.h3``;
 
 type Props = {
   bounds: [Station | null, Station | null] | undefined;
-  onSelect: (line: Station | null) => void;
+  onSelect: (line: Station) => void;
 };
 
 const BoundsPanel = ({ bounds, onSelect }: Props) => {
@@ -21,11 +21,14 @@ const BoundsPanel = ({ bounds, onSelect }: Props) => {
     <Container>
       <Title>行き先極度選択（しなさい）</Title>
       <List>
-        {eligibleBounds?.map((b) => (
-          <ListItem key={b?.id}>
-            <Button onClick={onSelect.bind(null, b)}>{b?.name}</Button>
-          </ListItem>
-        ))}
+        {eligibleBounds?.map(
+          (b) =>
+            b && (
+              <ListItem key={b?.id}>
+                <Button onClick={onSelect.bind(null, b)}>{b?.name}</Button>
+              </ListItem>
+            )
+        )}
       </List>
     </Container>
   );

@@ -6,10 +6,11 @@ import LinesPanel from "../components/LinesPanel";
 import Loading from "../components/Loading";
 import MainMarquee from "../components/MainMarquee";
 import useBounds from "../hooks/useBounds";
+import useClosestStation from "../hooks/useClosestStation";
 import useNearbyStation from "../hooks/useNearbyStation";
-import useRefreshNextStations from "../hooks/useRefreshNextStations";
+import useNextStations from "../hooks/useNextStations";
 import useStationList from "../hooks/useStationList";
-import { Line, Station } from "../models/StationAPI";
+import type { Line, Station } from "../models/StationAPI";
 
 const Container = styled.main`
   display: flex;
@@ -30,25 +31,32 @@ const CautionText = styled.p`
 
 export default function Home() {
   const [selectedLine, setSelectedLine] = useState<Line>();
-  const [selectedBound, setSelectedBound] = useState<Station | null>();
+  const [selectedBound, setSelectedBound] = useState<Station>();
 
   const [station, fetchLinesLoading, hasFetchLinesError] = useNearbyStation();
   const [stations, fetchStations, fetchStationsLoading, hasFetchStationsError] =
     useStationList();
   const bounds = useBounds(stations, station, selectedLine);
 
-  const nextStations = useRefreshNextStations(
-    stations,
-    station,
-    selectedLine,
-    selectedBound
-  );
-
   useEffect(() => {
     if (selectedLine) {
       fetchStations(selectedLine.id);
     }
   }, [fetchStations, selectedLine]);
+
+  const { arrived, approaching, newStation } = useClosestStation(
+    station,
+    selectedBound,
+    stations,
+    selectedLine
+  );
+
+  const nextStations = useNextStations(
+    stations,
+    newStation,
+    selectedLine,
+    selectedBound
+  );
 
   if (fetchLinesLoading || fetchStationsLoading) {
     return <Loading />;
@@ -72,12 +80,16 @@ export default function Home() {
         <BoundsPanel bounds={bounds} onSelect={setSelectedBound} />
       ) : null}
       {selectedBound ? (
-        <MainMarquee bound={selectedBound} nextStations={nextStations} />
+        <MainMarquee
+          arrived={arrived}
+          approaching={approaching}
+          bound={selectedBound}
+          currentStation={newStation}
+          nextStation={nextStations[1]}
+        />
       ) : null}
       {!selectedBound ? (
-        <CautionText>
-          ※このアプリはβ版です。現在の実装では移動しても駅は更新されません。
-        </CautionText>
+        <CautionText>※このアプリはβ版です。</CautionText>
       ) : null}
     </Container>
   );

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Line, Station } from "../models/StationAPI";
+import type { Line, Station } from "../models/StationAPI";
 import getCurrentStationIndex from "../utils/currentStationIndex";
 import {
   inboundStationForLoopLine,

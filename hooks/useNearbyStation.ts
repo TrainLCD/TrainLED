@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Station } from "../models/StationAPI";
+import type { Station } from "../models/StationAPI";
 import useFetchNearbyStation from "./useFetchNearbyStation";
 import useGeolocation from "./useGeolocation";
 

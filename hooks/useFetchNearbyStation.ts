@@ -1,7 +1,7 @@
 import { ApolloError, useLazyQuery } from "@apollo/client";
 import gql from "graphql-tag";
 import { useCallback, useEffect, useState } from "react";
-import { NearbyStationsData, Station } from "../models/StationAPI";
+import type { NearbyStationsData, Station } from "../models/StationAPI";
 
 const useFetchNearbyStation = (): [
   Station | undefined,

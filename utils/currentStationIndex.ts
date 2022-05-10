@@ -1,4 +1,4 @@
-import { Station } from "../models/StationAPI";
+import type { Station } from "../models/StationAPI";
 
 const getCurrentStationIndex = (
   stations: Station[],

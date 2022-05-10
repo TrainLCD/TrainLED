@@ -1,6 +1,6 @@
 import Marquee from "react-fast-marquee";
 import styled from "styled-components";
-import { Station } from "../models/StationAPI";
+import type { Station } from "../models/StationAPI";
 
 const InnerContainer = styled.div`
   display: flex;
@@ -33,10 +33,70 @@ const LanguageSpacer = styled.div`
 
 type Props = {
   bound: Station;
-  nextStations: Station[];
+  currentStation: Station | undefined;
+  nextStation: Station | undefined;
+  arrived: boolean;
+  approaching: boolean;
+};
+type SwitchedStationTextProps = {
+  arrived: boolean;
+  approaching: boolean;
+  currentStation: Station | undefined;
+  nextStation: Station | undefined;
 };
 
-const MainMarquee = ({ bound, nextStations }: Props) => {
+const SwitchedStationText = ({
+  arrived,
+  approaching,
+  currentStation,
+  nextStation,
+}: SwitchedStationTextProps) => {
+  if (arrived && currentStation) {
+    return (
+      <TextContainer>
+        <GreenText>ただいま</GreenText>
+        <RedText>{currentStation.name}</RedText>
+        <LanguageSpacer />
+        <GreenText>ただいま{currentStation.nameK}</GreenText>
+
+        <LanguageSpacer />
+        <YellowText>Now stopping at {currentStation.nameR}.</YellowText>
+      </TextContainer>
+    );
+  }
+  if (approaching && currentStation) {
+    return (
+      <TextContainer>
+        <GreenText>まもなく</GreenText>
+        <RedText>{currentStation.name}</RedText>
+        <LanguageSpacer />
+        <GreenText>まもなく{currentStation.nameK}</GreenText>
+
+        <LanguageSpacer />
+        <YellowText>Next {currentStation.nameR}.</YellowText>
+      </TextContainer>
+    );
+  }
+
+  if (!nextStation) {
+    return null;
+  }
+  return (
+    <TextContainer>
+      <GreenText>次は</GreenText>
+      <RedText>{nextStation.name}</RedText>
+      <LanguageSpacer />
+      <GreenText>つぎは{nextStation.nameK}</GreenText>
+
+      <LanguageSpacer />
+      <YellowText>Next {nextStation.nameR}.</YellowText>
+    </TextContainer>
+  );
+};
+
+const MainMarquee = (props: Props) => {
+  const { bound, ...rest } = props;
+
   return (
     <Marquee gradient={false} speed={180}>
       <InnerContainer>
@@ -47,18 +107,7 @@ const MainMarquee = ({ bound, nextStations }: Props) => {
           <YellowText>For {bound.nameR}.</YellowText>
         </TextContainer>
         <Spacer />
-        {nextStations[1] ? (
-          <TextContainer>
-            <GreenText>次は</GreenText>
-            <RedText>{nextStations[1].name}</RedText>
-            <LanguageSpacer />
-            <GreenText>つぎは</GreenText>
-            <RedText>{nextStations[1].nameK}</RedText>
-
-            <LanguageSpacer />
-            <YellowText>Next {nextStations[1].nameR}.</YellowText>
-          </TextContainer>
-        ) : null}
+        <SwitchedStationText {...rest} />
         <Spacer />
       </InnerContainer>
     </Marquee>
