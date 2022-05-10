@@ -29,13 +29,17 @@ const useGeolocation = (
           );
           break;
         case "denied":
+          navigator.geolocation.getCurrentPosition(
+            onPositionUpdate || noop,
+            onPositionError,
+            geolocationOptions
+          );
           setGranted(false);
-
           break;
       }
     };
     promptAsync();
-  }, [onPositionError, onPositionUpdate]);
+  }, [noop, onPositionError, onPositionUpdate]);
 
   return granted;
 };
