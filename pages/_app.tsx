@@ -6,7 +6,7 @@ import apolloClient from "../lib/apolloClient";
 const GlobalStyle = createGlobalStyle`
 @font-face {
 	font-family: 'JF-Dot-jiskan24';
-	src: url(/JF-Dot-jiskan24.ttf);
+	src: url(/JF-Dot-jiskan24.woff2) format('woff2');
 }
 
 html,
