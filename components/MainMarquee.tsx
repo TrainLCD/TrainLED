@@ -8,10 +8,11 @@ const InnerContainer = styled.div`
 `;
 
 const TextContainer = styled.div`
-  font-size: 3rem;
+  font-size: 5rem;
   white-space: nowrap;
   display: flex;
   text-align: right;
+  user-select: none;
 `;
 
 const GreenText = styled.span`
