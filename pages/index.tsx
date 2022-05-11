@@ -76,7 +76,7 @@ export default function Home() {
       {!selectedLine ? (
         <LinesPanel lines={station?.lines || []} onSelect={setSelectedLine} />
       ) : null}
-      {!selectedBound ? (
+      {selectedLine && !selectedBound ? (
         <BoundsPanel bounds={bounds} onSelect={setSelectedBound} />
       ) : null}
       {selectedBound ? (
