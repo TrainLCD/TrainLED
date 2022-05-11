@@ -69,16 +69,22 @@ const SwitchedStationText = ({
       </TextContainer>
     );
   }
-  if (approaching && currentStation) {
+  if (approaching && nextStation) {
     return (
       <TextContainer>
         <GreenText>まもなく</GreenText>
-        <RedText>{currentStation.name}</RedText>
+        <RedText>{nextStation.name}</RedText>
         <LanguageSpacer />
-        <GreenText>まもなく{currentStation.nameK}</GreenText>
+        <GreenText>まもなく{nextStation.nameK}</GreenText>
 
         <LanguageSpacer />
-        <YellowText>Next {currentStation.nameR}.</YellowText>
+        <YellowText>
+          Next {nextStation.nameR}{" "}
+          {nextStation.fullStationNumber
+            ? `(${nextStation.fullStationNumber})`
+            : ""}
+          .
+        </YellowText>
       </TextContainer>
     );
   }
@@ -99,7 +105,7 @@ const SwitchedStationText = ({
         {nextStation.fullStationNumber
           ? `(${nextStation.fullStationNumber})`
           : ""}
-        . .
+        .
       </YellowText>
     </TextContainer>
   );
