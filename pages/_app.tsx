@@ -1,5 +1,6 @@
 import { ApolloProvider } from "@apollo/client";
 import { AppProps } from "next/app";
+import Head from "next/head";
 import { createGlobalStyle } from "styled-components";
 import apolloClient from "../lib/apolloClient";
 
@@ -35,6 +36,15 @@ a {
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ApolloProvider client={apolloClient}>
+      <Head>
+        <link
+          rel="preload"
+          href="/JF-Dot-jiskan24.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin=""
+        />
+      </Head>
       <GlobalStyle />
       <Component {...pageProps} />
     </ApolloProvider>
