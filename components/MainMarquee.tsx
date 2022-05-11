@@ -60,7 +60,12 @@ const SwitchedStationText = ({
         <GreenText>ただいま{currentStation.nameK}</GreenText>
 
         <LanguageSpacer />
-        <YellowText>Now stopping at {currentStation.nameR}.</YellowText>
+        <YellowText>
+          {currentStation.nameR}
+          {currentStation.fullStationNumber
+            ? `(${currentStation.fullStationNumber}).`
+            : "."}
+        </YellowText>
       </TextContainer>
     );
   }
@@ -89,7 +94,13 @@ const SwitchedStationText = ({
       <GreenText>つぎは{nextStation.nameK}</GreenText>
 
       <LanguageSpacer />
-      <YellowText>Next {nextStation.nameR}.</YellowText>
+      <YellowText>
+        Next {nextStation.nameR}{" "}
+        {nextStation.fullStationNumber
+          ? `(${nextStation.fullStationNumber})`
+          : ""}
+        . .
+      </YellowText>
     </TextContainer>
   );
 };
@@ -104,7 +115,10 @@ const MainMarquee = (props: Props) => {
           <GreenText>この電車は</GreenText>
           <RedText>{bound.name}ゆき。</RedText>
           <LanguageSpacer />
-          <YellowText>For {bound.nameR}.</YellowText>
+          <YellowText>
+            For {bound.nameR}
+            {bound.fullStationNumber ? `(${bound.fullStationNumber})` : ""}.
+          </YellowText>
         </TextContainer>
         <Spacer />
         <SwitchedStationText {...rest} />
