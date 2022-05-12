@@ -84,6 +84,7 @@ export interface Station {
   trainTypes: APITrainType[];
   stationNumber: number;
   fullStationNumber: string;
+  secondaryFullStationNumber: string;
   stopCondition: StopCondition;
   __typename: "Station";
 }

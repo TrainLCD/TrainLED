@@ -1,3 +1,4 @@
+import { useCallback, useMemo } from "react";
 import Marquee from "react-fast-marquee";
 import styled from "styled-components";
 import type { Station } from "../models/StationAPI";
@@ -51,6 +52,16 @@ const SwitchedStationText = ({
   currentStation,
   nextStation,
 }: SwitchedStationTextProps) => {
+  const getFullStationNumber = useCallback((station: Station) => {
+    if (station.secondaryFullStationNumber) {
+      return `(${station.fullStationNumber}/${station.secondaryFullStationNumber})`;
+    }
+    if (station.fullStationNumber) {
+      return `(${station.fullStationNumber})`;
+    }
+    return "";
+  }, []);
+
   if (arrived && currentStation) {
     return (
       <TextContainer>
@@ -62,9 +73,7 @@ const SwitchedStationText = ({
         <LanguageSpacer />
         <YellowText>
           {currentStation.nameR}
-          {currentStation.fullStationNumber
-            ? `(${currentStation.fullStationNumber}).`
-            : "."}
+          {getFullStationNumber(currentStation)}.
         </YellowText>
       </TextContainer>
     );
@@ -79,11 +88,7 @@ const SwitchedStationText = ({
 
         <LanguageSpacer />
         <YellowText>
-          Next {nextStation.nameR}{" "}
-          {nextStation.fullStationNumber
-            ? `(${nextStation.fullStationNumber})`
-            : ""}
-          .
+          Next {nextStation.nameR} {getFullStationNumber(nextStation)}.
         </YellowText>
       </TextContainer>
     );
@@ -101,11 +106,7 @@ const SwitchedStationText = ({
 
       <LanguageSpacer />
       <YellowText>
-        Next {nextStation.nameR}{" "}
-        {nextStation.fullStationNumber
-          ? `(${nextStation.fullStationNumber})`
-          : ""}
-        .
+        Next {nextStation.nameR} {getFullStationNumber(nextStation)}.
       </YellowText>
     </TextContainer>
   );
@@ -113,6 +114,16 @@ const SwitchedStationText = ({
 
 const MainMarquee = (props: Props) => {
   const { bound, ...rest } = props;
+
+  const boundStationNumbers = useMemo(() => {
+    if (bound.secondaryFullStationNumber) {
+      return `(${bound.fullStationNumber}/${bound.secondaryFullStationNumber})`;
+    }
+    if (bound.fullStationNumber) {
+      return `(${bound.fullStationNumber})`;
+    }
+    return "";
+  }, [bound.fullStationNumber, bound.secondaryFullStationNumber]);
 
   return (
     <Marquee gradient={false} speed={180}>
@@ -124,7 +135,7 @@ const MainMarquee = (props: Props) => {
           <LanguageSpacer />
           <YellowText>
             For {bound.nameR}
-            {bound.fullStationNumber ? `(${bound.fullStationNumber})` : ""}.
+            {boundStationNumbers}
           </YellowText>
         </TextContainer>
         <Spacer />
