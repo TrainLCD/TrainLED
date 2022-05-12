@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import geolocationOptions from "../constants/geolocationOptions";
 import { Line, LineType, Station } from "../models/StationAPI";
 import {
@@ -27,6 +27,8 @@ const useClosestStation = (
   const [arrived, setArrived] = useState(false);
   const [approaching, setApproaching] = useState(false);
   const [newStation, setNewStation] = useState<Station>();
+
+  const isMountedRef = useRef(false);
 
   const displayedNextStation = getNextStation(stations, station);
   const direction = useDirection(selectedBound, stations);
@@ -112,8 +114,9 @@ const useClosestStation = (
     setArrived(arrived);
     setApproaching(approaching);
 
-    if (arrived) {
+    if (arrived || !isMountedRef.current) {
       setNewStation(nearestStation);
+      isMountedRef.current = true;
     }
   }, [isApproaching, isArrived, location, selectedBound, stations]);
 
