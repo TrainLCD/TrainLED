@@ -17,6 +17,7 @@ body {
   font-family: 'JF-Dot-jiskan24';
   background-color: #212121;
   color: white;
+  overscroll-behavior-y: none;
 }
 
 html, body, #__next {
