@@ -5,6 +5,7 @@ import BoundsPanel from "../components/BoundsPanel";
 import LinesPanel from "../components/LinesPanel";
 import Loading from "../components/Loading";
 import MainMarquee from "../components/MainMarquee";
+import { parenthesisRegexp } from "../constants/regexp";
 import useBounds from "../hooks/useBounds";
 import useClosestStation from "../hooks/useClosestStation";
 import useNearbyStation from "../hooks/useNearbyStation";
@@ -70,7 +71,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {selectedLine && !selectedBound ? (
-        <LineName>{selectedLine.name}</LineName>
+        <LineName>{selectedLine.name.replace(parenthesisRegexp, "")}</LineName>
       ) : null}
       {!selectedBound ? <LineName>{station?.name}</LineName> : null}
       {!selectedLine ? (
