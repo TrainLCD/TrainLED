@@ -117,6 +117,7 @@ const MainMarquee = (props: Props) => {
   return (
     <Marquee gradient={false} speed={180}>
       <InnerContainer>
+        <Spacer />
         <TextContainer>
           <GreenText>この電車は</GreenText>
           <RedText>{bound.name}ゆき。</RedText>
@@ -128,7 +129,6 @@ const MainMarquee = (props: Props) => {
         </TextContainer>
         <Spacer />
         <SwitchedStationText {...rest} />
-        <Spacer />
       </InnerContainer>
     </Marquee>
   );
