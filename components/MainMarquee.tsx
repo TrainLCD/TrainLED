@@ -135,7 +135,7 @@ const MainMarquee = (props: Props) => {
           <LanguageSpacer />
           <YellowText>
             For {bound.nameR}
-            {boundStationNumbers}
+            {boundStationNumbers}.
           </YellowText>
         </TextContainer>
         <Spacer />
