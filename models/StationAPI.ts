@@ -85,6 +85,7 @@ export interface Station {
   stationNumber: number;
   fullStationNumber: string;
   secondaryFullStationNumber: string;
+  extraFullStationNumber: string;
   stopCondition: StopCondition;
   __typename: "Station";
 }

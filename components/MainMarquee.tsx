@@ -53,6 +53,9 @@ const SwitchedStationText = ({
   nextStation,
 }: SwitchedStationTextProps) => {
   const getFullStationNumber = useCallback((station: Station) => {
+    if (station.extraFullStationNumber) {
+      return `(${station.fullStationNumber}/${station.secondaryFullStationNumber}/${station.extraFullStationNumber})`;
+    }
     if (station.secondaryFullStationNumber) {
       return `(${station.fullStationNumber}/${station.secondaryFullStationNumber})`;
     }
@@ -116,6 +119,9 @@ const MainMarquee = (props: Props) => {
   const { bound, ...rest } = props;
 
   const boundStationNumbers = useMemo(() => {
+    if (bound.extraFullStationNumber) {
+      return `(${bound.fullStationNumber}/${bound.secondaryFullStationNumber}/${bound.extraFullStationNumber})`;
+    }
     if (bound.secondaryFullStationNumber) {
       return `(${bound.fullStationNumber}/${bound.secondaryFullStationNumber})`;
     }
@@ -123,7 +129,11 @@ const MainMarquee = (props: Props) => {
       return `(${bound.fullStationNumber})`;
     }
     return "";
-  }, [bound.fullStationNumber, bound.secondaryFullStationNumber]);
+  }, [
+    bound.extraFullStationNumber,
+    bound.fullStationNumber,
+    bound.secondaryFullStationNumber,
+  ]);
 
   return (
     <Marquee gradient={false} speed={180}>
