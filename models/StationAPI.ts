@@ -36,6 +36,12 @@ export interface TrainTypeData {
   trainType: APITrainType;
 }
 
+export interface StationNumber {
+  lineSymbol: string;
+  lineSymbolColor: string;
+  stationNumber: string;
+}
+
 export interface APITrainTypeMinimum {
   id: number;
   typeId: number;
@@ -82,11 +88,8 @@ export interface Station {
   longitude: number;
   distance?: number;
   trainTypes: APITrainType[];
-  stationNumber: number;
-  fullStationNumber: string;
-  secondaryFullStationNumber: string;
-  extraFullStationNumber: string;
   stopCondition: StopCondition;
+  stationNumbers: StationNumber[];
   __typename: "Station";
 }
 

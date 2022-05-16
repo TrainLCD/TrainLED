@@ -52,18 +52,11 @@ const SwitchedStationText = ({
   currentStation,
   nextStation,
 }: SwitchedStationTextProps) => {
-  const getFullStationNumber = useCallback((station: Station) => {
-    if (station.extraFullStationNumber) {
-      return `(${station.fullStationNumber}/${station.secondaryFullStationNumber}/${station.extraFullStationNumber})`;
-    }
-    if (station.secondaryFullStationNumber) {
-      return `(${station.fullStationNumber}/${station.secondaryFullStationNumber})`;
-    }
-    if (station.fullStationNumber) {
-      return `(${station.fullStationNumber})`;
-    }
-    return "";
-  }, []);
+  const getFullStationNumber = useCallback(
+    (station: Station) =>
+      `(${station.stationNumbers.map((sn) => sn.stationNumber).join("/")})`,
+    []
+  );
 
   if (arrived && currentStation) {
     return (
@@ -118,22 +111,10 @@ const SwitchedStationText = ({
 const MainMarquee = (props: Props) => {
   const { bound, ...rest } = props;
 
-  const boundStationNumbers = useMemo(() => {
-    if (bound.extraFullStationNumber) {
-      return `(${bound.fullStationNumber}/${bound.secondaryFullStationNumber}/${bound.extraFullStationNumber})`;
-    }
-    if (bound.secondaryFullStationNumber) {
-      return `(${bound.fullStationNumber}/${bound.secondaryFullStationNumber})`;
-    }
-    if (bound.fullStationNumber) {
-      return `(${bound.fullStationNumber})`;
-    }
-    return "";
-  }, [
-    bound.extraFullStationNumber,
-    bound.fullStationNumber,
-    bound.secondaryFullStationNumber,
-  ]);
+  const boundStationNumbers = useMemo(
+    () => `(${bound.stationNumbers.map((sn) => sn.stationNumber).join("/")})`,
+    [bound.stationNumbers]
+  );
 
   return (
     <Marquee gradient={false} speed={180}>
