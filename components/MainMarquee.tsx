@@ -84,7 +84,8 @@ const SwitchedStationText = ({
 
         <LanguageSpacer />
         <YellowText>
-          Next {nextStation.nameR} {getFullStationNumber(nextStation)}.
+          Next {nextStation.nameR}
+          {getFullStationNumber(nextStation)}.
         </YellowText>
       </TextContainer>
     );
