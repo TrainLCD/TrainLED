@@ -52,11 +52,14 @@ const SwitchedStationText = ({
   currentStation,
   nextStation,
 }: SwitchedStationTextProps) => {
-  const getFullStationNumber = useCallback(
-    (station: Station) =>
-      `(${station.stationNumbers.map((sn) => sn.stationNumber).join("/")})`,
-    []
-  );
+  const getFullStationNumber = useCallback((station: Station) => {
+    if (!station.stationNumbers.length) {
+      return "";
+    }
+    return `(${station.stationNumbers
+      .map((sn) => sn.stationNumber)
+      .join("/")})`;
+  }, []);
 
   if (arrived && currentStation) {
     return (
@@ -84,8 +87,7 @@ const SwitchedStationText = ({
 
         <LanguageSpacer />
         <YellowText>
-          Next {nextStation.nameR}
-          {getFullStationNumber(nextStation)}.
+          {`Next ${nextStation.nameR}${getFullStationNumber(nextStation)}.`}
         </YellowText>
       </TextContainer>
     );
@@ -103,7 +105,7 @@ const SwitchedStationText = ({
 
       <LanguageSpacer />
       <YellowText>
-        Next {nextStation.nameR} {getFullStationNumber(nextStation)}.
+        {`Next ${nextStation.nameR}${getFullStationNumber(nextStation)}.`}
       </YellowText>
     </TextContainer>
   );
@@ -112,10 +114,12 @@ const SwitchedStationText = ({
 const MainMarquee = (props: Props) => {
   const { bound, ...rest } = props;
 
-  const boundStationNumbers = useMemo(
-    () => `(${bound.stationNumbers.map((sn) => sn.stationNumber).join("/")})`,
-    [bound.stationNumbers]
-  );
+  const boundStationNumbers = useMemo(() => {
+    if (!bound.stationNumbers.length) {
+      return "";
+    }
+    return `(${bound.stationNumbers.map((sn) => sn.stationNumber).join("/")})`;
+  }, [bound.stationNumbers]);
 
   return (
     <Marquee gradient={false} speed={180}>
@@ -125,10 +129,7 @@ const MainMarquee = (props: Props) => {
           <GreenText>この電車は</GreenText>
           <RedText>{bound.name}ゆき。</RedText>
           <LanguageSpacer />
-          <YellowText>
-            For {bound.nameR}
-            {boundStationNumbers}.
-          </YellowText>
+          <YellowText>{`For ${bound.nameR}${boundStationNumbers}.`}</YellowText>
         </TextContainer>
         <Spacer />
         <SwitchedStationText {...rest} />
