@@ -30,7 +30,7 @@ const TextContainer = styled.div<{ arrived?: boolean }>`
 
 const GreenText = styled.span<{ small?: boolean }>`
   color: green;
-  width: ${({ small }) => (small ? "15%" : "25%")};
+  width: ${({ small }) => (small ? "20%" : "25%")};
   font-size: ${({ small }) => (small ? "3rem" : "4rem")};
 `;
 
