@@ -137,6 +137,7 @@ const MainMarquee = (props: Props) => {
                       : ""}
                   </OrangeText>
                   <GreenText>, will be </GreenText>
+                  <SmallSpacer />
                   <OrangeText>
                     {afterNextStation.nameR}
                     {afterNextStation.stationNumbers.length
