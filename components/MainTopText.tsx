@@ -104,7 +104,7 @@ const SwitchedStationText = ({
       <TextContainer>
         {language === "ja" ? (
           <>
-            <GreenText>まもなく</GreenText>
+            <GreenText small>まもなく</GreenText>
             <OrangeTextContainer>
               {nextStation.name.split("").map((c) => (
                 <OrangeText>{c}</OrangeText>
@@ -114,7 +114,7 @@ const SwitchedStationText = ({
         ) : null}
         {language === "jaKana" ? (
           <>
-            <GreenText>まもなく</GreenText>
+            <GreenText small>まもなく</GreenText>
             <OrangeTextContainer>
               {nextStation.nameK.split("").map((c) => (
                 <OrangeText>{c}</OrangeText>
