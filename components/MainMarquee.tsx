@@ -72,7 +72,7 @@ const MainMarquee = (props: Props) => {
             ""
           )} train for`}</GreenText>
           <OrangeText>
-            &nbsp;
+            {" "}
             {bound.nameR}
             {bound.stationNumbers.length
               ? `(${bound.stationNumbers[0]?.stationNumber})`
