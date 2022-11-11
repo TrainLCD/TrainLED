@@ -121,6 +121,7 @@ const MainMarquee = (props: Props) => {
               <LanguageSpacer />
 
               <GreenText>The next stop is</GreenText>
+              <SmallSpacer />
               <OrangeText>
                 {nextStation.nameR}
                 {nextStation.stationNumbers.length
@@ -130,6 +131,7 @@ const MainMarquee = (props: Props) => {
               {afterNextStation ? (
                 <>
                   <GreenText>. The stop after </GreenText>
+                  <SmallSpacer />
                   <OrangeText>
                     {nextStation.nameR}
                     {nextStation.stationNumbers.length
