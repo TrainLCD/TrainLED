@@ -4,14 +4,14 @@ import type { Station } from "../models/StationAPI";
 
 const Container = styled.div`
   margin-left: 1vw;
-  display: flex;
   mask: radial-gradient(1px, #fff 100%, transparent 100%) 0 0/2px 2px;
 `;
 
-const TextContainer = styled.div`
+const TextContainer = styled.div<{ arrived?: boolean }>`
   font-size: 5rem;
-  display: flex;
   user-select: none;
+  width: 100%;
+  text-align: ${({ arrived }) => (arrived ? "center" : "left")};
 `;
 
 const GreenText = styled.span`
@@ -51,7 +51,7 @@ const SwitchedStationText = ({
 }: SwitchedStationTextProps) => {
   if (arrived && currentStation) {
     return (
-      <TextContainer>
+      <TextContainer arrived>
         {language === "ja" ? (
           <OrangeText>{currentStation.name}</OrangeText>
         ) : null}
