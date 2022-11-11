@@ -68,28 +68,26 @@ const SwitchedStationText = ({
     return (
       <TextContainer arrived>
         <OrangeTextContainer>
-          <OrangeTextContainer>
-            {currentStation.name.split("").map((c) => (
-              <OrangeText>{c}</OrangeText>
-            ))}
-          </OrangeTextContainer>
+          {currentStation.name.split("").map((c) => (
+            <OrangeText>{c}</OrangeText>
+          ))}
         </OrangeTextContainer>
         {language === "jaKana" ? (
           <OrangeTextContainer>
-            <OrangeTextContainer>
-              {currentStation.nameK.split("").map((c) => (
-                <OrangeText>{c}</OrangeText>
-              ))}
-            </OrangeTextContainer>
+            {currentStation.nameK.split("").map((c) => (
+              <OrangeText>{c}</OrangeText>
+            ))}
           </OrangeTextContainer>
         ) : null}
         {language === "en" ? (
-          <OrangeText>
-            {currentStation.nameR}
-            {currentStation.stationNumbers.length
-              ? `(${currentStation.stationNumbers[0]?.stationNumber})`
-              : ""}
-          </OrangeText>
+          <OrangeTextContainer>
+            <OrangeText>
+              {currentStation.nameR}
+              {currentStation.stationNumbers.length
+                ? `(${currentStation.stationNumbers[0]?.stationNumber})`
+                : ""}
+            </OrangeText>
+          </OrangeTextContainer>
         ) : null}
       </TextContainer>
     );
@@ -98,24 +96,24 @@ const SwitchedStationText = ({
     return (
       <TextContainer>
         {language === "ja" ? (
-          <OrangeTextContainer>
+          <>
             <GreenText>まもなく</GreenText>
             <OrangeTextContainer>
               {nextStation.name.split("").map((c) => (
                 <OrangeText>{c}</OrangeText>
               ))}
             </OrangeTextContainer>
-          </OrangeTextContainer>
+          </>
         ) : null}
         {language === "jaKana" ? (
-          <OrangeTextContainer>
+          <>
             <GreenText>まもなく</GreenText>
             <OrangeTextContainer>
               {nextStation.nameK.split("").map((c) => (
                 <OrangeText>{c}</OrangeText>
               ))}
             </OrangeTextContainer>
-          </OrangeTextContainer>
+          </>
         ) : null}
         {language === "en" ? (
           <>
