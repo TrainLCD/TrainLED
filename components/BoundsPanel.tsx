@@ -3,7 +3,9 @@ import type { Station } from "../models/StationAPI";
 import Button from "./Button";
 import { List, ListItem } from "./List";
 
-const Container = styled.div``;
+const Container = styled.div`
+  text-align: center;
+`;
 const Title = styled.h3``;
 
 type Props = {

@@ -5,9 +5,11 @@ import BoundsPanel from "../components/BoundsPanel";
 import LinesPanel from "../components/LinesPanel";
 import Loading from "../components/Loading";
 import MainMarquee from "../components/MainMarquee";
+import MainTopText from "../components/MainTopText";
 import { parenthesisRegexp } from "../constants/regexp";
 import useBounds from "../hooks/useBounds";
 import useClosestStation from "../hooks/useClosestStation";
+import useCurrentLanguageState from "../hooks/useCurrentLanguageState";
 import useNearbyStation from "../hooks/useNearbyStation";
 import useNextStations from "../hooks/useNextStations";
 import useStationList from "../hooks/useStationList";
@@ -16,18 +18,22 @@ import type { Line, Station } from "../models/StationAPI";
 const Container = styled.main`
   display: flex;
   justify-content: center;
-  align-items: center;
   flex-direction: column;
   height: 100%;
-  text-align: center;
 `;
 
 const LineName = styled.h2`
   line-height: 1.5;
   margin: 0;
+  text-align: center;
 `;
 const CautionText = styled.p`
   line-height: 1.5;
+  text-align: center;
+`;
+
+const HorizontalSpacer = styled.div`
+  height: 5vh;
 `;
 
 export default function Home() {
@@ -59,6 +65,8 @@ export default function Home() {
     selectedBound
   );
 
+  const langState = useCurrentLanguageState();
+
   if (fetchLinesLoading || fetchStationsLoading) {
     return <Loading />;
   }
@@ -80,14 +88,26 @@ export default function Home() {
       {selectedLine && !selectedBound ? (
         <BoundsPanel bounds={bounds} onSelect={setSelectedBound} />
       ) : null}
-      {selectedBound ? (
-        <MainMarquee
-          arrived={arrived}
-          approaching={approaching}
-          bound={selectedBound}
-          currentStation={newStation}
-          nextStation={nextStations[1]}
-        />
+      {selectedBound && selectedLine ? (
+        <>
+          <MainTopText
+            arrived={arrived}
+            approaching={approaching}
+            bound={selectedBound}
+            currentStation={newStation}
+            nextStation={nextStations[1]}
+            language={langState}
+          />
+          <HorizontalSpacer />
+          <MainMarquee
+            arrived={arrived}
+            approaching={approaching}
+            bound={selectedBound}
+            currentStation={newStation}
+            nextStation={nextStations[1]}
+            line={selectedLine}
+          />
+        </>
       ) : null}
       {!selectedBound ? (
         <CautionText>※このアプリはβ版です。</CautionText>

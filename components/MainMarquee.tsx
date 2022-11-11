@@ -1,7 +1,8 @@
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import Marquee from "react-fast-marquee";
 import styled from "styled-components";
-import type { Station } from "../models/StationAPI";
+import { parenthesisRegexp } from "../constants/regexp";
+import type { Line, Station } from "../models/StationAPI";
 
 const InnerContainer = styled.div`
   display: flex;
@@ -18,11 +19,8 @@ const TextContainer = styled.div`
 const GreenText = styled.span`
   color: green;
 `;
-const RedText = styled.span`
-  color: red;
-`;
-const YellowText = styled.span`
-  color: yellow;
+const OrangeText = styled.span`
+  color: orange;
 `;
 
 const Spacer = styled.div`
@@ -38,101 +36,50 @@ type Props = {
   nextStation: Station | undefined;
   arrived: boolean;
   approaching: boolean;
-};
-type SwitchedStationTextProps = {
-  arrived: boolean;
-  approaching: boolean;
-  currentStation: Station | undefined;
-  nextStation: Station | undefined;
-};
-
-const SwitchedStationText = ({
-  arrived,
-  approaching,
-  currentStation,
-  nextStation,
-}: SwitchedStationTextProps) => {
-  const getFullStationNumber = useCallback((station: Station) => {
-    if (!station.stationNumbers.length) {
-      return "";
-    }
-    return `(${station.stationNumbers
-      .map((sn) => sn.stationNumber)
-      .join("/")})`;
-  }, []);
-
-  if (arrived && currentStation) {
-    return (
-      <TextContainer>
-        <GreenText>ただいま</GreenText>
-        <RedText>{currentStation.name}</RedText>
-        <LanguageSpacer />
-        <GreenText>ただいま{currentStation.nameK}</GreenText>
-
-        <LanguageSpacer />
-        <YellowText>
-          {currentStation.nameR}
-          {getFullStationNumber(currentStation)}.
-        </YellowText>
-      </TextContainer>
-    );
-  }
-  if (approaching && nextStation) {
-    return (
-      <TextContainer>
-        <GreenText>まもなく</GreenText>
-        <RedText>{nextStation.name}</RedText>
-        <LanguageSpacer />
-        <GreenText>まもなく{nextStation.nameK}</GreenText>
-
-        <LanguageSpacer />
-        <YellowText>
-          {`Next ${nextStation.nameR}${getFullStationNumber(nextStation)}.`}
-        </YellowText>
-      </TextContainer>
-    );
-  }
-
-  if (!nextStation) {
-    return null;
-  }
-  return (
-    <TextContainer>
-      <GreenText>次は</GreenText>
-      <RedText>{nextStation.name}</RedText>
-      <LanguageSpacer />
-      <GreenText>つぎは{nextStation.nameK}</GreenText>
-
-      <LanguageSpacer />
-      <YellowText>
-        {`Next ${nextStation.nameR}${getFullStationNumber(nextStation)}.`}
-      </YellowText>
-    </TextContainer>
-  );
+  line: Line;
 };
 
 const MainMarquee = (props: Props) => {
-  const { bound, ...rest } = props;
+  const { bound, line } = props;
 
-  const boundStationNumbers = useMemo(() => {
-    if (!bound.stationNumbers.length) {
-      return "";
+  const aOrAn = useMemo(() => {
+    const first = line.nameR[0].toLowerCase();
+    switch (first) {
+      case "a":
+      case "e":
+      case "i":
+      case "o":
+      case "u":
+        return "an";
+      default:
+        return "a";
     }
-    return `(${bound.stationNumbers.map((sn) => sn.stationNumber).join("/")})`;
-  }, [bound.stationNumbers]);
+  }, [line.nameR]);
 
   return (
-    <Marquee gradient={false} speed={180}>
+    <Marquee gradient={false} speed={300}>
       <InnerContainer>
         <Spacer />
         <TextContainer>
-          <GreenText>この電車は</GreenText>
-          <RedText>{bound.name}ゆき。</RedText>
+          <GreenText>
+            この電車は、{line.name.replace(parenthesisRegexp, "")}、
+          </GreenText>
+          <OrangeText>{bound.name}</OrangeText>
+          <GreenText>行きです。</GreenText>
           <LanguageSpacer />
-          <YellowText>{`For ${bound.nameR}${boundStationNumbers}.`}</YellowText>
+          <GreenText>{`This is ${aOrAn} ${line.nameR.replace(
+            parenthesisRegexp,
+            ""
+          )} train for `}</GreenText>
+          <OrangeText>
+            {bound.nameR}
+            {bound.stationNumbers.length
+              ? `(${bound.stationNumbers[0]?.stationNumber})`
+              : ""}
+          </OrangeText>
+          <GreenText>.</GreenText>
         </TextContainer>
         <Spacer />
-        <SwitchedStationText {...rest} />
       </InnerContainer>
     </Marquee>
   );
