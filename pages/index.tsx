@@ -36,6 +36,12 @@ const HorizontalSpacer = styled.div`
   height: 5vh;
 `;
 
+const TrainLCDLink = styled.a`
+  line-height: 1.5;
+  margin: 0;
+  text-align: center;
+`;
+
 export default function Home() {
   const [selectedLine, setSelectedLine] = useState<Line>();
   const [selectedBound, setSelectedBound] = useState<Station>();
@@ -110,7 +116,16 @@ export default function Home() {
         </>
       ) : null}
       {!selectedBound ? (
-        <CautionText>※このアプリはβ版です。</CautionText>
+        <>
+          <CautionText>※このアプリはβ版です。</CautionText>
+          <TrainLCDLink
+            href="https://trainlcd.app/"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            TrainLCDアプリをダウンロード
+          </TrainLCDLink>
+        </>
       ) : null}
     </Container>
   );
