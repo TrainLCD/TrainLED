@@ -24,7 +24,7 @@ const TextContainer = styled.div<{ arrived?: boolean }>`
   font-size: 4rem;
   width: 100%;
   height: 100%;
-  text-align: ${({ arrived }) => (arrived ? "center" : "left")};
+  text-align: center;
   align-items: flex-end;
 `;
 
