@@ -15,6 +15,12 @@ const TextContainer = styled.div`
   display: flex;
 `;
 
+const Container = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: center;
+`;
+
 const GreenText = styled.span`
   color: green;
 `;
@@ -25,6 +31,10 @@ const OrangeText = styled.span`
 const Spacer = styled.div`
   width: 50vw;
 `;
+const SmallSpacer = styled.div`
+  width: 2.5rem;
+`;
+
 const LanguageSpacer = styled.div`
   width: 5vw;
 `;
@@ -33,12 +43,14 @@ type Props = {
   bound: Station;
   nextStation: Station | undefined;
   afterNextStation: Station | undefined;
+  arrived: boolean;
   approaching: boolean;
   line: Line;
 };
 
 const MainMarquee = (props: Props) => {
-  const { bound, nextStation, line, approaching, afterNextStation } = props;
+  const { bound, nextStation, line, arrived, approaching, afterNextStation } =
+    props;
 
   const aOrAn = useMemo(() => {
     const first = line.nameR[0].toLowerCase();
@@ -54,93 +66,95 @@ const MainMarquee = (props: Props) => {
     }
   }, [line.nameR]);
 
-  if (approaching && nextStation) {
+  if (arrived) {
     return (
-      <Marquee gradient={false} speed={300}>
-        <InnerContainer>
-          <Spacer />
-          <TextContainer>
-            <GreenText>まもなく</GreenText>
-            <OrangeText>{nextStation.name}</OrangeText>
-            <GreenText>です。</GreenText>
-            {afterNextStation ? (
-              <>
-                {" "}
-                <OrangeText>{nextStation.name}</OrangeText>
-                <GreenText>の次は</GreenText>
-                <OrangeText>
-                  {afterNextStation.nameR}
-                  {afterNextStation.stationNumbers.length
-                    ? `(${afterNextStation.stationNumbers[0]?.stationNumber})`
-                    : ""}
-                </OrangeText>
-                <GreenText>に停車いたします。</GreenText>
-              </>
-            ) : null}
-
-            <LanguageSpacer />
-
-            <GreenText>The next stop is</GreenText>
-            <OrangeText>
-              {nextStation.nameR}
-              {nextStation.stationNumbers.length
-                ? `(${nextStation.stationNumbers[0]?.stationNumber})`
-                : ""}
-            </OrangeText>
-            {afterNextStation ? (
-              <>
-                <GreenText>. The stop after </GreenText>
-                <OrangeText>
-                  {nextStation.nameR}
-                  {nextStation.stationNumbers.length
-                    ? `(${nextStation.stationNumbers[0]?.stationNumber})`
-                    : ""}
-                </OrangeText>
-                <GreenText>, will be </GreenText>
-                <OrangeText>
-                  {afterNextStation.nameR}
-                  {afterNextStation.stationNumbers.length
-                    ? `(${afterNextStation.stationNumbers[0]?.stationNumber})`
-                    : ""}
-                </OrangeText>
-              </>
-            ) : null}
-            <GreenText>.</GreenText>
-          </TextContainer>
-          <Spacer />
-        </InnerContainer>
-      </Marquee>
+      <Container>
+        <Marquee gradient={false} speed={300}>
+          <InnerContainer>
+            <Spacer />
+            <TextContainer>
+              <GreenText>
+                この電車は、{line.name.replace(parenthesisRegexp, "")}、
+              </GreenText>
+              <OrangeText>{bound.name}</OrangeText>
+              <GreenText>行きです。</GreenText>
+              <LanguageSpacer />
+              <GreenText>{`This is ${aOrAn} ${line.nameR.replace(
+                parenthesisRegexp,
+                ""
+              )} train for`}</GreenText>
+              <SmallSpacer />
+              <OrangeText>
+                {bound.nameR}
+                {bound.stationNumbers.length
+                  ? `(${bound.stationNumbers[0]?.stationNumber})`
+                  : ""}
+              </OrangeText>
+              <GreenText>.</GreenText>
+            </TextContainer>
+            <Spacer />
+          </InnerContainer>
+        </Marquee>
+      </Container>
     );
   }
 
-  return (
-    <Marquee gradient={false} speed={300}>
-      <InnerContainer>
-        <Spacer />
-        <TextContainer>
-          <GreenText>
-            この電車は、{line.name.replace(parenthesisRegexp, "")}、
-          </GreenText>
-          <OrangeText>{bound.name}</OrangeText>
-          <GreenText>行きです。</GreenText>
-          <LanguageSpacer />
-          <GreenText>{`This is ${aOrAn} ${line.nameR.replace(
-            parenthesisRegexp,
-            ""
-          )} train for`}</GreenText>
-          <OrangeText>
-            {" "}
-            {bound.nameR}
-            {bound.stationNumbers.length
-              ? `(${bound.stationNumbers[0]?.stationNumber})`
-              : ""}
-          </OrangeText>
-          <GreenText>.</GreenText>
-        </TextContainer>
-        <Spacer />
-      </InnerContainer>
-    </Marquee>
-  );
+  if (approaching && nextStation) {
+    return (
+      <Container>
+        <Marquee gradient={false} speed={300}>
+          <InnerContainer>
+            <Spacer />
+            <TextContainer>
+              <GreenText>まもなく</GreenText>
+              <OrangeText>{nextStation.name}</OrangeText>
+              <GreenText>です。</GreenText>
+              {afterNextStation ? (
+                <>
+                  <OrangeText>{nextStation.name}</OrangeText>
+                  <GreenText>の次は</GreenText>
+                  <OrangeText>{afterNextStation.name}</OrangeText>
+                  <GreenText>に停車いたします。</GreenText>
+                </>
+              ) : null}
+
+              <LanguageSpacer />
+
+              <GreenText>The next stop is</GreenText>
+              <OrangeText>
+                {nextStation.nameR}
+                {nextStation.stationNumbers.length
+                  ? `(${nextStation.stationNumbers[0]?.stationNumber})`
+                  : ""}
+              </OrangeText>
+              {afterNextStation ? (
+                <>
+                  <GreenText>. The stop after </GreenText>
+                  <OrangeText>
+                    {nextStation.nameR}
+                    {nextStation.stationNumbers.length
+                      ? `(${nextStation.stationNumbers[0]?.stationNumber})`
+                      : ""}
+                  </OrangeText>
+                  <GreenText>, will be </GreenText>
+                  <OrangeText>
+                    {afterNextStation.nameR}
+                    {afterNextStation.stationNumbers.length
+                      ? `(${afterNextStation.stationNumbers[0]?.stationNumber})`
+                      : ""}
+                  </OrangeText>
+                </>
+              ) : null}
+              <GreenText>.</GreenText>
+            </TextContainer>
+            <Spacer />
+          </InnerContainer>
+        </Marquee>
+      </Container>
+    );
+  }
+
+  return <Container />;
 };
 
 export default MainMarquee;

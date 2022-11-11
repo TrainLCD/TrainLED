@@ -111,6 +111,7 @@ export default function Home() {
           />
           <HorizontalSpacer />
           <MainMarquee
+            arrived={arrived}
             approaching={approaching}
             bound={selectedBound}
             nextStation={nextStations[1]}

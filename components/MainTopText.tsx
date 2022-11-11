@@ -14,6 +14,8 @@ const Container = styled.div`
   ${media.between("medium", "large")`
     flex: 0.75;
   `}
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
   mask: radial-gradient(1px, #fff 100%, transparent 100%) 0 0/2px 2px;
 `;
 
@@ -23,13 +25,13 @@ const TextContainer = styled.div<{ arrived?: boolean }>`
   width: 100%;
   height: 100%;
   text-align: ${({ arrived }) => (arrived ? "center" : "left")};
-  align-items: center;
+  align-items: flex-end;
 `;
 
-const GreenText = styled.span<{ en?: boolean }>`
+const GreenText = styled.span<{ small?: boolean }>`
   color: green;
   width: 30%;
-  font-size: 4rem;
+  font-size: ${({ small }) => (small ? "3.5rem" : "5rem")};
 `;
 
 const OrangeTextContainer = styled.div`
@@ -122,7 +124,7 @@ const SwitchedStationText = ({
         ) : null}
         {language === "en" ? (
           <>
-            <GreenText en>Soon</GreenText>
+            <GreenText small>Soon</GreenText>
             <OrangeText>
               {nextStation.nameR}
               {nextStation.stationNumbers.length
@@ -152,7 +154,7 @@ const SwitchedStationText = ({
       ) : null}
       {language === "jaKana" ? (
         <>
-          <GreenText>次は</GreenText>
+          <GreenText small>次は</GreenText>
           <OrangeTextContainer>
             {nextStation.nameK.split("").map((c) => (
               <OrangeText>{c}</OrangeText>
@@ -162,7 +164,7 @@ const SwitchedStationText = ({
       ) : null}
       {language === "en" ? (
         <>
-          <GreenText en>Next</GreenText>
+          <GreenText small>Next</GreenText>
           <OrangeTextContainer>
             <OrangeText>
               {nextStation.nameR}
