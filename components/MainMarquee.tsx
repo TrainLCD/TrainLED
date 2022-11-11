@@ -31,15 +31,14 @@ const LanguageSpacer = styled.div`
 
 type Props = {
   bound: Station;
-  currentStation: Station | undefined;
   nextStation: Station | undefined;
-  arrived: boolean;
+  afterNextStation: Station | undefined;
   approaching: boolean;
   line: Line;
 };
 
 const MainMarquee = (props: Props) => {
-  const { bound, line } = props;
+  const { bound, nextStation, line, approaching, afterNextStation } = props;
 
   const aOrAn = useMemo(() => {
     const first = line.nameR[0].toLowerCase();
@@ -54,6 +53,65 @@ const MainMarquee = (props: Props) => {
         return "a";
     }
   }, [line.nameR]);
+
+  if (approaching && nextStation) {
+    return (
+      <Marquee gradient={false} speed={300}>
+        <InnerContainer>
+          <Spacer />
+          <TextContainer>
+            <GreenText>まもなく</GreenText>
+            <OrangeText>{nextStation.name}</OrangeText>
+            <GreenText>です。</GreenText>
+            {afterNextStation ? (
+              <>
+                {" "}
+                <OrangeText>{nextStation.name}</OrangeText>
+                <GreenText>の次は</GreenText>
+                <OrangeText>
+                  {afterNextStation.nameR}
+                  {afterNextStation.stationNumbers.length
+                    ? `(${afterNextStation.stationNumbers[0]?.stationNumber})`
+                    : ""}
+                </OrangeText>
+                <GreenText>に停車いたします。</GreenText>
+              </>
+            ) : null}
+
+            <LanguageSpacer />
+
+            <GreenText>The next stop is</GreenText>
+            <OrangeText>
+              {nextStation.nameR}
+              {nextStation.stationNumbers.length
+                ? `(${nextStation.stationNumbers[0]?.stationNumber})`
+                : ""}
+            </OrangeText>
+            {afterNextStation ? (
+              <>
+                <GreenText>. The stop after </GreenText>
+                <OrangeText>
+                  {nextStation.nameR}
+                  {nextStation.stationNumbers.length
+                    ? `(${nextStation.stationNumbers[0]?.stationNumber})`
+                    : ""}
+                </OrangeText>
+                <GreenText>, will be </GreenText>
+                <OrangeText>
+                  {afterNextStation.nameR}
+                  {afterNextStation.stationNumbers.length
+                    ? `(${afterNextStation.stationNumbers[0]?.stationNumber})`
+                    : ""}
+                </OrangeText>
+              </>
+            ) : null}
+            <GreenText>.</GreenText>
+          </TextContainer>
+          <Spacer />
+        </InnerContainer>
+      </Marquee>
+    );
+  }
 
   return (
     <Marquee gradient={false} speed={300}>

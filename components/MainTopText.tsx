@@ -1,28 +1,44 @@
 import styled from "styled-components";
+import media from "styled-media-query";
 import { LanguageState } from "../hooks/useCurrentLanguageState";
 import type { Station } from "../models/StationAPI";
 
 const Container = styled.div`
-  margin-left: 1vw;
+  display: flex;
+  align-items: center;
+  ${media.between("small", "medium")`
+    flex: 1;
+  `}
+  ${media.between("medium", "large")`
+    flex: 0.75;
+  `}
   mask: radial-gradient(1px, #fff 100%, transparent 100%) 0 0/2px 2px;
 `;
 
 const TextContainer = styled.div<{ arrived?: boolean }>`
+  display: flex;
   font-size: 5rem;
   width: 100%;
+  height: 100%;
   text-align: ${({ arrived }) => (arrived ? "center" : "left")};
+  align-items: center;
 `;
 
-const GreenText = styled.span`
+const GreenText = styled.span<{ en?: boolean }>`
   color: green;
+  width: 30%;
 `;
 
-const OrangeText = styled.span`
+const OrangeTextContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+`;
+
+const OrangeText = styled.p`
   color: orange;
-`;
-
-const Spacer = styled.div`
-  width: 5vw;
+  margin: 0;
+  flex: 1;
 `;
 
 type Props = {
@@ -51,11 +67,21 @@ const SwitchedStationText = ({
   if (arrived && currentStation) {
     return (
       <TextContainer arrived>
-        {language === "ja" ? (
-          <OrangeText>{currentStation.name}</OrangeText>
-        ) : null}
+        <OrangeTextContainer>
+          <OrangeTextContainer>
+            {currentStation.name.split("").map((c) => (
+              <OrangeText>{c}</OrangeText>
+            ))}
+          </OrangeTextContainer>
+        </OrangeTextContainer>
         {language === "jaKana" ? (
-          <OrangeText>{currentStation.nameK}</OrangeText>
+          <OrangeTextContainer>
+            <OrangeTextContainer>
+              {currentStation.nameK.split("").map((c) => (
+                <OrangeText>{c}</OrangeText>
+              ))}
+            </OrangeTextContainer>
+          </OrangeTextContainer>
         ) : null}
         {language === "en" ? (
           <OrangeText>
@@ -72,23 +98,28 @@ const SwitchedStationText = ({
     return (
       <TextContainer>
         {language === "ja" ? (
-          <>
+          <OrangeTextContainer>
             <GreenText>まもなく</GreenText>
-            <Spacer />
-            <OrangeText>{nextStation.name}</OrangeText>
-          </>
+            <OrangeTextContainer>
+              {nextStation.name.split("").map((c) => (
+                <OrangeText>{c}</OrangeText>
+              ))}
+            </OrangeTextContainer>
+          </OrangeTextContainer>
         ) : null}
         {language === "jaKana" ? (
-          <>
+          <OrangeTextContainer>
             <GreenText>まもなく</GreenText>
-            <Spacer />
-            <OrangeText>{nextStation.nameK}</OrangeText>
-          </>
+            <OrangeTextContainer>
+              {nextStation.nameK.split("").map((c) => (
+                <OrangeText>{c}</OrangeText>
+              ))}
+            </OrangeTextContainer>
+          </OrangeTextContainer>
         ) : null}
         {language === "en" ? (
           <>
-            <GreenText>Soon</GreenText>
-            <Spacer />
+            <GreenText en>Soon</GreenText>
             <OrangeText>
               {nextStation.nameR}
               {nextStation.stationNumbers.length
@@ -109,27 +140,34 @@ const SwitchedStationText = ({
       {language === "ja" ? (
         <>
           <GreenText>次は</GreenText>
-          <Spacer />
-          <OrangeText>{nextStation.name}</OrangeText>
+          <OrangeTextContainer>
+            {nextStation.name.split("").map((c) => (
+              <OrangeText>{c}</OrangeText>
+            ))}
+          </OrangeTextContainer>
         </>
       ) : null}
       {language === "jaKana" ? (
         <>
           <GreenText>次は</GreenText>
-          <Spacer />
-          <OrangeText>{nextStation.nameK}</OrangeText>
+          <OrangeTextContainer>
+            {nextStation.nameK.split("").map((c) => (
+              <OrangeText>{c}</OrangeText>
+            ))}
+          </OrangeTextContainer>
         </>
       ) : null}
       {language === "en" ? (
         <>
-          <GreenText>Next</GreenText>
-          <Spacer />
-          <OrangeText>
-            {nextStation.nameR}
-            {nextStation.stationNumbers.length
-              ? `(${nextStation.stationNumbers[0]?.stationNumber})`
-              : ""}
-          </OrangeText>
+          <GreenText en>Next</GreenText>
+          <OrangeTextContainer>
+            <OrangeText>
+              {nextStation.nameR}
+              {nextStation.stationNumbers.length
+                ? `(${nextStation.stationNumbers[0]?.stationNumber})`
+                : ""}
+            </OrangeText>
+          </OrangeTextContainer>
         </>
       ) : null}
     </TextContainer>

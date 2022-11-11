@@ -111,11 +111,10 @@ export default function Home() {
           />
           <HorizontalSpacer />
           <MainMarquee
-            arrived={arrived}
             approaching={approaching}
             bound={selectedBound}
-            currentStation={newStation}
             nextStation={nextStations[1]}
+            afterNextStation={nextStations[2]}
             line={selectedLine}
           />
         </>
