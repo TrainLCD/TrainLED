@@ -67,11 +67,13 @@ const SwitchedStationText = ({
   if (arrived && currentStation) {
     return (
       <TextContainer arrived>
-        <OrangeTextContainer>
-          {currentStation.name.split("").map((c) => (
-            <OrangeText>{c}</OrangeText>
-          ))}
-        </OrangeTextContainer>
+        {language === "ja" ? (
+          <OrangeTextContainer>
+            {currentStation.name.split("").map((c) => (
+              <OrangeText>{c}</OrangeText>
+            ))}
+          </OrangeTextContainer>
+        ) : null}
         {language === "jaKana" ? (
           <OrangeTextContainer>
             {currentStation.nameK.split("").map((c) => (
