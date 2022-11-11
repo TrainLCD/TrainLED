@@ -9,7 +9,6 @@ const Container = styled.div`
 
 const TextContainer = styled.div<{ arrived?: boolean }>`
   font-size: 5rem;
-  user-select: none;
   width: 100%;
   text-align: ${({ arrived }) => (arrived ? "center" : "left")};
 `;
