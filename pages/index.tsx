@@ -84,8 +84,12 @@ export default function Home() {
         <meta name="description" content="A joking navigation app" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {selectedLine && !selectedBound ? (
-        <LineName>{selectedLine.name.replace(parenthesisRegexp, "")}</LineName>
+      {!selectedBound ? (
+        <LineName>
+          {selectedLine
+            ? selectedLine.name.replace(parenthesisRegexp, "")
+            : "TrainLED"}
+        </LineName>
       ) : null}
       {!selectedBound ? <LineName>{station?.name}</LineName> : null}
       {!selectedLine ? (
@@ -117,7 +121,7 @@ export default function Home() {
       ) : null}
       {!selectedBound ? (
         <>
-          <CautionText>※このアプリはβ版です。</CautionText>
+          <CautionText>※TrainLEDはβ版です。</CautionText>
           <TrainLCDLink
             href="https://trainlcd.app/"
             rel="noopener noreferrer"

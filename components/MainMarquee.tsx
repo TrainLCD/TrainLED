@@ -70,8 +70,9 @@ const MainMarquee = (props: Props) => {
           <GreenText>{`This is ${aOrAn} ${line.nameR.replace(
             parenthesisRegexp,
             ""
-          )} train for `}</GreenText>
+          )} train for`}</GreenText>
           <OrangeText>
+            &nbsp;
             {bound.nameR}
             {bound.stationNumbers.length
               ? `(${bound.stationNumbers[0]?.stationNumber})`
