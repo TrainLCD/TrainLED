@@ -20,6 +20,7 @@ const Container = styled.main`
   justify-content: center;
   flex-direction: column;
   height: 100%;
+  user-select: none;
 `;
 
 const LineName = styled.h2`

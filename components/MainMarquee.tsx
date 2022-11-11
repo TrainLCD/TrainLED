@@ -13,7 +13,6 @@ const TextContainer = styled.div`
   font-size: 5rem;
   white-space: nowrap;
   display: flex;
-  user-select: none;
 `;
 
 const GreenText = styled.span`
