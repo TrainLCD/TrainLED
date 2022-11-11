@@ -10,7 +10,7 @@ const InnerContainer = styled.div`
 `;
 
 const TextContainer = styled.div`
-  font-size: 5rem;
+  font-size: 4rem;
   white-space: nowrap;
   display: flex;
 `;
@@ -32,7 +32,7 @@ const Spacer = styled.div`
   width: 50vw;
 `;
 const SmallSpacer = styled.div`
-  width: 2.5rem;
+  width: 1.5rem;
 `;
 
 const LanguageSpacer = styled.div`

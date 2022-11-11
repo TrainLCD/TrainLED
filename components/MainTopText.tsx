@@ -21,7 +21,7 @@ const Container = styled.div`
 
 const TextContainer = styled.div<{ arrived?: boolean }>`
   display: flex;
-  font-size: 5rem;
+  font-size: 4rem;
   width: 100%;
   height: 100%;
   text-align: ${({ arrived }) => (arrived ? "center" : "left")};
@@ -30,8 +30,8 @@ const TextContainer = styled.div<{ arrived?: boolean }>`
 
 const GreenText = styled.span<{ small?: boolean }>`
   color: green;
-  width: 30%;
-  font-size: ${({ small }) => (small ? "3.5rem" : "5rem")};
+  width: ${({ small }) => (small ? "15%" : "20%")};
+  font-size: ${({ small }) => (small ? "3rem" : "4rem")};
 `;
 
 const OrangeTextContainer = styled.div`
