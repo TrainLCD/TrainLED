@@ -29,6 +29,7 @@ const TextContainer = styled.div<{ arrived?: boolean }>`
 const GreenText = styled.span<{ en?: boolean }>`
   color: green;
   width: 30%;
+  font-size: 4rem;
 `;
 
 const OrangeTextContainer = styled.div`
