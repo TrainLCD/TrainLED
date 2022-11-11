@@ -1,3 +1,5 @@
+// 対処法が今のところないので一旦無視する
+/* eslint-disable react/jsx-key */
 import styled from "styled-components";
 import media from "styled-media-query";
 import { LanguageState } from "../hooks/useCurrentLanguageState";
