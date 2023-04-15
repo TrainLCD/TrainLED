@@ -4,12 +4,7 @@ const withPWA = require("next-pwa");
 const nextConfig = {
   reactStrictMode: true,
   compiler: {
-    // ssr and displayName are configured by default
     styledComponents: true,
-  },
-  pwa: {
-    dest: "public",
-    disable: process.env.NODE_ENV === "development",
   },
 };
 
