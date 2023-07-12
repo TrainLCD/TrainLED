@@ -74,7 +74,7 @@ const MainMarquee = (props: Props) => {
             <Spacer />
             <TextContainer>
               <GreenText>
-                この電車は、{line.name.replace(parenthesisRegexp, "")}、
+                この電車は、{line.name.replace(parenthesisRegexp, "")}
               </GreenText>
               <OrangeText>{bound.name}</OrangeText>
               <GreenText>行きです。</GreenText>
