@@ -1,43 +1,39 @@
 // 対処法が今のところないので一旦無視する
 /* eslint-disable react/jsx-key */
 import styled from "styled-components";
-import media from "styled-media-query";
 import { LanguageState } from "../hooks/useCurrentLanguageState";
 import type { Station } from "../models/grpc";
 
 const Container = styled.div`
+  width: 100%;
+  height: 50%;
   display: flex;
-  align-items: center;
-  ${media.between("small", "medium")`
-    flex: 1;
-  `}
-  ${media.between("medium", "large")`
-    flex: 0.75;
-  `}
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
+  align-items: flex-end;
+  justify-content: center;
+
   mask: radial-gradient(1px, #fff 100%, transparent 100%) 0 0/2px 2px;
 `;
 
 const TextContainer = styled.div<{ arrived?: boolean }>`
   display: flex;
-  font-size: 4rem;
   width: 100%;
-  height: 100%;
+  font-size: 10vw;
   text-align: center;
-  align-items: flex-end;
+  align-items: center;
+  justify-content: center;
 `;
 
 const GreenText = styled.span<{ small?: boolean }>`
   color: green;
-  width: ${({ small }) => (small ? "20%" : "25%")};
-  font-size: ${({ small }) => (small ? "3rem" : "4rem")};
+  font-size: 7.5vw;
+  min-width: 17.5vw;
 `;
 
 const OrangeTextContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   width: 100%;
+  margin-left: 1vw;
 `;
 
 const OrangeText = styled.p`

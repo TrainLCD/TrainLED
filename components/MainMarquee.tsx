@@ -10,13 +10,14 @@ const InnerContainer = styled.div`
 `;
 
 const TextContainer = styled.div`
-  font-size: 4rem;
+  font-size: 7.5vw;
   white-space: nowrap;
   display: flex;
 `;
 
 const Container = styled.div`
-  flex: 1;
+  width: 100%;
+  height: 50%;
   display: flex;
   align-items: center;
 `;
@@ -31,11 +32,8 @@ const OrangeText = styled.span`
 const Spacer = styled.div`
   width: 50vw;
 `;
-const SmallSpacer = styled.div`
-  width: 1.5rem;
-`;
 
-const LanguageSpacer = styled.div`
+const HorizontalSpacer = styled.div`
   width: 5vw;
 `;
 
@@ -66,39 +64,6 @@ const MainMarquee = (props: Props) => {
     }
   }, [line.nameRoman]);
 
-  if (arrived) {
-    return (
-      <Container>
-        <Marquee gradient={false} speed={300}>
-          <InnerContainer>
-            <Spacer />
-            <TextContainer>
-              <GreenText>
-                この電車は、{line.nameShort.replace(parenthesisRegexp, "")}
-              </GreenText>
-              <OrangeText>{bound.name}</OrangeText>
-              <GreenText>行きです。</GreenText>
-              <LanguageSpacer />
-              <GreenText>{`This is ${aOrAn} ${line.nameRoman.replace(
-                parenthesisRegexp,
-                ""
-              )} train for`}</GreenText>
-              <SmallSpacer />
-              <OrangeText>
-                {bound.nameRoman}
-                {bound.stationNumbersList.length
-                  ? `(${bound.stationNumbersList[0]?.stationNumber})`
-                  : ""}
-              </OrangeText>
-              <GreenText>.</GreenText>
-            </TextContainer>
-            <Spacer />
-          </InnerContainer>
-        </Marquee>
-      </Container>
-    );
-  }
-
   if (approaching && nextStation) {
     return (
       <Container>
@@ -118,10 +83,10 @@ const MainMarquee = (props: Props) => {
                 </>
               ) : null}
 
-              <LanguageSpacer />
+              <HorizontalSpacer />
 
               <GreenText>The next stop is</GreenText>
-              <SmallSpacer />
+              <HorizontalSpacer />
               <OrangeText>
                 {nextStation.nameRoman}
                 {nextStation.stationNumbersList.length
@@ -131,7 +96,7 @@ const MainMarquee = (props: Props) => {
               {afterNextStation ? (
                 <>
                   <GreenText>. The stop after </GreenText>
-                  <SmallSpacer />
+                  <HorizontalSpacer />
                   <OrangeText>
                     {nextStation.nameRoman}
                     {nextStation.stationNumbersList.length
@@ -139,7 +104,7 @@ const MainMarquee = (props: Props) => {
                       : ""}
                   </OrangeText>
                   <GreenText>, will be </GreenText>
-                  <SmallSpacer />
+                  <HorizontalSpacer />
                   <OrangeText>
                     {afterNextStation.nameRoman}
                     {afterNextStation.stationNumbersList.length
@@ -156,6 +121,39 @@ const MainMarquee = (props: Props) => {
       </Container>
     );
   }
+
+  return (
+    <Container>
+      <Marquee gradient={false} speed={300}>
+        <InnerContainer>
+          <Spacer />
+          <TextContainer>
+            <GreenText>
+              この電車は、{line.nameShort.replace(parenthesisRegexp, "")} 普通
+            </GreenText>
+            <HorizontalSpacer />
+            <OrangeText>{bound.name}</OrangeText>
+            <HorizontalSpacer />
+            <GreenText>行きです。</GreenText>
+            <HorizontalSpacer />
+            <GreenText>{`This is ${aOrAn} ${line.nameRoman.replace(
+              parenthesisRegexp,
+              ""
+            )} local train for`}</GreenText>
+            <HorizontalSpacer />
+            <OrangeText>
+              {bound.nameRoman}
+              {bound.stationNumbersList.length
+                ? `(${bound.stationNumbersList[0]?.stationNumber})`
+                : ""}
+            </OrangeText>
+            <GreenText>.</GreenText>
+          </TextContainer>
+          <Spacer />
+        </InnerContainer>
+      </Marquee>
+    </Container>
+  );
 
   return <Container />;
 };
