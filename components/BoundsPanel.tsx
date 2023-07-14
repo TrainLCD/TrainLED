@@ -24,9 +24,17 @@ const BoundsPanel = ({ bounds, onSelect }: Props) => {
           (bound, index) =>
             bound && (
               <ListItem key={bound[index]?.id}>
-                <Button onClick={onSelect.bind(null, bound[index])}>
-                  {bound.map((station) => station.name)}
-                </Button>
+                {bound.map(
+                  (station) =>
+                    station && (
+                      <Button
+                        key={station.id}
+                        onClick={onSelect.bind(null, station)}
+                      >
+                        {station.name}
+                      </Button>
+                    )
+                )}
               </ListItem>
             )
         )}
