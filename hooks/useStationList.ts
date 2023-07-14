@@ -1,106 +1,42 @@
-import { ApolloError, useLazyQuery } from "@apollo/client";
-import gql from "graphql-tag";
-import { useCallback, useEffect, useState } from "react";
-import type { Station, StationsByLineIdData } from "../models/StationAPI";
+import { useCallback, useState } from "react";
+import { GetStationByLineIdRequest } from "../generated/stationapi_pb";
+import { Station } from "../models/grpc";
+import useGRPC from "./useGRPC";
 
 const useStationList = (): [
   Station[],
   (lineId: number) => void,
   boolean,
-  ApolloError | undefined
+  Error | undefined
 ] => {
   const [stations, setStations] = useState<Station[]>([]);
-  const STATIONS_BY_LINE_ID_TYPE = gql`
-    query StationsByLineId($lineId: ID!) {
-      stationsByLineId(lineId: $lineId) {
-        id
-        groupId
-        name
-        nameK
-        nameR
-        nameZh
-        nameKo
-        address
-        latitude
-        longitude
-        stationNumbers {
-          stationNumber
-        }
-        lines {
-          id
-          companyId
-          lineColorC
-          name
-          nameR
-          nameK
-          nameZh
-          nameKo
-          lineType
-        }
-        trainTypes {
-          id
-          typeId
-          groupId
-          name
-          nameR
-          nameZh
-          nameKo
-          color
-          lines {
-            id
-            name
-            nameR
-            nameK
-            lineColorC
-            companyId
-            company {
-              nameR
-              nameEn
-            }
-          }
-          allTrainTypes {
-            id
-            groupId
-            typeId
-            name
-            nameK
-            nameR
-            nameZh
-            nameKo
-            color
-            line {
-              id
-              name
-              nameR
-              lineColorC
-            }
-          }
-        }
-      }
-    }
-  `;
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error>();
 
-  const [getStations, { loading, error, data }] =
-    useLazyQuery<StationsByLineIdData>(STATIONS_BY_LINE_ID_TYPE, {
-      notifyOnNetworkStatusChange: true,
-    });
+  const grpcClient = useGRPC();
 
   const fetchStationListWithTrainTypes = useCallback(
-    (lineId: number) => {
-      getStations({
-        variables: {
-          lineId,
-        },
-      });
-    },
-    [getStations]
-  );
+    async (lineId: number) => {
+      if (!grpcClient) {
+        return;
+      }
 
-  useEffect(() => {
-    if (data?.stationsByLineId?.length) {
-      setStations(data.stationsByLineId);
-    }
-  }, [data, setStations]);
+      try {
+        setLoading(true);
+        const req = new GetStationByLineIdRequest();
+        req.setLineId(lineId);
+        const data = (
+          await grpcClient?.getStationsByLineId(req, null)
+        )?.toObject();
+        setStations(data.stationsList);
+        setLoading(false);
+      } catch (err) {
+        setError(err as Error);
+        setLoading(false);
+      }
+    },
+    [grpcClient]
+  );
 
   return [stations, fetchStationListWithTrainTypes, loading, error];
 };

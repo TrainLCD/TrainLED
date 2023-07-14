@@ -1,4 +1,5 @@
-import { Station, StopCondition } from "../models/StationAPI";
+import { StopCondition } from "../generated/stationapi_pb";
+import { Station } from "../models/grpc";
 
 const getIsPass = (station: Station | undefined): boolean => {
   if (!station) {

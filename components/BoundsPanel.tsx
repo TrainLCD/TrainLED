@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import type { Station } from "../models/StationAPI";
+import type { Station } from "../models/grpc";
 import Button from "./Button";
 import { List, ListItem } from "./List";
 

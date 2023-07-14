@@ -1,10 +1,7 @@
 import { useMemo } from "react";
-import type { Station } from "../models/StationAPI";
+import type { Station } from "../models/grpc";
 
-const useDirection = (
-  boundStation: Station | undefined,
-  stations: Station[]
-) => {
+const useDirection = (boundStation: Station | null, stations: Station[]) => {
   const direction = useMemo(() => {
     if (stations.findIndex((s) => s.groupId === boundStation?.groupId) === 0) {
       return "OUTBOUND";

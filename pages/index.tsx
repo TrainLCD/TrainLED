@@ -13,7 +13,7 @@ import useCurrentLanguageState from "../hooks/useCurrentLanguageState";
 import useNearbyStation from "../hooks/useNearbyStation";
 import useNextStations from "../hooks/useNextStations";
 import useStationList from "../hooks/useStationList";
-import type { Line, Station } from "../models/StationAPI";
+import { Line, Station } from "../models/grpc";
 
 const Container = styled.main`
   display: flex;
@@ -44,8 +44,8 @@ const TrainLCDLink = styled.a`
 `;
 
 export default function Home() {
-  const [selectedLine, setSelectedLine] = useState<Line>();
-  const [selectedBound, setSelectedBound] = useState<Station>();
+  const [selectedLine, setSelectedLine] = useState<Line | null>(null);
+  const [selectedBound, setSelectedBound] = useState<Station | null>(null);
 
   const [station, fetchLinesLoading, hasFetchLinesError] = useNearbyStation();
   const [stations, fetchStations, fetchStationsLoading, hasFetchStationsError] =
@@ -88,13 +88,16 @@ export default function Home() {
       {!selectedBound ? (
         <LineName>
           {selectedLine
-            ? selectedLine.name.replace(parenthesisRegexp, "")
+            ? selectedLine.nameShort.replace(parenthesisRegexp, "")
             : "TrainLED"}
         </LineName>
       ) : null}
       {!selectedBound ? <LineName>{station?.name}</LineName> : null}
       {!selectedLine ? (
-        <LinesPanel lines={station?.lines || []} onSelect={setSelectedLine} />
+        <LinesPanel
+          lines={station?.linesList || []}
+          onSelect={setSelectedLine}
+        />
       ) : null}
       {selectedLine && !selectedBound ? (
         <BoundsPanel bounds={bounds} onSelect={setSelectedBound} />

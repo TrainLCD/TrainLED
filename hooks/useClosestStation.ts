@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import geolocationOptions from "../constants/geolocationOptions";
-import { Line, LineType, Station } from "../models/StationAPI";
+import { LineType } from "../generated/stationapi_pb";
+import { Line, Station } from "../models/grpc";
 import {
   getAvgStationBetweenDistances,
   scoreStationDistances,
@@ -14,19 +15,19 @@ import {
 import useDirection from "./useDirection";
 
 const useClosestStation = (
-  station: Station | undefined,
-  selectedBound: Station | undefined,
+  station: Station | null,
+  selectedBound: Station | null,
   stations: Station[],
-  selectedLine: Line | undefined
+  selectedLine: Line | null
 ): {
   arrived: boolean;
   approaching: boolean;
-  newStation: Station | undefined;
+  newStation: Station | null;
 } => {
   const [location, setLocation] = useState<GeolocationPosition>();
   const [arrived, setArrived] = useState(false);
   const [approaching, setApproaching] = useState(false);
-  const [newStation, setNewStation] = useState<Station>();
+  const [newStation, setNewStation] = useState<Station | null>(null);
 
   const isMountedRef = useRef(false);
 
@@ -73,7 +74,7 @@ const useClosestStation = (
         !getIsPass(displayedNextStation);
       if (
         isNextStationIsNextStop &&
-        selectedLine?.lineType !== LineType.BulletTrain
+        selectedLine?.lineType !== LineType.BULLETTRAIN
       ) {
         return true;
       }

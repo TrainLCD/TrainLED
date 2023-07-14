@@ -1,8 +1,8 @@
-import type { Station } from "../models/StationAPI";
+import type { Station } from "../models/grpc";
 
 const getCurrentStationIndex = (
   stations: Station[],
-  nearestStation: Station | undefined
+  nearestStation: Station | null
 ): number =>
   stations.findIndex(
     (s) =>

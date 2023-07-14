@@ -3,7 +3,7 @@
 import styled from "styled-components";
 import media from "styled-media-query";
 import { LanguageState } from "../hooks/useCurrentLanguageState";
-import type { Station } from "../models/StationAPI";
+import type { Station } from "../models/grpc";
 
 const Container = styled.div`
   display: flex;
@@ -48,8 +48,8 @@ const OrangeText = styled.p`
 
 type Props = {
   bound: Station;
-  currentStation: Station | undefined;
-  nextStation: Station | undefined;
+  currentStation: Station | null;
+  nextStation: Station | null;
   arrived: boolean;
   approaching: boolean;
   language: LanguageState;
@@ -57,8 +57,8 @@ type Props = {
 type SwitchedStationTextProps = {
   arrived: boolean;
   approaching: boolean;
-  currentStation: Station | undefined;
-  nextStation: Station | undefined;
+  currentStation: Station | null;
+  nextStation: Station | null;
   language: LanguageState;
 };
 
@@ -81,7 +81,7 @@ const SwitchedStationText = ({
         ) : null}
         {language === "jaKana" ? (
           <OrangeTextContainer>
-            {currentStation.nameK.split("").map((c) => (
+            {currentStation.nameKatakana.split("").map((c) => (
               <OrangeText>{c}</OrangeText>
             ))}
           </OrangeTextContainer>
@@ -89,9 +89,9 @@ const SwitchedStationText = ({
         {language === "en" ? (
           <OrangeTextContainer>
             <OrangeText>
-              {currentStation.nameR}
-              {currentStation.stationNumbers.length
-                ? `(${currentStation.stationNumbers[0]?.stationNumber})`
+              {currentStation.nameRoman}
+              {currentStation.stationNumbersList.length
+                ? `(${currentStation.stationNumbersList[0]?.stationNumber})`
                 : ""}
             </OrangeText>
           </OrangeTextContainer>
@@ -116,7 +116,7 @@ const SwitchedStationText = ({
           <>
             <GreenText small>まもなく</GreenText>
             <OrangeTextContainer>
-              {nextStation.nameK.split("").map((c) => (
+              {nextStation.nameKatakana.split("").map((c) => (
                 <OrangeText>{c}</OrangeText>
               ))}
             </OrangeTextContainer>
@@ -126,9 +126,9 @@ const SwitchedStationText = ({
           <>
             <GreenText small>Soon</GreenText>
             <OrangeText>
-              {nextStation.nameR}
-              {nextStation.stationNumbers.length
-                ? `(${nextStation.stationNumbers[0]?.stationNumber})`
+              {nextStation.nameRoman}
+              {nextStation.stationNumbersList.length
+                ? `(${nextStation.stationNumbersList[0]?.stationNumber})`
                 : ""}
             </OrangeText>
           </>
@@ -156,7 +156,7 @@ const SwitchedStationText = ({
         <>
           <GreenText small>次は</GreenText>
           <OrangeTextContainer>
-            {nextStation.nameK.split("").map((c) => (
+            {nextStation.nameKatakana.split("").map((c) => (
               <OrangeText>{c}</OrangeText>
             ))}
           </OrangeTextContainer>
@@ -167,9 +167,9 @@ const SwitchedStationText = ({
           <GreenText small>Next</GreenText>
           <OrangeTextContainer>
             <OrangeText>
-              {nextStation.nameR}
-              {nextStation.stationNumbers.length
-                ? `(${nextStation.stationNumbers[0]?.stationNumber})`
+              {nextStation.nameRoman}
+              {nextStation.stationNumbersList.length
+                ? `(${nextStation.stationNumbersList[0]?.stationNumber})`
                 : ""}
             </OrangeText>
           </OrangeTextContainer>

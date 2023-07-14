@@ -1,8 +1,6 @@
-import { ApolloProvider } from "@apollo/client";
 import { AppProps } from "next/app";
 import Head from "next/head";
 import { createGlobalStyle } from "styled-components";
-import apolloClient from "../lib/apolloClient";
 
 const GlobalStyle = createGlobalStyle`
 @font-face {
@@ -40,7 +38,8 @@ const APP_BASE_URL = "https://led.trainlcd.app";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <ApolloProvider client={apolloClient}>
+    <>
+      {" "}
       <Head>
         <link
           rel="preload"
@@ -90,7 +89,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       </Head>
       <GlobalStyle />
       <Component {...pageProps} />
-    </ApolloProvider>
+    </>
   );
 }
 

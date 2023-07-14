@@ -1,30 +1,55 @@
-import { useCallback, useEffect, useState } from "react";
-import type { Station } from "../models/StationAPI";
-import useFetchNearbyStation from "./useFetchNearbyStation";
+import { useCallback, useState } from "react";
+import { GetStationByCoordinatesRequest } from "../generated/stationapi_pb";
+import { Station } from "../models/grpc";
+import useGRPC from "./useGRPC";
 import useGeolocation from "./useGeolocation";
 
-const useNearbyStation = (): [Station | undefined, boolean, boolean] => {
-  const [station, fetchStation, stationLoading, stationLoadingError] =
-    useFetchNearbyStation();
+const useNearbyStation = (): [
+  Station | null,
+  boolean,
+  GeolocationPositionError | null
+] => {
+  const [station, setStation] = useState<Station | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<GeolocationPositionError | null>(null);
 
-  const [hasError, setHasError] = useState<boolean>(false);
+  const grpcClient = useGRPC();
+
+  const fetchStation = useCallback(
+    async (coords: GeolocationCoordinates | undefined) => {
+      if (!coords || !grpcClient) {
+        return;
+      }
+      try {
+        const { latitude, longitude } = coords;
+        const req = new GetStationByCoordinatesRequest();
+        req.setLatitude(latitude);
+        req.setLongitude(longitude);
+        req.setLimit(1);
+        setLoading(true);
+        const data = (
+          await grpcClient?.getStationsByCoordinates(req, null)
+        )?.toObject();
+        setLoading(false);
+        setStation(data.stationsList[0]);
+      } catch (err) {
+        setError(err as GeolocationPositionError);
+        setLoading(false);
+      }
+    },
+    [grpcClient]
+  );
+
   const onLocation = useCallback(
-    (position: GeolocationPosition) => {
-      fetchStation(position.coords);
+    (pos: GeolocationPosition) => {
+      fetchStation(pos.coords);
     },
     [fetchStation]
   );
-  const onLocationError = useCallback(() => setHasError(true), []);
 
-  useEffect(() => {
-    if (stationLoadingError) {
-      setHasError(true);
-    }
-  }, [stationLoadingError]);
+  useGeolocation(onLocation, setError);
 
-  useGeolocation(onLocation, onLocationError);
-
-  return [station, stationLoading, hasError];
+  return [station, loading, error];
 };
 
 export default useNearbyStation;

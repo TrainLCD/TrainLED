@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import Marquee from "react-fast-marquee";
 import styled from "styled-components";
 import { parenthesisRegexp } from "../constants/regexp";
-import type { Line, Station } from "../models/StationAPI";
+import type { Line, Station } from "../models/grpc";
 
 const InnerContainer = styled.div`
   display: flex;
@@ -53,7 +53,7 @@ const MainMarquee = (props: Props) => {
     props;
 
   const aOrAn = useMemo(() => {
-    const first = line.nameR[0].toLowerCase();
+    const first = line.nameRoman[0].toLowerCase();
     switch (first) {
       case "a":
       case "e":
@@ -64,7 +64,7 @@ const MainMarquee = (props: Props) => {
       default:
         return "a";
     }
-  }, [line.nameR]);
+  }, [line.nameRoman]);
 
   if (arrived) {
     return (
@@ -74,20 +74,20 @@ const MainMarquee = (props: Props) => {
             <Spacer />
             <TextContainer>
               <GreenText>
-                この電車は、{line.name.replace(parenthesisRegexp, "")}
+                この電車は、{line.nameShort.replace(parenthesisRegexp, "")}
               </GreenText>
               <OrangeText>{bound.name}</OrangeText>
               <GreenText>行きです。</GreenText>
               <LanguageSpacer />
-              <GreenText>{`This is ${aOrAn} ${line.nameR.replace(
+              <GreenText>{`This is ${aOrAn} ${line.nameRoman.replace(
                 parenthesisRegexp,
                 ""
               )} train for`}</GreenText>
               <SmallSpacer />
               <OrangeText>
-                {bound.nameR}
-                {bound.stationNumbers.length
-                  ? `(${bound.stationNumbers[0]?.stationNumber})`
+                {bound.nameRoman}
+                {bound.stationNumbersList.length
+                  ? `(${bound.stationNumbersList[0]?.stationNumber})`
                   : ""}
               </OrangeText>
               <GreenText>.</GreenText>
@@ -123,9 +123,9 @@ const MainMarquee = (props: Props) => {
               <GreenText>The next stop is</GreenText>
               <SmallSpacer />
               <OrangeText>
-                {nextStation.nameR}
-                {nextStation.stationNumbers.length
-                  ? `(${nextStation.stationNumbers[0]?.stationNumber})`
+                {nextStation.nameRoman}
+                {nextStation.stationNumbersList.length
+                  ? `(${nextStation.stationNumbersList[0]?.stationNumber})`
                   : ""}
               </OrangeText>
               {afterNextStation ? (
@@ -133,17 +133,17 @@ const MainMarquee = (props: Props) => {
                   <GreenText>. The stop after </GreenText>
                   <SmallSpacer />
                   <OrangeText>
-                    {nextStation.nameR}
-                    {nextStation.stationNumbers.length
-                      ? `(${nextStation.stationNumbers[0]?.stationNumber})`
+                    {nextStation.nameRoman}
+                    {nextStation.stationNumbersList.length
+                      ? `(${nextStation.stationNumbersList[0]?.stationNumber})`
                       : ""}
                   </OrangeText>
                   <GreenText>, will be </GreenText>
                   <SmallSpacer />
                   <OrangeText>
-                    {afterNextStation.nameR}
-                    {afterNextStation.stationNumbers.length
-                      ? `(${afterNextStation.stationNumbers[0]?.stationNumber})`
+                    {afterNextStation.nameRoman}
+                    {afterNextStation.stationNumbersList.length
+                      ? `(${afterNextStation.stationNumbersList[0]?.stationNumber})`
                       : ""}
                   </OrangeText>
                 </>

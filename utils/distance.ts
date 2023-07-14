@@ -1,5 +1,5 @@
 import * as geolib from "geolib";
-import type { Station } from "../models/StationAPI";
+import type { Station } from "../models/grpc";
 
 // 駅配列から平均駅間距離（直線距離）を求める
 export const getAvgStationBetweenDistances = (stations: Station[]): number =>

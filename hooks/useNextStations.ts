@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { Line, Station } from "../models/StationAPI";
+import type { Line, Station } from "../models/grpc";
 import getCurrentStationIndex from "../utils/currentStationIndex";
 import { isYamanoteLine } from "../utils/loopLine";
 import useDirection from "./useDirection";
 
 const useNextStations = (
   stations: Station[],
-  station: Station | undefined,
-  selectedLine: Line | undefined,
-  boundStation: Station | undefined
+  station: Station | null,
+  selectedLine: Line | null,
+  boundStation: Station | null
 ): Station[] => {
   const [nextStations, setNextStations] = useState<Station[]>([]);
   const direction = useDirection(boundStation, stations);

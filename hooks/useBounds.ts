@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Line, Station } from "../models/StationAPI";
+import type { Line, Station } from "../models/grpc";
 import getCurrentStationIndex from "../utils/currentStationIndex";
 import {
   inboundStationForLoopLine,
@@ -9,8 +9,8 @@ import {
 
 const useBounds = (
   stations: Station[],
-  station: Station | undefined,
-  selectedLine: Line | undefined
+  station: Station | null,
+  selectedLine: Line | null
 ) => {
   const [bounds, setBounds] = useState<[Station | null, Station | null]>();
 

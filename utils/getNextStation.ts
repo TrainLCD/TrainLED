@@ -1,9 +1,9 @@
-import type { Station } from "../models/StationAPI";
+import type { Station } from "../models/grpc";
 
 const getNextStation = (
   nextStations: Station[],
-  station: Station | undefined
-): Station | undefined => {
+  station: Station | null
+): Station | null => {
   const index =
     nextStations.findIndex((s) => s?.groupId === station?.groupId) + 1;
   return nextStations[index];

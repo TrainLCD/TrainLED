@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { parenthesisRegexp } from "../constants/regexp";
-import type { Line } from "../models/StationAPI";
+import type { Line } from "../models/grpc";
 import Button from "./Button";
 import { List, ListItem } from "./List";
 
@@ -25,7 +25,7 @@ const LinesPanel = ({ lines, onSelect }: Props) => {
         {lines.map((l) => (
           <ListItem key={l.id}>
             <Button onClick={onSelect.bind(null, l)}>
-              {l.name.replace(parenthesisRegexp, "")}
+              {l.nameShort.replace(parenthesisRegexp, "")}
             </Button>
           </ListItem>
         ))}
