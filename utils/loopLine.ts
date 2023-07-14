@@ -42,7 +42,7 @@ const osakaLoopLineDetectDirection = (
 export const inboundStationForLoopLine = (
   stations: Station[],
   index: number,
-  selectedLine: Line | undefined
+  selectedLine: Line | null
 ): { boundFor: string; station: Station } | null => {
   if (!selectedLine) {
     return null;
@@ -83,7 +83,7 @@ export const inboundStationForLoopLine = (
 export const outboundStationForLoopLine = (
   stations: Station[],
   index: number,
-  selectedLine: Line | undefined
+  selectedLine: Line | null
 ): { boundFor: string; station: Station } | null => {
   if (!selectedLine) {
     return null;
