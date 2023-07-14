@@ -66,6 +66,37 @@ const SwitchedStationText = ({
   nextStation,
   language,
 }: SwitchedStationTextProps) => {
+  if (arrived && currentStation) {
+    return (
+      <TextContainer arrived>
+        {language === "ja" ? (
+          <OrangeTextContainer>
+            {currentStation.name.split("").map((c) => (
+              <OrangeText>{c}</OrangeText>
+            ))}
+          </OrangeTextContainer>
+        ) : null}
+        {language === "jaKana" ? (
+          <OrangeTextContainer>
+            {currentStation.nameKatakana.split("").map((c) => (
+              <OrangeText>{c}</OrangeText>
+            ))}
+          </OrangeTextContainer>
+        ) : null}
+        {language === "en" ? (
+          <OrangeTextContainer>
+            <OrangeText>
+              {currentStation.nameRoman}
+              {currentStation.stationNumbersList.length
+                ? `\n(${currentStation.stationNumbersList[0]?.stationNumber})`
+                : ""}
+            </OrangeText>
+          </OrangeTextContainer>
+        ) : null}
+      </TextContainer>
+    );
+  }
+
   if (approaching && nextStation) {
     return (
       <TextContainer>
@@ -99,37 +130,6 @@ const SwitchedStationText = ({
                 : ""}
             </OrangeText>
           </>
-        ) : null}
-      </TextContainer>
-    );
-  }
-
-  if (arrived && currentStation) {
-    return (
-      <TextContainer arrived>
-        {language === "ja" ? (
-          <OrangeTextContainer>
-            {currentStation.name.split("").map((c) => (
-              <OrangeText>{c}</OrangeText>
-            ))}
-          </OrangeTextContainer>
-        ) : null}
-        {language === "jaKana" ? (
-          <OrangeTextContainer>
-            {currentStation.nameKatakana.split("").map((c) => (
-              <OrangeText>{c}</OrangeText>
-            ))}
-          </OrangeTextContainer>
-        ) : null}
-        {language === "en" ? (
-          <OrangeTextContainer>
-            <OrangeText>
-              {currentStation.nameRoman}
-              {currentStation.stationNumbersList.length
-                ? `\n(${currentStation.stationNumbersList[0]?.stationNumber})`
-                : ""}
-            </OrangeText>
-          </OrangeTextContainer>
         ) : null}
       </TextContainer>
     );
