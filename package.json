@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "gen:grpc": "protoc -I=./proto stationapi.proto --js_out=import_style=commonjs,binary:./generated --grpc-web_out=import_style=typescript,mode=grpcweb:./generated",
-    "postinstall": "npm run gen:grpc"
+    "gen:grpc": "protoc -I=./proto stationapi.proto --js_out=import_style=commonjs,binary:./generated --grpc-web_out=import_style=typescript,mode=grpcweb:./generated"
   },
   "dependencies": {
     "geolib": "^3.3.3",
