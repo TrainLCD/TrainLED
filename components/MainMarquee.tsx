@@ -1,6 +1,8 @@
+import { useAtomValue } from "jotai";
 import { useMemo } from "react";
 import Marquee from "react-fast-marquee";
 import styled from "styled-components";
+import { trainTypeAtom } from "../atoms/trainType";
 import { parenthesisRegexp } from "../constants/regexp";
 import type { Line, Station } from "../models/grpc";
 
@@ -49,6 +51,8 @@ type Props = {
 const MainMarquee = (props: Props) => {
   const { bound, nextStation, line, arrived, approaching, afterNextStation } =
     props;
+
+  const { trainType } = useAtomValue(trainTypeAtom);
 
   const aOrAn = useMemo(() => {
     const first = line.nameRoman[0].toLowerCase();
@@ -132,7 +136,9 @@ const MainMarquee = (props: Props) => {
               この電車は、{line.nameShort.replace(parenthesisRegexp, "")}
             </GreenText>
             <HorizontalSpacer />
-            <OrangeText>普通 {bound.name}行き</OrangeText>
+            <OrangeText>
+              {trainType?.name ?? "普通"} {bound.name}行き
+            </OrangeText>
             <HorizontalSpacer />
             <GreenText>です。</GreenText>
             <HorizontalSpacer wide />
@@ -141,7 +147,7 @@ const MainMarquee = (props: Props) => {
               ""
             )}`}</GreenText>
             <HorizontalSpacer />
-            <OrangeText>Local</OrangeText>
+            <OrangeText>{trainType?.nameRoman ?? "Local"}</OrangeText>
             <HorizontalSpacer />
             <GreenText>train for</GreenText>
             <HorizontalSpacer />
