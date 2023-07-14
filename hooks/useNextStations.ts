@@ -45,7 +45,10 @@ const useNextStations = (
     if (selectedLine?.id === 11623) {
       return false;
     }
-    return isYamanoteLine(selectedLine?.id) || selectedLine?.id === 11623;
+    return (
+      (selectedLine && isYamanoteLine(selectedLine?.id)) ||
+      selectedLine?.id === 11623
+    );
   }, [selectedLine]);
 
   useEffect(() => {
