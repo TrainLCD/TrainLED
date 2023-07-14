@@ -1,15 +1,12 @@
+import { useSetAtom } from "jotai";
 import { useCallback, useState } from "react";
+import { stationAtom } from "../atoms/station";
 import { GetStationByCoordinatesRequest } from "../generated/stationapi_pb";
-import { Station } from "../models/grpc";
 import useGRPC from "./useGRPC";
 import useGeolocation from "./useGeolocation";
 
-const useNearbyStation = (): [
-  Station | null,
-  boolean,
-  GeolocationPositionError | null
-] => {
-  const [station, setStation] = useState<Station | null>(null);
+const useNearbyStation = (): [boolean, GeolocationPositionError | null] => {
+  const setStation = useSetAtom(stationAtom);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<GeolocationPositionError | null>(null);
 
@@ -31,13 +28,16 @@ const useNearbyStation = (): [
           await grpcClient?.getStationsByCoordinates(req, null)
         )?.toObject();
         setLoading(false);
-        setStation(data.stationsList[0]);
+        setStation((prev) => ({
+          ...prev,
+          station: data.stationsList[0] || null,
+        }));
       } catch (err) {
         setError(err as GeolocationPositionError);
         setLoading(false);
       }
     },
-    [grpcClient]
+    [grpcClient, setStation]
   );
 
   const onLocation = useCallback(
@@ -49,7 +49,7 @@ const useNearbyStation = (): [
 
   useGeolocation(onLocation, setError);
 
-  return [station, loading, error];
+  return [loading, error];
 };
 
 export default useNearbyStation;

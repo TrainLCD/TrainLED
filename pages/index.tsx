@@ -1,6 +1,9 @@
+import { useAtom } from "jotai";
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
+import { lineAtom } from "../atoms/line";
+import { stationAtom } from "../atoms/station";
 import BoundsPanel from "../components/BoundsPanel";
 import LinesPanel from "../components/LinesPanel";
 import Loading from "../components/Loading";
@@ -44,19 +47,20 @@ const TrainLCDLink = styled.a`
 `;
 
 export default function Home() {
-  const [selectedLine, setSelectedLine] = useState<Line | null>(null);
+  const [{ station, stations }, setStationAtom] = useAtom(stationAtom);
+  const [{ selectedLine }, setLineAtom] = useAtom(lineAtom);
   const [selectedBound, setSelectedBound] = useState<Station | null>(null);
 
-  const [station, fetchLinesLoading, hasFetchLinesError] = useNearbyStation();
-  const [stations, fetchStations, fetchStationsLoading, hasFetchStationsError] =
-    useStationList();
+  const [fetchLinesLoading, hasFetchLinesError] = useNearbyStation();
+  const { fetchSelectedTrainTypeStations } = useStationList();
+
   const bounds = useBounds(stations, station, selectedLine);
 
   useEffect(() => {
     if (selectedLine) {
-      fetchStations(selectedLine.id);
+      fetchSelectedTrainTypeStations();
     }
-  }, [fetchStations, selectedLine]);
+  }, [fetchSelectedTrainTypeStations, selectedLine]);
 
   const { arrived, approaching, newStation } = useClosestStation(
     station,
@@ -74,7 +78,12 @@ export default function Home() {
 
   const langState = useCurrentLanguageState();
 
-  if (fetchLinesLoading || fetchStationsLoading) {
+  const handleSelectLine = useCallback(
+    (line: Line) => setLineAtom((prev) => ({ ...prev, selectedLine: line })),
+    [setLineAtom]
+  );
+
+  if (fetchLinesLoading) {
     return <Loading />;
   }
 
@@ -96,10 +105,10 @@ export default function Home() {
       {!selectedLine ? (
         <LinesPanel
           lines={station?.linesList || []}
-          onSelect={setSelectedLine}
+          onSelect={handleSelectLine}
         />
       ) : null}
-      {selectedLine && !selectedBound ? (
+      {selectedLine && !selectedBound && bounds ? (
         <BoundsPanel bounds={bounds} onSelect={setSelectedBound} />
       ) : null}
       {selectedBound && selectedLine ? (

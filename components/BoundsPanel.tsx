@@ -9,25 +9,24 @@ const Container = styled.div`
 const Title = styled.h3``;
 
 type Props = {
-  bounds: [Station | null, Station | null] | undefined;
+  bounds: [Station[], Station[]];
   onSelect: (line: Station) => void;
 };
 
 const BoundsPanel = ({ bounds, onSelect }: Props) => {
-  const eligibleBounds = bounds?.filter((b) => b);
-  if (eligibleBounds?.length === 0) {
-    return null;
-  }
+  if (!bounds[0][0] || !bounds[1][0]) return null;
 
   return (
     <Container>
       <Title>行き先極度選択（しなさい）</Title>
       <List>
-        {eligibleBounds?.map(
-          (b) =>
-            b && (
-              <ListItem key={b?.id}>
-                <Button onClick={onSelect.bind(null, b)}>{b?.name}</Button>
+        {bounds?.map(
+          (bound, index) =>
+            bound && (
+              <ListItem key={bound[index]?.id}>
+                <Button onClick={onSelect.bind(null, bound[index])}>
+                  {bound.map((station) => station.name)}
+                </Button>
               </ListItem>
             )
         )}
