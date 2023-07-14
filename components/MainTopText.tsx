@@ -17,29 +17,30 @@ const Container = styled.div`
 const TextContainer = styled.div<{ arrived?: boolean }>`
   display: flex;
   width: 100%;
-  font-size: 10vw;
   text-align: center;
   align-items: center;
   justify-content: center;
 `;
 
-const GreenText = styled.span<{ small?: boolean }>`
+const GreenText = styled.p`
+  width: 100%;
+  max-width: 22.5%;
   color: green;
-  font-size: 7.5vw;
-  min-width: 17.5vw;
+  font-size: 5vw;
 `;
 
 const OrangeTextContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   width: 100%;
-  margin-left: 1vw;
 `;
 
 const OrangeText = styled.p`
   color: orange;
   margin: 0;
   flex: 1;
+  font-size: 7.5vw;
+  white-space: pre-wrap;
 `;
 
 type Props = {
@@ -65,6 +66,44 @@ const SwitchedStationText = ({
   nextStation,
   language,
 }: SwitchedStationTextProps) => {
+  if (approaching && nextStation) {
+    return (
+      <TextContainer>
+        {language === "ja" ? (
+          <>
+            <GreenText>まもなく</GreenText>
+            <OrangeTextContainer>
+              {nextStation.name.split("").map((c) => (
+                <OrangeText>{c}</OrangeText>
+              ))}
+            </OrangeTextContainer>
+          </>
+        ) : null}
+        {language === "jaKana" ? (
+          <>
+            <GreenText>まもなく</GreenText>
+            <OrangeTextContainer>
+              {nextStation.nameKatakana.split("").map((c) => (
+                <OrangeText>{c}</OrangeText>
+              ))}
+            </OrangeTextContainer>
+          </>
+        ) : null}
+        {language === "en" ? (
+          <>
+            <GreenText>Soon</GreenText>
+            <OrangeText>
+              {nextStation.nameRoman}
+              {nextStation.stationNumbersList.length
+                ? `\n(${nextStation.stationNumbersList[0]?.stationNumber})`
+                : ""}
+            </OrangeText>
+          </>
+        ) : null}
+      </TextContainer>
+    );
+  }
+
   if (arrived && currentStation) {
     return (
       <TextContainer arrived>
@@ -87,47 +126,10 @@ const SwitchedStationText = ({
             <OrangeText>
               {currentStation.nameRoman}
               {currentStation.stationNumbersList.length
-                ? `(${currentStation.stationNumbersList[0]?.stationNumber})`
+                ? `\n(${currentStation.stationNumbersList[0]?.stationNumber})`
                 : ""}
             </OrangeText>
           </OrangeTextContainer>
-        ) : null}
-      </TextContainer>
-    );
-  }
-  if (approaching && nextStation) {
-    return (
-      <TextContainer>
-        {language === "ja" ? (
-          <>
-            <GreenText small>まもなく</GreenText>
-            <OrangeTextContainer>
-              {nextStation.name.split("").map((c) => (
-                <OrangeText>{c}</OrangeText>
-              ))}
-            </OrangeTextContainer>
-          </>
-        ) : null}
-        {language === "jaKana" ? (
-          <>
-            <GreenText small>まもなく</GreenText>
-            <OrangeTextContainer>
-              {nextStation.nameKatakana.split("").map((c) => (
-                <OrangeText>{c}</OrangeText>
-              ))}
-            </OrangeTextContainer>
-          </>
-        ) : null}
-        {language === "en" ? (
-          <>
-            <GreenText small>Soon</GreenText>
-            <OrangeText>
-              {nextStation.nameRoman}
-              {nextStation.stationNumbersList.length
-                ? `(${nextStation.stationNumbersList[0]?.stationNumber})`
-                : ""}
-            </OrangeText>
-          </>
         ) : null}
       </TextContainer>
     );
@@ -150,7 +152,7 @@ const SwitchedStationText = ({
       ) : null}
       {language === "jaKana" ? (
         <>
-          <GreenText small>次は</GreenText>
+          <GreenText>次は</GreenText>
           <OrangeTextContainer>
             {nextStation.nameKatakana.split("").map((c) => (
               <OrangeText>{c}</OrangeText>
@@ -160,7 +162,7 @@ const SwitchedStationText = ({
       ) : null}
       {language === "en" ? (
         <>
-          <GreenText small>Next</GreenText>
+          <GreenText>Next</GreenText>
           <OrangeTextContainer>
             <OrangeText>
               {nextStation.nameRoman}
