@@ -1,4 +1,4 @@
-import type { Line, Station } from "../models/StationAPI";
+import type { Line, Station } from "../models/grpc";
 
 export const isYamanoteLine = (lineId: number | undefined): boolean =>
   lineId === 11302;
