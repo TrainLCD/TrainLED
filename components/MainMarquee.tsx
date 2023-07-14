@@ -33,8 +33,8 @@ const Spacer = styled.div`
   width: 50vw;
 `;
 
-const HorizontalSpacer = styled.div`
-  width: 5vw;
+const HorizontalSpacer = styled.div<{ wide?: boolean }>`
+  width: ${({ wide }) => (wide ? 10 : 2.5)}vw;
 `;
 
 type Props = {
@@ -129,17 +129,21 @@ const MainMarquee = (props: Props) => {
           <Spacer />
           <TextContainer>
             <GreenText>
-              この電車は、{line.nameShort.replace(parenthesisRegexp, "")} 普通
+              この電車は、{line.nameShort.replace(parenthesisRegexp, "")}
             </GreenText>
             <HorizontalSpacer />
-            <OrangeText>{bound.name}</OrangeText>
+            <OrangeText>普通 {bound.name}行き</OrangeText>
             <HorizontalSpacer />
-            <GreenText>行きです。</GreenText>
-            <HorizontalSpacer />
+            <GreenText>です。</GreenText>
+            <HorizontalSpacer wide />
             <GreenText>{`This is ${aOrAn} ${line.nameRoman.replace(
               parenthesisRegexp,
               ""
-            )} local train for`}</GreenText>
+            )}`}</GreenText>
+            <HorizontalSpacer />
+            <OrangeText>Local</OrangeText>
+            <HorizontalSpacer />
+            <GreenText>train for</GreenText>
             <HorizontalSpacer />
             <OrangeText>
               {bound.nameRoman}
