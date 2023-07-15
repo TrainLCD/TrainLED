@@ -33,8 +33,6 @@ const useBounds = (): {
   );
 
   // 環状路線フラグの更新
-  // 特に駄目な理由がないと思うのでuseFocusEffectではなくuseEffectで更新する
-  // この画面でエラーが発生した際復帰後環状運転扱いにならない問題がありそうなので
   useEffect(() => {
     if (selectedLine) {
       setYamanoteLine(isYamanoteLine(selectedLine?.id));

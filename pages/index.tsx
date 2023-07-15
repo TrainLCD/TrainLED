@@ -1,6 +1,6 @@
 import { useAtom } from "jotai";
 import Head from "next/head";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect } from "react";
 import styled from "styled-components";
 import { lineAtom } from "../atoms/line";
 import { stationAtom } from "../atoms/station";
@@ -52,9 +52,9 @@ const TrainLCDLink = styled.a`
 `;
 
 export default function Home() {
-  const [{ station, stations }, setStationAtom] = useAtom(stationAtom);
+  const [{ station, stations, selectedBound }, setStationAtom] =
+    useAtom(stationAtom);
   const [{ selectedLine }, setLineAtom] = useAtom(lineAtom);
-  const [selectedBound, setSelectedBound] = useState<Station | null>(null);
 
   const [fetchLinesLoading, hasFetchLinesError] = useFetchNearbyStation();
   const { fetchSelectedTrainTypeStations, loading: fetchStationsLoading } =
@@ -62,11 +62,9 @@ export default function Home() {
 
   const { bounds } = useBounds();
 
-  // useEffect(() => {
-  //   if (selectedLine) {
-  //     fetchSelectedTrainTypeStations();
-  //   }
-  // }, [fetchSelectedTrainTypeStations, selectedLine]);
+  useEffect(() => {
+    fetchSelectedTrainTypeStations();
+  }, [fetchSelectedTrainTypeStations]);
 
   const { arrived, approaching, newStation } = useClosestStation(
     station,
@@ -89,6 +87,17 @@ export default function Home() {
     [setLineAtom]
   );
 
+  const handleSelectedBound = useCallback(
+    (selectedBound: Station, index: number) => {
+      setStationAtom((prev) => ({ ...prev, selectedBound }));
+      setLineAtom((prev) => ({
+        ...prev,
+        selectedDirection: !index ? "INBOUND" : "OUTBOUND",
+      }));
+    },
+    [setLineAtom, setStationAtom]
+  );
+
   return (
     <Container>
       <Head>
@@ -108,15 +117,14 @@ export default function Home() {
       {!selectedLine && station ? (
         <LinesPanel lines={station.linesList} onSelect={handleSelectLine} />
       ) : null}
-      {!selectedBound ? (
-        <BoundsPanel bounds={bounds} onSelect={setSelectedBound} />
+      {selectedLine && !selectedBound ? (
+        <BoundsPanel stationGroupList={bounds} onSelect={handleSelectedBound} />
       ) : null}
       {selectedBound && selectedLine ? (
         <>
           <MainTopText
             arrived={arrived}
             approaching={approaching}
-            bound={selectedBound}
             currentStation={newStation}
             nextStation={nextStations[1]}
             language={langState}
@@ -125,7 +133,6 @@ export default function Home() {
           <MainMarquee
             arrived={arrived}
             approaching={approaching}
-            bound={selectedBound}
             nextStation={nextStations[1]}
             afterNextStation={nextStations[2]}
             line={selectedLine}

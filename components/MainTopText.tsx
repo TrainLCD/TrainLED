@@ -35,6 +35,7 @@ const OrangeTextContainer = styled.div`
 `;
 
 const OrangeText = styled.p`
+  line-height: 1.25;
   color: orange;
   margin: 0;
   flex: 1;
@@ -43,7 +44,6 @@ const OrangeText = styled.p`
 `;
 
 type Props = {
-  bound: Station;
   currentStation: Station | null;
   nextStation: Station | null;
   arrived: boolean;
@@ -166,7 +166,7 @@ const SwitchedStationText = ({
             <OrangeText>
               {nextStation.nameRoman}
               {nextStation.stationNumbersList.length
-                ? `(\n${nextStation.stationNumbersList[0]?.stationNumber})`
+                ? `\n(${nextStation.stationNumbersList[0]?.stationNumber})`
                 : ""}
             </OrangeText>
           </OrangeTextContainer>
@@ -177,10 +177,9 @@ const SwitchedStationText = ({
 };
 
 const MainTopText = (props: Props) => {
-  const { bound, ...rest } = props;
   return (
     <Container>
-      <SwitchedStationText {...rest} />
+      <SwitchedStationText {...props} />
     </Container>
   );
 };

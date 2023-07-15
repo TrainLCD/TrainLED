@@ -76,7 +76,7 @@ const useStationList = (): {
       }
       setTrainTypeAtom((prev) => ({
         ...prev,
-        trainType: trainTypesRes?.trainTypesList[0] ?? null,
+        trainType: findLocalType(trainTypesRes?.trainTypesList ?? []),
         fetchedTrainTypes: [
           ...prev.fetchedTrainTypes,
           ...(trainTypesRes?.trainTypesList ?? []),
@@ -110,16 +110,14 @@ const useStationList = (): {
         return;
       }
 
-      if (station?.hasTrainTypes) {
-        await fetchTrainTypes();
-        setLoading(false);
-        return;
-      }
-
       setStationState((prev) => ({
         ...prev,
         stations: data.stationsList,
       }));
+
+      if (station?.hasTrainTypes) {
+        await fetchTrainTypes();
+      }
 
       setLoading(false);
     } catch (err) {

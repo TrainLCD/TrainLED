@@ -1,6 +1,14 @@
 import { atom } from "jotai";
 import { Line } from "../models/grpc";
 
-type LineAtom = { selectedLine: Line | null };
+type Direction = "INBOUND" | "OUTBOUND";
 
-export const lineAtom = atom<LineAtom>({ selectedLine: null });
+type LineAtom = {
+  selectedLine: Line | null;
+  selectedDirection: Direction | null;
+};
+
+export const lineAtom = atom<LineAtom>({
+  selectedLine: null,
+  selectedDirection: null,
+});

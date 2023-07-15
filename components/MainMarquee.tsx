@@ -2,9 +2,12 @@ import { useAtomValue } from "jotai";
 import { useMemo } from "react";
 import Marquee from "react-fast-marquee";
 import styled from "styled-components";
+import { lineAtom } from "../atoms/line";
 import { trainTypeAtom } from "../atoms/trainType";
 import { parenthesisRegexp } from "../constants/regexp";
+import useBounds from "../hooks/useBounds";
 import type { Line, Station } from "../models/grpc";
+import { getIsLoopLine } from "../utils/loopLine";
 
 const InnerContainer = styled.div`
   display: flex;
@@ -40,7 +43,6 @@ const HorizontalSpacer = styled.div<{ wide?: boolean }>`
 `;
 
 type Props = {
-  bound: Station;
   nextStation: Station | undefined;
   afterNextStation: Station | undefined;
   arrived: boolean;
@@ -49,10 +51,12 @@ type Props = {
 };
 
 const MainMarquee = (props: Props) => {
-  const { bound, nextStation, line, arrived, approaching, afterNextStation } =
-    props;
+  const { nextStation, line, arrived, approaching, afterNextStation } = props;
 
   const { trainType } = useAtomValue(trainTypeAtom);
+  const { selectedDirection } = useAtomValue(lineAtom);
+
+  const { bounds } = useBounds();
 
   const aOrAn = useMemo(() => {
     const first = line.nameRoman[0].toLowerCase();
@@ -68,7 +72,27 @@ const MainMarquee = (props: Props) => {
     }
   }, [line.nameRoman]);
 
-  if (approaching && nextStation) {
+  const boundTexts = useMemo(() => {
+    const index = selectedDirection === "INBOUND" ? 0 : 1;
+    const jaText = bounds[index].map((station) => station.name).join("・");
+    const enText = bounds[index]
+      .map(
+        (station) =>
+          `${station.nameRoman}${
+            station.stationNumbersList[0]?.stationNumber
+              ? `(${station.stationNumbersList[0]?.stationNumber})`
+              : ""
+          }`
+      )
+      .join(" and ");
+    return [`${jaText}${getIsLoopLine(line, trainType) ? "方面" : ""}`, enText];
+  }, [bounds, line, selectedDirection, trainType]);
+
+  if (!nextStation) {
+    return <Container />;
+  }
+
+  if (approaching && !arrived) {
     return (
       <Container>
         <Marquee gradient={false} speed={300}>
@@ -137,7 +161,13 @@ const MainMarquee = (props: Props) => {
             </GreenText>
             <HorizontalSpacer />
             <OrangeText>
-              {trainType?.name ?? "普通"} {bound.name}行き
+              {(!getIsLoopLine(line, trainType) &&
+                trainType?.name?.replace(parenthesisRegexp, "")) ??
+                "普通"}
+              {getIsLoopLine(line, trainType) &&
+                (selectedDirection ? "内回り" : "外回り")}
+              <OrangeText>{` ${boundTexts[0]}`}</OrangeText>
+              行き
             </OrangeText>
             <HorizontalSpacer />
             <GreenText>です。</GreenText>
@@ -147,16 +177,17 @@ const MainMarquee = (props: Props) => {
               ""
             )}`}</GreenText>
             <HorizontalSpacer />
-            <OrangeText>{trainType?.nameRoman ?? "Local"}</OrangeText>
+            <OrangeText>
+              {(!getIsLoopLine(line, trainType) &&
+                trainType?.nameRoman?.replace(parenthesisRegexp, "")) ??
+                "Local"}
+              {getIsLoopLine(line, trainType) &&
+                (selectedDirection ? "Counter-clockwise" : "Clockwise")}
+            </OrangeText>
             <HorizontalSpacer />
             <GreenText>train for</GreenText>
             <HorizontalSpacer />
-            <OrangeText>
-              {bound.nameRoman}
-              {bound.stationNumbersList.length
-                ? `(${bound.stationNumbersList[0]?.stationNumber})`
-                : ""}
-            </OrangeText>
+            <OrangeText>{boundTexts[1]}</OrangeText>
             <GreenText>.</GreenText>
           </TextContainer>
           <Spacer />
@@ -164,8 +195,6 @@ const MainMarquee = (props: Props) => {
       </Marquee>
     </Container>
   );
-
-  return <Container />;
 };
 
 export default MainMarquee;
