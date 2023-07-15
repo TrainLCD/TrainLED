@@ -166,7 +166,7 @@ const SwitchedStationText = ({
             <OrangeText>
               {nextStation.nameRoman}
               {nextStation.stationNumbersList.length
-                ? `(${nextStation.stationNumbersList[0]?.stationNumber})`
+                ? `(\n${nextStation.stationNumbersList[0]?.stationNumber})`
                 : ""}
             </OrangeText>
           </OrangeTextContainer>
