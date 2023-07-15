@@ -73,12 +73,7 @@ export default function Home() {
     selectedLine
   );
 
-  const nextStations = useNextStations(
-    stations,
-    newStation,
-    selectedLine,
-    selectedBound
-  );
+  const nextStations = useNextStations(stations, newStation, selectedLine);
 
   const langState = useCurrentLanguageState();
 

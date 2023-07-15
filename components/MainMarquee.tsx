@@ -165,7 +165,8 @@ const MainMarquee = (props: Props) => {
                 trainType?.name?.replace(parenthesisRegexp, "")) ??
                 "普通"}
               {getIsLoopLine(line, trainType) &&
-                (selectedDirection ? "内回り" : "外回り")}
+                selectedDirection &&
+                (selectedDirection === "INBOUND" ? "内回り" : "外回り")}
               <OrangeText>{` ${boundTexts[0]}`}</OrangeText>
               行き
             </OrangeText>
@@ -182,7 +183,10 @@ const MainMarquee = (props: Props) => {
                 trainType?.nameRoman?.replace(parenthesisRegexp, "")) ??
                 "Local"}
               {getIsLoopLine(line, trainType) &&
-                (selectedDirection ? "Counter-clockwise" : "Clockwise")}
+                selectedDirection &&
+                (selectedDirection === "INBOUND"
+                  ? "Counter-clockwise"
+                  : "Clockwise")}
             </OrangeText>
             <HorizontalSpacer />
             <GreenText>train for</GreenText>
