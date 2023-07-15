@@ -21,7 +21,7 @@ const LinesPanel = ({ lines, onSelect }: Props) => (
         <ListItem key={l.id}>
           <Button onClick={onSelect.bind(null, l)} bgColor={l.color ?? "#ffｆ"}>
             {l.lineSymbolsList.length > 0 &&
-              `[{${l.lineSymbolsList.map((sym) => sym?.symbol).join("/")}}]`}
+              `[${l.lineSymbolsList.map((sym) => sym?.symbol).join("/")}]`}
             {l.nameShort.replace(parenthesisRegexp, "")}
           </Button>
         </ListItem>
