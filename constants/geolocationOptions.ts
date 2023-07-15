@@ -1,3 +1,3 @@
 export default {
-  enableHighAccuracy: true,
+  enableHighAccuracy: false,
 } as PositionOptions;
