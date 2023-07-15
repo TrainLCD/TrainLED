@@ -124,14 +124,17 @@ const MainMarquee = (props: Props) => {
       filteredLines.length > 1
         ? filteredLines
             .slice(0, filteredLines.length - 1)
-            .map((line) => line.nameRoman)
+            .map((line) => line.nameRoman.replace(parenthesisRegexp, ""))
             .join(", the ")
         : filteredLines.map((line) => line.nameRoman).join("");
 
     const tailTextForEn = filteredLines.slice(-1)[0]?.nameRoman;
 
     return [
-      filteredLines.map((line) => line.nameShort).join("、"),
+      filteredLines
+        .map((line) => line.nameShort.replace(parenthesisRegexp, ""))
+        .join("、")
+        .replace(parenthesisRegexp, ""),
       `${headTextForEn} and the ${tailTextForEn}`,
     ];
   }, [nextStation]);
