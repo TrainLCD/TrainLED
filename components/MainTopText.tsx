@@ -1,5 +1,4 @@
 // 対処法が今のところないので一旦無視する
-/* eslint-disable react/jsx-key */
 import styled from "styled-components";
 import { LanguageState } from "../hooks/useCurrentLanguageState";
 import type { Station } from "../models/grpc";
@@ -71,15 +70,15 @@ const SwitchedStationText = ({
       <TextContainer arrived>
         {language === "ja" ? (
           <OrangeTextContainer>
-            {currentStation.name.split("").map((c) => (
-              <OrangeText>{c}</OrangeText>
+            {currentStation.name.split("").map((c, i) => (
+              <OrangeText key={`${c}${i}`}>{c}</OrangeText>
             ))}
           </OrangeTextContainer>
         ) : null}
         {language === "jaKana" ? (
           <OrangeTextContainer>
-            {currentStation.nameKatakana.split("").map((c) => (
-              <OrangeText>{c}</OrangeText>
+            {currentStation.nameKatakana.split("").map((c, i) => (
+              <OrangeText key={`${c}${i}`}>{c}</OrangeText>
             ))}
           </OrangeTextContainer>
         ) : null}
@@ -104,8 +103,8 @@ const SwitchedStationText = ({
           <>
             <GreenText>まもなく</GreenText>
             <OrangeTextContainer>
-              {nextStation.name.split("").map((c) => (
-                <OrangeText>{c}</OrangeText>
+              {nextStation.name.split("").map((c, i) => (
+                <OrangeText key={`${c}${i}`}>{c}</OrangeText>
               ))}
             </OrangeTextContainer>
           </>
@@ -114,8 +113,8 @@ const SwitchedStationText = ({
           <>
             <GreenText>まもなく</GreenText>
             <OrangeTextContainer>
-              {nextStation.nameKatakana.split("").map((c) => (
-                <OrangeText>{c}</OrangeText>
+              {nextStation.nameKatakana.split("").map((c, i) => (
+                <OrangeText key={`${c}${i}`}>{c}</OrangeText>
               ))}
             </OrangeTextContainer>
           </>
@@ -144,8 +143,8 @@ const SwitchedStationText = ({
         <>
           <GreenText>次は</GreenText>
           <OrangeTextContainer>
-            {nextStation.name.split("").map((c) => (
-              <OrangeText>{c}</OrangeText>
+            {nextStation.name.split("").map((c, i) => (
+              <OrangeText key={`${c}${i}`}>{c}</OrangeText>
             ))}
           </OrangeTextContainer>
         </>
@@ -154,8 +153,8 @@ const SwitchedStationText = ({
         <>
           <GreenText>次は</GreenText>
           <OrangeTextContainer>
-            {nextStation.nameKatakana.split("").map((c) => (
-              <OrangeText>{c}</OrangeText>
+            {nextStation.nameKatakana.split("").map((c, i) => (
+              <OrangeText key={`${c}${i}`}>{c}</OrangeText>
             ))}
           </OrangeTextContainer>
         </>

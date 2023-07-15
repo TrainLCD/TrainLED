@@ -1,6 +1,6 @@
 import { useAtom } from "jotai";
 import Head from "next/head";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import styled from "styled-components";
 import { lineAtom } from "../atoms/line";
 import { stationAtom } from "../atoms/station";
@@ -13,7 +13,7 @@ import { parenthesisRegexp } from "../constants/regexp";
 import useBounds from "../hooks/useBounds";
 import useClosestStation from "../hooks/useClosestStation";
 import useCurrentLanguageState from "../hooks/useCurrentLanguageState";
-import useNearbyStation from "../hooks/useNearbyStation";
+import useFetchNearbyStation from "../hooks/useFetchNearbyStation";
 import useNextStations from "../hooks/useNextStations";
 import useStationList from "../hooks/useStationList";
 import { Line, Station } from "../models/grpc";
@@ -40,9 +40,14 @@ const HorizontalSpacer = styled.div`
   height: 5vh;
 `;
 
+const CreditContainer = styled.div`
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+`;
+
 const TrainLCDLink = styled.a`
   line-height: 1.5;
-  margin: 0;
   text-align: center;
 `;
 
@@ -51,16 +56,17 @@ export default function Home() {
   const [{ selectedLine }, setLineAtom] = useAtom(lineAtom);
   const [selectedBound, setSelectedBound] = useState<Station | null>(null);
 
-  const [fetchLinesLoading, hasFetchLinesError] = useNearbyStation();
-  const { fetchSelectedTrainTypeStations } = useStationList();
+  const [fetchLinesLoading, hasFetchLinesError] = useFetchNearbyStation();
+  const { fetchSelectedTrainTypeStations, loading: fetchStationsLoading } =
+    useStationList();
 
-  const bounds = useBounds(stations, station, selectedLine);
+  const { bounds } = useBounds();
 
-  useEffect(() => {
-    if (selectedLine) {
-      fetchSelectedTrainTypeStations();
-    }
-  }, [fetchSelectedTrainTypeStations, selectedLine]);
+  // useEffect(() => {
+  //   if (selectedLine) {
+  //     fetchSelectedTrainTypeStations();
+  //   }
+  // }, [fetchSelectedTrainTypeStations, selectedLine]);
 
   const { arrived, approaching, newStation } = useClosestStation(
     station,
@@ -83,10 +89,6 @@ export default function Home() {
     [setLineAtom]
   );
 
-  if (fetchLinesLoading) {
-    return <Loading />;
-  }
-
   return (
     <Container>
       <Head>
@@ -101,14 +103,12 @@ export default function Home() {
             : "TrainLED"}
         </LineName>
       ) : null}
-      {!selectedBound ? <LineName>{station?.name}</LineName> : null}
-      {!selectedLine ? (
-        <LinesPanel
-          lines={station?.linesList || []}
-          onSelect={handleSelectLine}
-        />
+      {(fetchLinesLoading || fetchStationsLoading) && <Loading />}
+      {!selectedBound && station ? <LineName>{station.name}</LineName> : null}
+      {!selectedLine && station ? (
+        <LinesPanel lines={station.linesList} onSelect={handleSelectLine} />
       ) : null}
-      {selectedLine && !selectedBound && bounds ? (
+      {!selectedBound ? (
         <BoundsPanel bounds={bounds} onSelect={setSelectedBound} />
       ) : null}
       {selectedBound && selectedLine ? (
@@ -133,7 +133,7 @@ export default function Home() {
         </>
       ) : null}
       {!selectedBound ? (
-        <>
+        <CreditContainer>
           <CautionText>※TrainLEDはβ版です。</CautionText>
           <TrainLCDLink
             href="https://trainlcd.app/"
@@ -142,7 +142,7 @@ export default function Home() {
           >
             TrainLCDアプリをダウンロード
           </TrainLCDLink>
-        </>
+        </CreditContainer>
       ) : null}
     </Container>
   );

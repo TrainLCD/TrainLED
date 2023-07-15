@@ -1,7 +1,9 @@
 import { useAtomValue } from "jotai";
 import { useEffect, useMemo, useState } from "react";
+import { lineAtom } from "../atoms/line";
+import { stationAtom } from "../atoms/station";
 import { trainTypeAtom } from "../atoms/trainType";
-import type { Line, Station } from "../models/grpc";
+import type { Station } from "../models/grpc";
 import getCurrentStationIndex from "../utils/currentStationIndex";
 import {
   inboundStationsForLoopLine,
@@ -12,16 +14,17 @@ import {
 } from "../utils/loopLine";
 import { findBranchLine, findLocalType } from "../utils/trainTypeString";
 
-const useBounds = (
-  stations: Station[],
-  station: Station | null,
-  selectedLine: Line | null
-): [Station[], Station[]] => {
+const useBounds = (): {
+  bounds: [Station[], Station[]];
+  withTrainTypes: boolean;
+} => {
   const [yamanoteLine, setYamanoteLine] = useState(false);
   const [osakaLoopLine, setOsakaLoopLine] = useState(false);
   const [meijoLine, setMeijoLine] = useState(false);
 
-  const [bounds, setBounds] = useState<[Station[], Station[]]>();
+  const [bounds, setBounds] = useState<[Station[], Station[]]>([[], []]);
+  const { station, stations } = useAtomValue(stationAtom);
+  const { selectedLine } = useAtomValue(lineAtom);
   const { fetchedTrainTypes, trainType } = useAtomValue(trainTypeAtom);
 
   const localType = useMemo(
@@ -102,8 +105,12 @@ const useBounds = (
       computedInboundStation = inboundStations;
       computedOutboundStation = outboundStations;
     } else {
-      computedInboundStation = [inboundStation];
-      computedOutboundStation = [outboundStation];
+      if (inboundStation?.groupId !== station?.groupId) {
+        computedInboundStation = [inboundStation];
+      }
+      if (outboundStation?.groupId !== station?.groupId) {
+        computedOutboundStation = [outboundStation];
+      }
     }
 
     setBounds([computedInboundStation, computedOutboundStation]);
@@ -114,12 +121,13 @@ const useBounds = (
     osakaLoopLine,
     outboundStations,
     selectedLine,
+    station?.groupId,
     stations,
     trainType,
     yamanoteLine,
   ]);
 
-  return bounds ?? [[], []];
+  return { bounds, withTrainTypes };
 };
 
 export default useBounds;

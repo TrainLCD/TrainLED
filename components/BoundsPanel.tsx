@@ -14,27 +14,19 @@ type Props = {
 };
 
 const BoundsPanel = ({ bounds, onSelect }: Props) => {
-  if (!bounds[0][0] || !bounds[1][0]) return null;
+  if (!bounds[0][0] && !bounds[1][0]) return null;
 
   return (
     <Container>
       <Title>行き先極度選択（しなさい）</Title>
       <List>
         {bounds?.map(
-          (bound, index) =>
-            bound && (
-              <ListItem key={bound[index]?.id}>
-                {bound.map(
-                  (station) =>
-                    station && (
-                      <Button
-                        key={station.id}
-                        onClick={onSelect.bind(null, station)}
-                      >
-                        {station.name}
-                      </Button>
-                    )
-                )}
+          (bound) =>
+            bound[0] && (
+              <ListItem key={bound[0].id}>
+                <Button onClick={() => onSelect(bound[0])}>
+                  {bound[0]?.name}
+                </Button>
               </ListItem>
             )
         )}

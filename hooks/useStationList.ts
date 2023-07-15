@@ -26,7 +26,7 @@ const useStationList = (): {
     useAtom(trainTypeAtom);
   const { selectedLine } = useAtomValue(lineAtom);
   const grpcClient = useGRPC();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const fetchTrainTypes = useCallback(async () => {
@@ -34,6 +34,8 @@ const useStationList = (): {
       if (!selectedLine?.station?.id) {
         return;
       }
+
+      setLoading(true);
 
       const req = new GetTrainTypesByStationIdRequest();
       req.setStationId(selectedLine.station.id);
@@ -94,8 +96,9 @@ const useStationList = (): {
       return;
     }
 
-    setLoading(true);
     try {
+      setLoading(true);
+
       const req = new GetStationByLineIdRequest();
       req.setLineId(lineId);
       const data = (
@@ -103,11 +106,13 @@ const useStationList = (): {
       )?.toObject();
 
       if (!data) {
+        setLoading(false);
         return;
       }
 
       if (station?.hasTrainTypes) {
         await fetchTrainTypes();
+        setLoading(false);
         return;
       }
 
@@ -143,6 +148,7 @@ const useStationList = (): {
       )?.toObject();
 
       if (!data) {
+        setLoading(false);
         return;
       }
 
