@@ -9,9 +9,12 @@ import {
   GetTrainTypesByStationIdRequest,
   TrainDirection,
 } from "../generated/stationapi_pb";
+import dropEitherJunctionStation from "../utils/dropJunctionStation";
 import {
   findBranchLine,
   findLocalType,
+  findLtdExpType,
+  findRapidType,
   getTrainTypeString,
 } from "../utils/trainTypeString";
 import useGRPC from "./useGRPC";
@@ -24,7 +27,7 @@ const useStationList = (): {
   const [{ station }, setStationState] = useAtom(stationAtom);
   const [{ trainType, fetchedTrainTypes }, setTrainTypeAtom] =
     useAtom(trainTypeAtom);
-  const { selectedLine } = useAtomValue(lineAtom);
+  const { selectedLine, selectedDirection } = useAtomValue(lineAtom);
   const grpcClient = useGRPC();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -43,16 +46,20 @@ const useStationList = (): {
         await grpcClient?.getTrainTypesByStationId(req, null)
       )?.toObject();
 
+      const trainTypesList = trainTypesRes?.trainTypesList ?? [];
+
       // 普通種別が登録済み: 非表示
+      // 普通種別は登録されていないが、快速もしくは特急はある: 非表示
       // 支線種別が登録されていているが、普通種別が登録されていない: 非表示
-      // 特例で普通列車以外の種別で表示を設定されている場合(中央線快速等): 表示
+      // 特例で普通列車以外の種別で表示を設定されている場合(中央線快速等): 非表示
       // 上記以外: 表示
       if (
         !(
-          findLocalType(trainTypesRes?.trainTypesList ?? []) ||
-          (findBranchLine(trainTypesRes?.trainTypesList ?? []) &&
-            !findLocalType(trainTypesRes?.trainTypesList ?? [])) ||
-          getTrainTypeString(selectedLine, station) !== "local"
+          findLocalType(trainTypesList) ||
+          (!findLocalType(trainTypesList) &&
+            (findRapidType(trainTypesList) ||
+              findLtdExpType(trainTypesList))) ||
+          (findBranchLine(trainTypesList) && !findLocalType(trainTypesList))
         )
       ) {
         setTrainTypeAtom((prev) => ({
@@ -74,21 +81,51 @@ const useStationList = (): {
           ],
         }));
       }
+
       setTrainTypeAtom((prev) => ({
         ...prev,
-        trainType: findLocalType(trainTypesRes?.trainTypesList ?? []),
-        fetchedTrainTypes: [
-          ...prev.fetchedTrainTypes,
-          ...(trainTypesRes?.trainTypesList ?? []),
-        ],
+        trainType:
+          findLocalType(trainTypesList) ?? findRapidType(trainTypesList),
+        fetchedTrainTypes: [...prev.fetchedTrainTypes, ...trainTypesList],
       }));
+
+      // 各停・快速・特急種別がある場合は該当種別を自動選択する
+      const trainTypeString = getTrainTypeString(selectedLine, station);
+      switch (trainTypeString) {
+        case "local":
+          setTrainTypeAtom((prev) => ({
+            ...prev,
+            trainType: !prev.trainType
+              ? findLocalType(fetchedTrainTypes)
+              : prev.trainType,
+          }));
+          break;
+        case "rapid":
+          setTrainTypeAtom((prev) => ({
+            ...prev,
+            trainType: !prev.trainType
+              ? findRapidType(fetchedTrainTypes)
+              : prev.trainType,
+          }));
+          break;
+        case "ltdexp":
+          setTrainTypeAtom((prev) => ({
+            ...prev,
+            trainType: !prev.trainType
+              ? findLtdExpType(fetchedTrainTypes)
+              : prev.trainType,
+          }));
+          break;
+        default:
+          break;
+      }
 
       setLoading(false);
     } catch (err) {
       setError(err as any);
       setLoading(false);
     }
-  }, [grpcClient, selectedLine, setTrainTypeAtom, station]);
+  }, [fetchedTrainTypes, grpcClient, selectedLine, setTrainTypeAtom, station]);
 
   const fetchInitialStationList = useCallback(async () => {
     const lineId = selectedLine?.id;
@@ -112,7 +149,10 @@ const useStationList = (): {
 
       setStationState((prev) => ({
         ...prev,
-        stations: data.stationsList,
+        stations: dropEitherJunctionStation(
+          data.stationsList,
+          selectedDirection
+        ),
       }));
 
       if (station?.hasTrainTypes) {
@@ -127,6 +167,7 @@ const useStationList = (): {
   }, [
     fetchTrainTypes,
     grpcClient,
+    selectedDirection,
     selectedLine?.id,
     setStationState,
     station?.hasTrainTypes,
@@ -136,6 +177,7 @@ const useStationList = (): {
     if (!trainType?.groupId || !fetchedTrainTypes.length) {
       return;
     }
+
     setLoading(true);
 
     try {
@@ -152,7 +194,10 @@ const useStationList = (): {
 
       setStationState((prev) => ({
         ...prev,
-        stations: data.stationsList,
+        stations: dropEitherJunctionStation(
+          data.stationsList,
+          selectedDirection
+        ),
       }));
       setTrainTypeAtom((prev) => ({ ...prev }));
 
@@ -164,9 +209,10 @@ const useStationList = (): {
   }, [
     fetchedTrainTypes.length,
     grpcClient,
+    selectedDirection,
     setStationState,
     setTrainTypeAtom,
-    trainType?.groupId,
+    trainType,
   ]);
 
   useEffect(() => {

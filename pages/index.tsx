@@ -1,9 +1,10 @@
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import Head from "next/head";
-import { useCallback, useEffect } from "react";
+import { memo, useCallback, useEffect } from "react";
 import styled from "styled-components";
 import { lineAtom } from "../atoms/line";
 import { stationAtom } from "../atoms/station";
+import { trainTypeAtom } from "../atoms/trainType";
 import BoundsPanel from "../components/BoundsPanel";
 import LinesPanel from "../components/LinesPanel";
 import Loading from "../components/Loading";
@@ -16,7 +17,7 @@ import useCurrentLanguageState from "../hooks/useCurrentLanguageState";
 import useFetchNearbyStation from "../hooks/useFetchNearbyStation";
 import useNextStations from "../hooks/useNextStations";
 import useStationList from "../hooks/useStationList";
-import { Line, Station } from "../models/grpc";
+import { Line, Station, TrainType } from "../models/grpc";
 
 const Container = styled.main`
   display: flex;
@@ -51,10 +52,11 @@ const TrainLCDLink = styled.a`
   text-align: center;
 `;
 
-export default function Home() {
+const Home = () => {
   const [{ station, stations, selectedBound }, setStationAtom] =
     useAtom(stationAtom);
   const [{ selectedLine }, setLineAtom] = useAtom(lineAtom);
+  const setTrainType = useSetAtom(trainTypeAtom);
 
   const [fetchLinesLoading, hasFetchLinesError] = useFetchNearbyStation();
   const { fetchSelectedTrainTypeStations, loading: fetchStationsLoading } =
@@ -93,6 +95,16 @@ export default function Home() {
     [setLineAtom, setStationAtom]
   );
 
+  const clearSelectedLine = useCallback(
+    () => setLineAtom((prev) => ({ ...prev, selectedLine: null })),
+    [setLineAtom]
+  );
+
+  const handleTrainTypeSelect = useCallback(
+    (trainType: TrainType) => setTrainType((prev) => ({ ...prev, trainType })),
+    [setTrainType]
+  );
+
   return (
     <Container>
       <Head>
@@ -113,7 +125,12 @@ export default function Home() {
         <LinesPanel lines={station.linesList} onSelect={handleSelectLine} />
       ) : null}
       {selectedLine && !selectedBound ? (
-        <BoundsPanel stationGroupList={bounds} onSelect={handleSelectedBound} />
+        <BoundsPanel
+          onBack={clearSelectedLine}
+          stationGroupList={bounds}
+          onSelect={handleSelectedBound}
+          onTrainTypeSelect={handleTrainTypeSelect}
+        />
       ) : null}
       {selectedBound && selectedLine ? (
         <>
@@ -148,4 +165,6 @@ export default function Home() {
       ) : null}
     </Container>
   );
-}
+};
+
+export default memo(Home);

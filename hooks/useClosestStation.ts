@@ -107,7 +107,11 @@ const useClosestStation = (
     }
     const { latitude, longitude } = location.coords;
 
-    const scoredStations = scoreStationDistances(stations, latitude, longitude);
+    const scoredStations = scoreStationDistances(
+      stations,
+      latitude,
+      longitude
+    ).filter((s) => !getIsPass(s));
     const nearestStation = scoredStations[0];
     const avg = getAvgStationBetweenDistances(stations);
     const arrived = isArrived(nearestStation, avg);

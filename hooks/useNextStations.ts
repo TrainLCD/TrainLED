@@ -4,6 +4,7 @@ import { lineAtom } from "../atoms/line";
 import { trainTypeAtom } from "../atoms/trainType";
 import type { Line, Station } from "../models/grpc";
 import getCurrentStationIndex from "../utils/currentStationIndex";
+import getIsPass from "../utils/isPass";
 import { getIsLoopLine } from "../utils/loopLine";
 
 const useNextStations = (
@@ -48,7 +49,7 @@ const useNextStations = (
     const ns = getIsLoopLine(selectedLine, trainType)
       ? getStationsForLoopLine(currentIndex)
       : getStations(currentIndex);
-    setNextStations(ns);
+    setNextStations(ns.filter((s) => !getIsPass(s)));
   }, [
     getStations,
     getStationsForLoopLine,
