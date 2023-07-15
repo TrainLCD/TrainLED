@@ -108,7 +108,7 @@ const MainMarquee = (props: Props) => {
       case "ltdexp":
         return ["特急", "Limited Express"];
       default:
-        return ["普通", "Local"];
+        return [trainType?.name ?? "", trainType?.nameRoman];
     }
   }, [line, nextStation, selectedDirection, trainType]);
 

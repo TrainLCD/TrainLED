@@ -2,6 +2,7 @@ import { useAtomValue } from "jotai";
 import { ChangeEvent, memo, useCallback } from "react";
 import styled from "styled-components";
 import { trainTypeAtom } from "../atoms/trainType";
+import useBounds from "../hooks/useBounds";
 import type { Station, TrainType } from "../models/grpc";
 import Button from "./Button";
 import { List, ListItem } from "./List";
@@ -47,6 +48,8 @@ const BoundsPanel = ({
 }: Props) => {
   const { trainType, fetchedTrainTypes } = useAtomValue(trainTypeAtom);
 
+  const { withTrainTypes } = useBounds();
+
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLSelectElement>) => {
       const newTrainType = fetchedTrainTypes.find(
@@ -74,15 +77,17 @@ const BoundsPanel = ({
             )
         )}
       </List>
-      <TrainTypeInputContainer>
-        <TrainTypeSelect value={trainType?.id ?? 0} onChange={handleChange}>
-          {fetchedTrainTypes.map((tt) => (
-            <option key={tt.id} value={tt.id}>
-              {tt.name}
-            </option>
-          ))}
-        </TrainTypeSelect>
-      </TrainTypeInputContainer>
+      {withTrainTypes && (
+        <TrainTypeInputContainer>
+          <TrainTypeSelect value={trainType?.id ?? 0} onChange={handleChange}>
+            {fetchedTrainTypes.map((tt) => (
+              <option key={tt.id} value={tt.id}>
+                {tt.name}
+              </option>
+            ))}
+          </TrainTypeSelect>
+        </TrainTypeInputContainer>
+      )}
 
       <BackButtonContainer>
         <Button onClick={onBack}>戻る</Button>
