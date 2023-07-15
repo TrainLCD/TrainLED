@@ -169,15 +169,6 @@ const MainMarquee = (props: Props) => {
 
               <LanguageSpacer />
 
-              <OrangeText>
-                {nextStation.linesList
-                  .filter((line) => line.id !== nextStation.line?.id)
-                  .map((line) => line.nameShort)
-                  .join(",")}
-              </OrangeText>
-
-              <HorizontalSpacer />
-
               <GreenText>The next stop is</GreenText>
               <HorizontalSpacer />
               <OrangeText>
