@@ -1,4 +1,6 @@
+import { useAtomValue } from "jotai";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { lineAtom } from "../atoms/line";
 import geolocationOptions from "../constants/geolocationOptions";
 import { LineType } from "../generated/stationapi_pb";
 import { Line, Station } from "../models/grpc";
@@ -12,7 +14,6 @@ import {
   getApproachingThreshold,
   getArrivedThreshold,
 } from "../utils/threshold";
-import useDirection from "./useDirection";
 
 const useClosestStation = (
   station: Station | null,
@@ -24,6 +25,7 @@ const useClosestStation = (
   approaching: boolean;
   newStation: Station | null;
 } => {
+  const { selectedDirection } = useAtomValue(lineAtom);
   const [location, setLocation] = useState<GeolocationPosition>();
   const [arrived, setArrived] = useState(false);
   const [approaching, setApproaching] = useState(false);
@@ -32,7 +34,6 @@ const useClosestStation = (
   const isMountedRef = useRef(false);
 
   const displayedNextStation = getNextStation(stations, station);
-  const direction = useDirection(selectedBound, stations);
 
   useEffect(() => {
     const noop = () => {};
@@ -86,7 +87,7 @@ const useClosestStation = (
         (s) => s.id === displayedNextStation?.id
       );
       const isNearestStationLaterThanCurrentStop =
-        direction === "INBOUND"
+        selectedDirection === "INBOUND"
           ? nearestStationIndex >= nextStationIndex
           : nearestStationIndex <= nextStationIndex;
 
@@ -97,7 +98,7 @@ const useClosestStation = (
         isNearestStationLaterThanCurrentStop
       );
     },
-    [direction, displayedNextStation, selectedLine?.lineType, stations]
+    [displayedNextStation, selectedDirection, selectedLine?.lineType, stations]
   );
 
   useEffect(() => {
@@ -106,7 +107,11 @@ const useClosestStation = (
     }
     const { latitude, longitude } = location.coords;
 
-    const scoredStations = scoreStationDistances(stations, latitude, longitude);
+    const scoredStations = scoreStationDistances(
+      stations,
+      latitude,
+      longitude
+    ).filter((s) => !getIsPass(s));
     const nearestStation = scoredStations[0];
     const avg = getAvgStationBetweenDistances(stations);
     const arrived = isArrived(nearestStation, avg);

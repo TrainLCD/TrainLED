@@ -1,43 +1,48 @@
+import { useAtom } from "jotai";
 import { useCallback, useState } from "react";
+import { stationAtom } from "../atoms/station";
 import { GetStationByCoordinatesRequest } from "../generated/stationapi_pb";
-import { Station } from "../models/grpc";
 import useGRPC from "./useGRPC";
 import useGeolocation from "./useGeolocation";
 
-const useNearbyStation = (): [
-  Station | null,
+const useFetchNearbyStation = (): [
   boolean,
   GeolocationPositionError | null
 ] => {
-  const [station, setStation] = useState<Station | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [{ station }, setStation] = useAtom(stationAtom);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<GeolocationPositionError | null>(null);
 
   const grpcClient = useGRPC();
 
   const fetchStation = useCallback(
     async (coords: GeolocationCoordinates | undefined) => {
-      if (!coords || !grpcClient) {
+      if (!coords || !!station) {
         return;
       }
+
+      setLoading(true);
+
       try {
         const { latitude, longitude } = coords;
         const req = new GetStationByCoordinatesRequest();
         req.setLatitude(latitude);
         req.setLongitude(longitude);
         req.setLimit(1);
-        setLoading(true);
         const data = (
           await grpcClient?.getStationsByCoordinates(req, null)
         )?.toObject();
+        setStation((prev) => ({
+          ...prev,
+          station: data?.stationsList[0] || null,
+        }));
         setLoading(false);
-        setStation(data.stationsList[0]);
       } catch (err) {
         setError(err as GeolocationPositionError);
         setLoading(false);
       }
     },
-    [grpcClient]
+    [grpcClient, setStation, station]
   );
 
   const onLocation = useCallback(
@@ -49,7 +54,7 @@ const useNearbyStation = (): [
 
   useGeolocation(onLocation, setError);
 
-  return [station, loading, error];
+  return [loading, error];
 };
 
-export default useNearbyStation;
+export default useFetchNearbyStation;

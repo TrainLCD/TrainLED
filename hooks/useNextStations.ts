@@ -1,21 +1,24 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useAtomValue } from "jotai";
+import { useCallback, useEffect, useState } from "react";
+import { lineAtom } from "../atoms/line";
+import { trainTypeAtom } from "../atoms/trainType";
 import type { Line, Station } from "../models/grpc";
 import getCurrentStationIndex from "../utils/currentStationIndex";
-import { isYamanoteLine } from "../utils/loopLine";
-import useDirection from "./useDirection";
+import getIsPass from "../utils/isPass";
+import { getIsLoopLine } from "../utils/loopLine";
 
 const useNextStations = (
   stations: Station[],
   station: Station | null,
-  selectedLine: Line | null,
-  boundStation: Station | null
+  selectedLine: Line | null
 ): Station[] => {
   const [nextStations, setNextStations] = useState<Station[]>([]);
-  const direction = useDirection(boundStation, stations);
+  const { selectedDirection } = useAtomValue(lineAtom);
+  const { trainType } = useAtomValue(trainTypeAtom);
 
   const getStationsForLoopLine = useCallback(
     (currentStationIndex: number): Station[] => {
-      if (direction === "OUTBOUND") {
+      if (selectedDirection === "OUTBOUND") {
         const sliced = stations.slice(currentStationIndex);
         if (sliced.length === 1) {
           return [...sliced, ...stations];
@@ -28,40 +31,32 @@ const useNextStations = (
       }
       return sliced;
     },
-    [direction, stations]
+    [selectedDirection, stations]
   );
 
   const getStations = useCallback(
     (currentStationIndex: number): Station[] => {
-      if (direction === "OUTBOUND") {
+      if (selectedDirection === "OUTBOUND") {
         return stations.slice(0, currentStationIndex + 1).reverse();
       }
       return stations.slice(currentStationIndex);
     },
-    [direction, stations]
+    [selectedDirection, stations]
   );
-
-  const loopLine = useMemo(() => {
-    if (selectedLine?.id === 11623) {
-      return false;
-    }
-    return isYamanoteLine(selectedLine?.id) || selectedLine?.id === 11623;
-  }, [selectedLine]);
 
   useEffect(() => {
     const currentIndex = getCurrentStationIndex(stations, station);
-    const ns = loopLine
+    const ns = getIsLoopLine(selectedLine, trainType)
       ? getStationsForLoopLine(currentIndex)
       : getStations(currentIndex);
-    setNextStations(ns);
+    setNextStations(ns.filter((s) => !getIsPass(s)));
   }, [
-    direction,
     getStations,
     getStationsForLoopLine,
-    loopLine,
     selectedLine,
     station,
     stations,
+    trainType,
   ]);
 
   return nextStations;

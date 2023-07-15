@@ -1,44 +1,231 @@
-import { useCallback, useState } from "react";
-import { GetStationByLineIdRequest } from "../generated/stationapi_pb";
-import { Station } from "../models/grpc";
+import { useAtom, useAtomValue } from "jotai";
+import { useCallback, useEffect, useState } from "react";
+import { lineAtom } from "../atoms/line";
+import { stationAtom } from "../atoms/station";
+import { trainTypeAtom } from "../atoms/trainType";
+import {
+  GetStationByLineIdRequest,
+  GetStationsByLineGroupIdRequest,
+  GetTrainTypesByStationIdRequest,
+  TrainDirection,
+} from "../generated/stationapi_pb";
+import dropEitherJunctionStation from "../utils/dropJunctionStation";
+import {
+  findBranchLine,
+  findLocalType,
+  findLtdExpType,
+  findRapidType,
+  getTrainTypeString,
+} from "../utils/trainTypeString";
 import useGRPC from "./useGRPC";
 
-const useStationList = (): [
-  Station[],
-  (lineId: number) => void,
-  boolean,
-  Error | undefined
-] => {
-  const [stations, setStations] = useState<Station[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error>();
-
+const useStationList = (): {
+  fetchSelectedTrainTypeStations: () => Promise<void>;
+  loading: boolean;
+  error: Error | null;
+} => {
+  const [{ station }, setStationState] = useAtom(stationAtom);
+  const [{ trainType, fetchedTrainTypes }, setTrainTypeAtom] =
+    useAtom(trainTypeAtom);
+  const { selectedLine, selectedDirection } = useAtomValue(lineAtom);
   const grpcClient = useGRPC();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const fetchStationListWithTrainTypes = useCallback(
-    async (lineId: number) => {
-      if (!grpcClient) {
+  const fetchTrainTypes = useCallback(async () => {
+    try {
+      if (!selectedLine?.station?.id) {
         return;
       }
 
-      try {
-        setLoading(true);
-        const req = new GetStationByLineIdRequest();
-        req.setLineId(lineId);
-        const data = (
-          await grpcClient?.getStationsByLineId(req, null)
-        )?.toObject();
-        setStations(data.stationsList);
-        setLoading(false);
-      } catch (err) {
-        setError(err as Error);
-        setLoading(false);
-      }
-    },
-    [grpcClient]
-  );
+      setLoading(true);
 
-  return [stations, fetchStationListWithTrainTypes, loading, error];
+      const req = new GetTrainTypesByStationIdRequest();
+      req.setStationId(selectedLine.station.id);
+      const trainTypesRes = (
+        await grpcClient?.getTrainTypesByStationId(req, null)
+      )?.toObject();
+
+      const trainTypesList = trainTypesRes?.trainTypesList ?? [];
+
+      // 普通種別が登録済み: 非表示
+      // 普通種別は登録されていないが、快速もしくは特急はある: 非表示
+      // 支線種別が登録されていているが、普通種別が登録されていない: 非表示
+      // 特例で普通列車以外の種別で表示を設定されている場合(中央線快速等): 非表示
+      // 上記以外: 表示
+      if (
+        !(
+          findLocalType(trainTypesList) ||
+          (!findLocalType(trainTypesList) &&
+            (findRapidType(trainTypesList) ||
+              findLtdExpType(trainTypesList))) ||
+          (findBranchLine(trainTypesList) && !findLocalType(trainTypesList))
+        )
+      ) {
+        setTrainTypeAtom((prev) => ({
+          ...prev,
+          fetchedTrainTypes: [
+            {
+              id: 0,
+              typeId: 0,
+              groupId: 0,
+              name: "普通/各駅停車",
+              nameKatakana: "",
+              nameRoman: "Local",
+              nameChinese: "慢车/每站停车",
+              nameKorean: "보통/각역정차",
+              color: "",
+              linesList: [],
+              direction: TrainDirection.BOTH,
+            },
+          ],
+        }));
+      }
+
+      setTrainTypeAtom((prev) => ({
+        ...prev,
+        trainType:
+          findLocalType(trainTypesList) ?? findRapidType(trainTypesList),
+        fetchedTrainTypes: [...prev.fetchedTrainTypes, ...trainTypesList],
+      }));
+
+      // 各停・快速・特急種別がある場合は該当種別を自動選択する
+      const trainTypeString = getTrainTypeString(selectedLine, station);
+      switch (trainTypeString) {
+        case "local":
+          setTrainTypeAtom((prev) => ({
+            ...prev,
+            trainType: !prev.trainType
+              ? findLocalType(fetchedTrainTypes)
+              : prev.trainType,
+          }));
+          break;
+        case "rapid":
+          setTrainTypeAtom((prev) => ({
+            ...prev,
+            trainType: !prev.trainType
+              ? findRapidType(fetchedTrainTypes)
+              : prev.trainType,
+          }));
+          break;
+        case "ltdexp":
+          setTrainTypeAtom((prev) => ({
+            ...prev,
+            trainType: !prev.trainType
+              ? findLtdExpType(fetchedTrainTypes)
+              : prev.trainType,
+          }));
+          break;
+        default:
+          break;
+      }
+
+      setLoading(false);
+    } catch (err) {
+      setError(err as any);
+      setLoading(false);
+    }
+  }, [fetchedTrainTypes, grpcClient, selectedLine, setTrainTypeAtom, station]);
+
+  const fetchInitialStationList = useCallback(async () => {
+    const lineId = selectedLine?.id;
+    if (!lineId) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const req = new GetStationByLineIdRequest();
+      req.setLineId(lineId);
+      const data = (
+        await grpcClient?.getStationsByLineId(req, null)
+      )?.toObject();
+
+      if (!data) {
+        setLoading(false);
+        return;
+      }
+
+      setStationState((prev) => ({
+        ...prev,
+        stations: dropEitherJunctionStation(
+          data.stationsList,
+          selectedDirection
+        ),
+      }));
+
+      if (station?.hasTrainTypes) {
+        await fetchTrainTypes();
+      }
+
+      setLoading(false);
+    } catch (err) {
+      setError(err as any);
+      setLoading(false);
+    }
+  }, [
+    fetchTrainTypes,
+    grpcClient,
+    selectedDirection,
+    selectedLine?.id,
+    setStationState,
+    station?.hasTrainTypes,
+  ]);
+
+  const fetchSelectedTrainTypeStations = useCallback(async () => {
+    if (!trainType?.groupId || !fetchedTrainTypes.length) {
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const req = new GetStationsByLineGroupIdRequest();
+      req.setLineGroupId(trainType?.groupId);
+      const data = (
+        await grpcClient?.getStationsByLineGroupId(req, null)
+      )?.toObject();
+
+      if (!data) {
+        setLoading(false);
+        return;
+      }
+
+      setStationState((prev) => ({
+        ...prev,
+        stations: dropEitherJunctionStation(
+          data.stationsList,
+          selectedDirection
+        ),
+      }));
+      setTrainTypeAtom((prev) => ({ ...prev }));
+
+      setLoading(false);
+    } catch (err) {
+      setError(err as any);
+      setLoading(false);
+    }
+  }, [
+    fetchedTrainTypes.length,
+    grpcClient,
+    selectedDirection,
+    setStationState,
+    setTrainTypeAtom,
+    trainType,
+  ]);
+
+  useEffect(() => {
+    if (!fetchedTrainTypes.length) {
+      fetchInitialStationList();
+    }
+  }, [fetchInitialStationList, fetchedTrainTypes.length]);
+
+  return {
+    fetchSelectedTrainTypeStations,
+    loading,
+    error,
+  };
 };
 
 export default useStationList;

@@ -1,5 +1,4 @@
 // 対処法が今のところないので一旦無視する
-/* eslint-disable react/jsx-key */
 import styled from "styled-components";
 import { LanguageState } from "../hooks/useCurrentLanguageState";
 import type { Station } from "../models/grpc";
@@ -36,6 +35,7 @@ const OrangeTextContainer = styled.div`
 `;
 
 const OrangeText = styled.p`
+  line-height: 1.25;
   color: orange;
   margin: 0;
   flex: 1;
@@ -44,7 +44,6 @@ const OrangeText = styled.p`
 `;
 
 type Props = {
-  bound: Station;
   currentStation: Station | null;
   nextStation: Station | null;
   arrived: boolean;
@@ -66,6 +65,37 @@ const SwitchedStationText = ({
   nextStation,
   language,
 }: SwitchedStationTextProps) => {
+  if (arrived && currentStation) {
+    return (
+      <TextContainer arrived>
+        {language === "ja" ? (
+          <OrangeTextContainer>
+            {currentStation.name.split("").map((c, i) => (
+              <OrangeText key={`${c}${i}`}>{c}</OrangeText>
+            ))}
+          </OrangeTextContainer>
+        ) : null}
+        {language === "jaKana" ? (
+          <OrangeTextContainer>
+            {currentStation.nameKatakana.split("").map((c, i) => (
+              <OrangeText key={`${c}${i}`}>{c}</OrangeText>
+            ))}
+          </OrangeTextContainer>
+        ) : null}
+        {language === "en" ? (
+          <OrangeTextContainer>
+            <OrangeText>
+              {currentStation.nameRoman}
+              {currentStation.stationNumbersList.length
+                ? `\n(${currentStation.stationNumbersList[0]?.stationNumber})`
+                : ""}
+            </OrangeText>
+          </OrangeTextContainer>
+        ) : null}
+      </TextContainer>
+    );
+  }
+
   if (approaching && nextStation) {
     return (
       <TextContainer>
@@ -73,8 +103,8 @@ const SwitchedStationText = ({
           <>
             <GreenText>まもなく</GreenText>
             <OrangeTextContainer>
-              {nextStation.name.split("").map((c) => (
-                <OrangeText>{c}</OrangeText>
+              {nextStation.name.split("").map((c, i) => (
+                <OrangeText key={`${c}${i}`}>{c}</OrangeText>
               ))}
             </OrangeTextContainer>
           </>
@@ -83,8 +113,8 @@ const SwitchedStationText = ({
           <>
             <GreenText>まもなく</GreenText>
             <OrangeTextContainer>
-              {nextStation.nameKatakana.split("").map((c) => (
-                <OrangeText>{c}</OrangeText>
+              {nextStation.nameKatakana.split("").map((c, i) => (
+                <OrangeText key={`${c}${i}`}>{c}</OrangeText>
               ))}
             </OrangeTextContainer>
           </>
@@ -104,37 +134,6 @@ const SwitchedStationText = ({
     );
   }
 
-  if (arrived && currentStation) {
-    return (
-      <TextContainer arrived>
-        {language === "ja" ? (
-          <OrangeTextContainer>
-            {currentStation.name.split("").map((c) => (
-              <OrangeText>{c}</OrangeText>
-            ))}
-          </OrangeTextContainer>
-        ) : null}
-        {language === "jaKana" ? (
-          <OrangeTextContainer>
-            {currentStation.nameKatakana.split("").map((c) => (
-              <OrangeText>{c}</OrangeText>
-            ))}
-          </OrangeTextContainer>
-        ) : null}
-        {language === "en" ? (
-          <OrangeTextContainer>
-            <OrangeText>
-              {currentStation.nameRoman}
-              {currentStation.stationNumbersList.length
-                ? `\n(${currentStation.stationNumbersList[0]?.stationNumber})`
-                : ""}
-            </OrangeText>
-          </OrangeTextContainer>
-        ) : null}
-      </TextContainer>
-    );
-  }
-
   if (!nextStation) {
     return null;
   }
@@ -144,8 +143,8 @@ const SwitchedStationText = ({
         <>
           <GreenText>次は</GreenText>
           <OrangeTextContainer>
-            {nextStation.name.split("").map((c) => (
-              <OrangeText>{c}</OrangeText>
+            {nextStation.name.split("").map((c, i) => (
+              <OrangeText key={`${c}${i}`}>{c}</OrangeText>
             ))}
           </OrangeTextContainer>
         </>
@@ -154,8 +153,8 @@ const SwitchedStationText = ({
         <>
           <GreenText>次は</GreenText>
           <OrangeTextContainer>
-            {nextStation.nameKatakana.split("").map((c) => (
-              <OrangeText>{c}</OrangeText>
+            {nextStation.nameKatakana.split("").map((c, i) => (
+              <OrangeText key={`${c}${i}`}>{c}</OrangeText>
             ))}
           </OrangeTextContainer>
         </>
@@ -167,7 +166,7 @@ const SwitchedStationText = ({
             <OrangeText>
               {nextStation.nameRoman}
               {nextStation.stationNumbersList.length
-                ? `(${nextStation.stationNumbersList[0]?.stationNumber})`
+                ? `\n(${nextStation.stationNumbersList[0]?.stationNumber})`
                 : ""}
             </OrangeText>
           </OrangeTextContainer>
@@ -178,10 +177,9 @@ const SwitchedStationText = ({
 };
 
 const MainTopText = (props: Props) => {
-  const { bound, ...rest } = props;
   return (
     <Container>
-      <SwitchedStationText {...rest} />
+      <SwitchedStationText {...props} />
     </Container>
   );
 };

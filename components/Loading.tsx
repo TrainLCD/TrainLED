@@ -1,9 +1,10 @@
-import styled from "styled-components";
+// const Message = styled.h1`
+//   text-align: center;
+// `;
 
-const Message = styled.h1``;
+// const Loading = () => {
+//   return <Message>暫し待たれよ</Message>;
+// };
 
-const Loading = () => {
-  return <Message>暫し待たれよ</Message>;
-};
-
-export default Loading;
+// eslint-disable-next-line import/no-anonymous-default-export
+export default () => null;

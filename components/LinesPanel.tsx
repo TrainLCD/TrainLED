@@ -13,25 +13,20 @@ type Props = {
   onSelect: (line: Line) => void;
 };
 
-const LinesPanel = ({ lines, onSelect }: Props) => {
-  if (!lines.length) {
-    return null;
-  }
-
-  return (
-    <Container>
-      <Title>路線極度選択（しなさい）</Title>
-      <List>
-        {lines.map((l) => (
-          <ListItem key={l.id}>
-            <Button onClick={onSelect.bind(null, l)}>
-              {l.nameShort.replace(parenthesisRegexp, "")}
-            </Button>
-          </ListItem>
-        ))}
-      </List>
-    </Container>
-  );
-};
+const LinesPanel = ({ lines, onSelect }: Props) => (
+  <Container>
+    <Title>路線極度選択（しなさい）</Title>
+    <List>
+      {lines.map((l) => (
+        <ListItem key={l.id}>
+          <Button onClick={onSelect.bind(null, l)} bgColor={l.color ?? "#ffｆ"}>
+            [{l.lineSymbolsList.map((sym) => sym?.symbol).join("/")}]
+            {l.nameShort.replace(parenthesisRegexp, "")}
+          </Button>
+        </ListItem>
+      ))}
+    </List>
+  </Container>
+);
 
 export default LinesPanel;
