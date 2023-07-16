@@ -1,6 +1,5 @@
 import { useAtom, useSetAtom } from "jotai";
 import Head from "next/head";
-import NoSleep from "nosleep.js";
 import { memo, useCallback, useEffect } from "react";
 import styled from "styled-components";
 import { lineAtom } from "../atoms/line";
@@ -21,8 +20,6 @@ import useStationList from "../hooks/useStationList";
 import { Line, Station, TrainType } from "../models/grpc";
 
 const isClient = () => typeof navigator !== "undefined";
-
-const noSleep = isClient() && new NoSleep();
 
 const Container = styled.main`
   display: flex;
@@ -90,14 +87,18 @@ const Home = () => {
   );
 
   const handleSelectedBound = useCallback(
-    (selectedBound: Station, index: number) => {
+    async (selectedBound: Station, index: number) => {
       setStationAtom((prev) => ({ ...prev, selectedBound }));
       setLineAtom((prev) => ({
         ...prev,
         selectedDirection: !index ? "INBOUND" : "OUTBOUND",
       }));
-      if (isClient() && typeof noSleep === "object") {
-        noSleep.enable();
+      if (isClient()) {
+        try {
+          await navigator.wakeLock.request("screen");
+        } catch (err: any) {
+          console.log(`${err.name}, ${err.message}`);
+        }
       }
     },
     [setLineAtom, setStationAtom]
