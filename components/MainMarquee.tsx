@@ -5,6 +5,7 @@ import styled from "styled-components";
 import { lineAtom } from "../atoms/line";
 import { trainTypeAtom } from "../atoms/trainType";
 import { parenthesisRegexp } from "../constants/regexp";
+import { StopCondition } from "../generated/stationapi_pb";
 import useBounds from "../hooks/useBounds";
 import type { Line, Station } from "../models/grpc";
 import { getIsLoopLine } from "../utils/loopLine";
@@ -33,6 +34,9 @@ const GreenText = styled.span`
 `;
 const OrangeText = styled.span`
   color: orange;
+`;
+const CrimsonText = styled.span`
+  color: crimson;
 `;
 
 const LanguageSpacer = styled.div`
@@ -159,6 +163,15 @@ const MainMarquee = (props: Props) => {
                   <GreenText>の次は</GreenText>
                   <OrangeText>{afterNextStation.name}</OrangeText>
                   <GreenText>に停車いたします。</GreenText>
+                  {nextStation.stopCondition !== StopCondition.ALL && (
+                    <>
+                      <CrimsonText>
+                        {nextStation.name}
+                        駅は一部列車は通過いたします。
+                      </CrimsonText>
+                      <OrangeText>ご注意ください。</OrangeText>
+                    </>
+                  )}
                 </>
               ) : null}
               <HorizontalSpacer />
@@ -237,6 +250,15 @@ const MainMarquee = (props: Props) => {
                   <GreenText>の次は</GreenText>
                   <OrangeText>{afterNextStation.name}</OrangeText>
                   <GreenText>に停車いたします。</GreenText>
+                  {nextStation.stopCondition !== StopCondition.ALL && (
+                    <>
+                      <CrimsonText>
+                        {nextStation.name}
+                        駅は一部列車は通過いたします。
+                      </CrimsonText>
+                      <OrangeText>ご注意ください。</OrangeText>
+                    </>
+                  )}
                 </>
               ) : null}
               <HorizontalSpacer />
