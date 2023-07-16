@@ -58,7 +58,7 @@ const Home = () => {
   const [{ station, stations, selectedBound }, setStationAtom] =
     useAtom(stationAtom);
   const [{ selectedLine }, setLineAtom] = useAtom(lineAtom);
-  const setTrainType = useSetAtom(trainTypeAtom);
+  const setTrainTypeAtom = useSetAtom(trainTypeAtom);
 
   const [fetchLinesLoading, hasFetchLinesError] = useFetchNearbyStation();
   const { fetchSelectedTrainTypeStations, loading: fetchStationsLoading } =
@@ -105,27 +105,32 @@ const Home = () => {
     [setLineAtom, setStationAtom]
   );
 
-  const clearSelectedLine = useCallback(
-    () => setLineAtom((prev) => ({ ...prev, selectedLine: null })),
-    [setLineAtom]
-  );
+  const clearSelectedLine = useCallback(() => {
+    setTrainTypeAtom((prev) => ({
+      ...prev,
+      trainType: null,
+      fetchedTrainTypes: [],
+    }));
+    setStationAtom((prev) => ({ ...prev, stations: [] }));
+    setLineAtom((prev) => ({ ...prev, selectedLine: null }));
+  }, [setLineAtom, setStationAtom, setTrainTypeAtom]);
 
   const handleTrainTypeSelect = useCallback(
     (trainType: TrainType) => {
       if (trainType.id === 0) {
-        setTrainType((prev) => ({
+        setTrainTypeAtom((prev) => ({
           ...prev,
           trainType: null,
         }));
         return;
       }
 
-      setTrainType((prev) => ({
+      setTrainTypeAtom((prev) => ({
         ...prev,
         trainType,
       }));
     },
-    [setTrainType]
+    [setTrainTypeAtom]
   );
 
   return (
