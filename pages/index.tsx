@@ -96,7 +96,7 @@ const Home = () => {
       if (isClient()) {
         try {
           if ("wakeLock" in navigator) {
-            await navigator.wakeLock.request("screen");
+            await (navigator as any).wakeLock.request("screen");
           }
         } catch (err: any) {
           console.log(`${err.name}, ${err.message}`);
