@@ -49,17 +49,15 @@ const useStationList = (): {
       const trainTypesList = trainTypesRes?.trainTypesList ?? [];
 
       // 普通種別が登録済み: 非表示
-      // 普通種別は登録されていないが、快速もしくは特急はある: 非表示
       // 支線種別が登録されていているが、普通種別が登録されていない: 非表示
-      // 特例で普通列車以外の種別で表示を設定されている場合(中央線快速等): 非表示
+      // 特例で普通列車以外の種別で表示を設定されている場合(中央線快速等): 表示
       // 上記以外: 表示
       if (
         !(
-          findLocalType(trainTypesList) ||
-          (!findLocalType(trainTypesList) &&
-            (findRapidType(trainTypesList) ||
-              findLtdExpType(trainTypesList))) ||
-          (findBranchLine(trainTypesList) && !findLocalType(trainTypesList))
+          findLocalType(trainTypesRes?.trainTypesList ?? []) ||
+          (findBranchLine(trainTypesRes?.trainTypesList ?? []) &&
+            !findLocalType(trainTypesRes?.trainTypesList ?? [])) ||
+          getTrainTypeString(selectedLine, station) !== "local"
         )
       ) {
         setTrainTypeAtom((prev) => ({
