@@ -132,6 +132,16 @@ const MainMarquee = (props: Props) => {
             .join(", the ")
         : filteredLines.map((line) => line.nameRoman).join("");
 
+    if (filteredLines.length <= 1) {
+      return [
+        filteredLines
+          .map((line) => line.nameShort.replace(parenthesisRegexp, ""))
+          .join("、")
+          .replace(parenthesisRegexp, ""),
+        headTextForEn,
+      ];
+    }
+
     const tailTextForEn = filteredLines
       .slice(-1)[0]
       ?.nameRoman?.replace(parenthesisRegexp, "");
