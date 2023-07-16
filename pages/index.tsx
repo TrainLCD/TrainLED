@@ -93,13 +93,12 @@ const Home = () => {
         ...prev,
         selectedDirection: !index ? "INBOUND" : "OUTBOUND",
       }));
-      if (isClient()) {
+      if (isClient() && "wakeLock" in navigator) {
         try {
-          if ("wakeLock" in navigator) {
-            await (navigator as any).wakeLock.request("screen");
-          }
+          await (navigator as any).wakeLock.request("screen");
         } catch (err: any) {
-          console.log(`${err.name}, ${err.message}`);
+          const msg = `${err.name}, ${err.message}`;
+          console.error(msg);
         }
       }
     },
