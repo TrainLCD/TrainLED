@@ -82,8 +82,7 @@ const useStationList = (): {
 
       setTrainTypeAtom((prev) => ({
         ...prev,
-        trainType:
-          findLocalType(trainTypesList) ?? findRapidType(trainTypesList),
+        trainType: findLocalType(trainTypesList),
         fetchedTrainTypes: [...prev.fetchedTrainTypes, ...trainTypesList],
       }));
 
@@ -172,13 +171,39 @@ const useStationList = (): {
   ]);
 
   const fetchSelectedTrainTypeStations = useCallback(async () => {
-    if (!trainType?.groupId || !fetchedTrainTypes.length) {
+    if (!selectedLine) {
       return;
     }
 
     setLoading(true);
 
+    setStationState((prev) => ({
+      ...prev,
+      stations: [],
+    }));
+
     try {
+      if (!trainType?.groupId) {
+        const req = new GetStationByLineIdRequest();
+        req.setLineId(selectedLine.id);
+        const data = (
+          await grpcClient?.getStationsByLineId(req, null)
+        )?.toObject();
+
+        if (!data) {
+          setLoading(false);
+          return;
+        }
+
+        setStationState((prev) => ({
+          ...prev,
+          stations: data.stationsList,
+        }));
+
+        setLoading(false);
+        return;
+      }
+
       const req = new GetStationsByLineGroupIdRequest();
       req.setLineGroupId(trainType?.groupId);
       const data = (
@@ -208,9 +233,10 @@ const useStationList = (): {
     fetchedTrainTypes.length,
     grpcClient,
     selectedDirection,
+    selectedLine,
     setStationState,
     setTrainTypeAtom,
-    trainType,
+    trainType?.groupId,
   ]);
 
   useEffect(() => {
