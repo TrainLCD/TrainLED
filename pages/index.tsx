@@ -101,7 +101,20 @@ const Home = () => {
   );
 
   const handleTrainTypeSelect = useCallback(
-    (trainType: TrainType) => setTrainType((prev) => ({ ...prev, trainType })),
+    (trainType: TrainType) => {
+      if (trainType.id === 0) {
+        setTrainType((prev) => ({
+          ...prev,
+          trainType: null,
+        }));
+        return;
+      }
+
+      setTrainType((prev) => ({
+        ...prev,
+        trainType,
+      }));
+    },
     [setTrainType]
   );
 
