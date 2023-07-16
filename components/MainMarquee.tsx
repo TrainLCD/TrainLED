@@ -215,12 +215,13 @@ const MainMarquee = (props: Props) => {
                   </OrangeText>
                 </>
               ) : null}
-              <GreenText>. Please change here for</GreenText>
-              <HorizontalSpacer />
+              <GreenText>.</GreenText>
               {nextStation.linesList.filter(
                 (line) => line.id !== nextStation.line?.id
               ).length > 0 && (
                 <>
+                  <GreenText>. Please change here for</GreenText>
+                  <HorizontalSpacer />
                   <OrangeText>the {transferTexts[1]}</OrangeText>
                   <GreenText>.</GreenText>
                 </>
@@ -302,12 +303,13 @@ const MainMarquee = (props: Props) => {
                   </OrangeText>
                 </>
               ) : null}
-              <GreenText>. Please change here for</GreenText>
-              <HorizontalSpacer />
+              <GreenText>.</GreenText>
               {nextStation.linesList.filter(
                 (line) => line.id !== nextStation.line?.id
               ).length > 0 && (
                 <>
+                  <GreenText>Please change here for</GreenText>
+                  <HorizontalSpacer />
                   <OrangeText>the {transferTexts[1]}</OrangeText>
                   <GreenText>.</GreenText>
                 </>
