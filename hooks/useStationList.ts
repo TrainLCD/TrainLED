@@ -177,11 +177,6 @@ const useStationList = (): {
 
     setLoading(true);
 
-    setStationState((prev) => ({
-      ...prev,
-      stations: [],
-    }));
-
     try {
       if (!trainType?.groupId) {
         const req = new GetStationByLineIdRequest();
@@ -230,7 +225,6 @@ const useStationList = (): {
       setLoading(false);
     }
   }, [
-    fetchedTrainTypes.length,
     grpcClient,
     selectedDirection,
     selectedLine,
