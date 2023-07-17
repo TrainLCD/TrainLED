@@ -4,7 +4,12 @@ import type { Line } from "../models/grpc";
 import Button from "./Button";
 import { List, ListItem } from "./List";
 
-const Container = styled.div``;
+const Container = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+`;
 const Title = styled.h3`
   text-align: center;
 `;

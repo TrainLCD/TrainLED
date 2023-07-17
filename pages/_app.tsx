@@ -39,7 +39,6 @@ const APP_BASE_URL = "https://led.trainlcd.app";
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
-      {" "}
       <Head>
         <link
           rel="preload"

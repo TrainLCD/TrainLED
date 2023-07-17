@@ -15,6 +15,7 @@ import {
   getIsYamanoteLine,
 } from "../utils/loopLine";
 import { getTrainTypeString } from "../utils/trainTypeString";
+import HorizontalSpacer from "./HorizontalSpacer";
 
 const InnerContainer = styled.div`
   display: flex;
@@ -46,10 +47,6 @@ const CrimsonText = styled.span`
 
 const LanguageSpacer = styled.div`
   width: 50vw;
-`;
-
-const HorizontalSpacer = styled.div<{ wide?: boolean }>`
-  width: ${({ wide }) => (wide ? 10 : 3)}vw;
 `;
 
 type Props = {
@@ -387,4 +384,3 @@ const MainMarquee = (props: Props) => {
 };
 
 export default MainMarquee;
-/////
