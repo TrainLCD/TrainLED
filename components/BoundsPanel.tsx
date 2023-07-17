@@ -15,30 +15,40 @@ import {
 import Button from "./Button";
 import { List, ListItem } from "./List";
 
-const Container = styled.div`
+const Container = styled.div``;
+const Title = styled.h3`
   text-align: center;
 `;
-const Title = styled.h3``;
 
 const BackButtonContainer = styled.div`
+  margin-top: 32px;
   margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
 `;
 
 const TrainTypeInputContainer = styled.div`
   margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
 `;
 
 const TrainTypeSelect = styled.select`
+  display: block;
   appearance: none;
   background-color: transparent;
   border: 1px solid #fff;
   color: white;
   font-size: 1rem;
   padding: 12px;
-  text-align: center;
   outline: none;
-  min-width: 200px;
+  min-width: 240px;
   font-family: "JF-Dot-jiskan24";
+  margin-top: 8px;
+`;
+
+const ButtonInnerText = styled.span`
+  font-weight: bold;
 `;
 
 type Props = {
@@ -101,7 +111,9 @@ const BoundsPanel = ({ onSelect, onBack, onTrainTypeSelect }: Props) => {
         group[0] && (
           <ListItem key={group[0]?.id}>
             <Button onClick={() => onSelect(group[0], index)}>
-              {getBoundTypeText(group, !index ? "INBOUND" : "OUTBOUND")}
+              <ButtonInnerText>
+                {getBoundTypeText(group, !index ? "INBOUND" : "OUTBOUND")}
+              </ButtonInnerText>
             </Button>
           </ListItem>
         )

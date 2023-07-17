@@ -9,6 +9,7 @@ export default styled.button<{ bgColor?: string }>`
   font-size: 1rem;
   font-family: "JF-Dot-jiskan24";
   background-color: ${({ bgColor }) => bgColor || "#212121"};
+  min-width: 240px;
 
   &:focus {
     outline: none;
