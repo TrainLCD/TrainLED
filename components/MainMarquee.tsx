@@ -8,7 +8,12 @@ import { parenthesisRegexp } from "../constants/regexp";
 import { StopCondition } from "../generated/stationapi_pb";
 import useBounds from "../hooks/useBounds";
 import type { Line, Station } from "../models/grpc";
-import { getIsLoopLine } from "../utils/loopLine";
+import {
+  getIsLoopLine,
+  getIsMeijoLine,
+  getIsOsakaLoopLine,
+  getIsYamanoteLine,
+} from "../utils/loopLine";
 import { getTrainTypeString } from "../utils/trainTypeString";
 
 const InnerContainer = styled.div`
@@ -96,10 +101,19 @@ const MainMarquee = (props: Props) => {
   }, [bounds, line, selectedDirection, trainType]);
 
   const trainTypeTexts = useMemo(() => {
-    if (getIsLoopLine(line, trainType) && selectedDirection) {
+    if (
+      (getIsYamanoteLine(line.id) || getIsOsakaLoopLine(line.id)) &&
+      selectedDirection
+    ) {
+      if (getIsMeijoLine(line.id)) {
+        return [
+          selectedDirection === "INBOUND" ? "左回り" : "右回り",
+          selectedDirection === "INBOUND" ? "Counterclockwise" : "Clockwise",
+        ];
+      }
       return [
         selectedDirection === "INBOUND" ? "内回り" : "外回り",
-        selectedDirection === "INBOUND" ? "Counter-clockwise" : "Clockwise",
+        selectedDirection === "INBOUND" ? "Counterclockwise" : "Clockwise",
       ];
     }
 
@@ -112,7 +126,7 @@ const MainMarquee = (props: Props) => {
       case "ltdexp":
         return ["特急", "Limited Express"];
       default:
-        return [trainType?.name ?? "", trainType?.nameRoman];
+        return [trainType?.name ?? "", trainType?.nameRoman ?? ""];
     }
   }, [line, nextStation, selectedDirection, trainType]);
 

@@ -150,7 +150,6 @@ const Home = () => {
       {selectedLine && !selectedBound ? (
         <BoundsPanel
           onBack={clearSelectedLine}
-          stationGroupList={bounds}
           onSelect={handleSelectedBound}
           onTrainTypeSelect={handleTrainTypeSelect}
         />

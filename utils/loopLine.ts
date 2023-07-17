@@ -18,17 +18,29 @@ const OSAKA_LOOP_LINE_MAJOR_STATIONS_ID = [
   1162313, // 京橋
 ];
 
-export const isYamanoteLine = (lineId: number): boolean => lineId === 11302;
-export const isOsakaLoopLine = (lineId: number): boolean => lineId === 11623;
-export const isMeijoLine = (lineId: number): boolean => lineId === 99514;
+const MEIJO_LINE_MAJOR_STATIONS_ID = [
+  9951409, // 栄
+  9951402, // 大曽根
+  9951407, // 名古屋城
+  9951413, // 金山
+  9951419, // 新瑞橋
+];
+
+export const getIsYamanoteLine = (lineId: number): boolean => lineId === 11302;
+export const getIsOsakaLoopLine = (lineId: number): boolean => lineId === 11623;
+export const getIsMeijoLine = (lineId: number): boolean => lineId === 99514;
 
 const getMajorStationIds = (line: Line) => {
-  if (isYamanoteLine(line.id)) {
+  if (getIsYamanoteLine(line.id)) {
     return YAMANOTE_LINE_MAJOR_STATIONS_ID;
   }
 
-  if (isOsakaLoopLine(line.id)) {
+  if (getIsOsakaLoopLine(line.id)) {
     return OSAKA_LOOP_LINE_MAJOR_STATIONS_ID;
+  }
+
+  if (getIsMeijoLine(line.id)) {
+    return MEIJO_LINE_MAJOR_STATIONS_ID;
   }
 
   return [];
@@ -42,7 +54,9 @@ export const getIsLoopLine = (
     return false;
   }
   return (
-    isYamanoteLine(line.id) || isOsakaLoopLine(line.id) || isMeijoLine(line.id)
+    getIsYamanoteLine(line.id) ||
+    getIsOsakaLoopLine(line.id) ||
+    getIsMeijoLine(line.id)
   );
 };
 

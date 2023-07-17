@@ -1,45 +1,48 @@
 import { useAtomValue } from "jotai";
 import { useEffect, useMemo, useState } from "react";
-import { lineAtom } from "../atoms/line";
 import { stationAtom } from "../atoms/station";
 import { trainTypeAtom } from "../atoms/trainType";
 import type { Station } from "../models/grpc";
 import getCurrentStationIndex from "../utils/currentStationIndex";
 import {
+  getIsMeijoLine,
+  getIsOsakaLoopLine,
+  getIsYamanoteLine,
   inboundStationsForLoopLine,
-  isMeijoLine,
-  isOsakaLoopLine,
-  isYamanoteLine,
   outboundStationsForLoopLine,
 } from "../utils/loopLine";
 import { findBranchLine, findLocalType } from "../utils/trainTypeString";
+import useCurrentLine from "./useCurrentLine";
+import useCurrentStation from "./useCurrentStation";
 
 const useBounds = (): {
   bounds: [Station[], Station[]];
   withTrainTypes: boolean;
 } => {
-  const [yamanoteLine, setYamanoteLine] = useState(false);
-  const [osakaLoopLine, setOsakaLoopLine] = useState(false);
-  const [meijoLine, setMeijoLine] = useState(false);
-
   const [bounds, setBounds] = useState<[Station[], Station[]]>([[], []]);
-  const { station, stations } = useAtomValue(stationAtom);
-  const { selectedLine } = useAtomValue(lineAtom);
+  const { stations } = useAtomValue(stationAtom);
   const { fetchedTrainTypes, trainType } = useAtomValue(trainTypeAtom);
+
+  const currentStation = useCurrentStation();
+  const currentLine = useCurrentLine();
 
   const localType = useMemo(
     () => findLocalType(fetchedTrainTypes),
     [fetchedTrainTypes]
   );
 
-  // 環状路線フラグの更新
-  useEffect(() => {
-    if (selectedLine) {
-      setYamanoteLine(isYamanoteLine(selectedLine?.id));
-      setOsakaLoopLine(!trainType && isOsakaLoopLine(selectedLine?.id));
-      setMeijoLine(isMeijoLine(selectedLine.id));
-    }
-  }, [selectedLine, trainType]);
+  const yamanoteLine = useMemo(
+    () => currentLine && getIsYamanoteLine(currentLine.id),
+    [currentLine]
+  );
+  const osakaLoopLine = useMemo(
+    () => currentLine && !trainType && getIsOsakaLoopLine(currentLine.id),
+    [currentLine, trainType]
+  );
+  const meijoLine = useMemo(
+    () => currentLine && getIsMeijoLine(currentLine.id),
+    [currentLine]
+  );
 
   // 種別選択ボタンを表示するかのフラグ
   const withTrainTypes = useMemo((): boolean => {
@@ -59,38 +62,34 @@ const useBounds = (): {
   }, [fetchedTrainTypes, localType]);
 
   const currentIndex = useMemo(
-    () => getCurrentStationIndex(stations, station),
-    [station, stations]
+    () => getCurrentStationIndex(stations, currentStation),
+    [currentStation, stations]
   );
 
   const inboundStations = useMemo(
     () =>
-      inboundStationsForLoopLine(
-        stations,
-        stations[currentIndex],
-        selectedLine
-      ),
-    [currentIndex, selectedLine, stations]
+      inboundStationsForLoopLine(stations, stations[currentIndex], currentLine),
+    [currentIndex, currentLine, stations]
   );
   const outboundStations = useMemo(
     () =>
       outboundStationsForLoopLine(
         stations,
         stations[currentIndex],
-        selectedLine
+        currentLine
       ),
-    [currentIndex, selectedLine, stations]
+    [currentIndex, currentLine, stations]
   );
   useEffect(() => {
     const inboundStations = inboundStationsForLoopLine(
       stations,
       stations[currentIndex],
-      selectedLine
+      currentLine
     );
     const outboundStations = outboundStationsForLoopLine(
       stations,
       stations[currentIndex],
-      selectedLine
+      currentLine
     );
 
     const inboundStation = stations[stations.length - 1];
@@ -103,10 +102,10 @@ const useBounds = (): {
       computedInboundStation = inboundStations;
       computedOutboundStation = outboundStations;
     } else {
-      if (inboundStation?.groupId !== station?.groupId) {
+      if (inboundStation?.groupId !== currentStation?.groupId) {
         computedInboundStation = [inboundStation];
       }
-      if (outboundStation?.groupId !== station?.groupId) {
+      if (outboundStation?.groupId !== currentStation?.groupId) {
         computedOutboundStation = [outboundStation];
       }
     }
@@ -114,12 +113,10 @@ const useBounds = (): {
     setBounds([computedInboundStation, computedOutboundStation]);
   }, [
     currentIndex,
-    inboundStations,
+    currentLine,
+    currentStation?.groupId,
     meijoLine,
     osakaLoopLine,
-    outboundStations,
-    selectedLine,
-    station?.groupId,
     stations,
     trainType,
     yamanoteLine,
