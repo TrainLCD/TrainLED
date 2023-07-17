@@ -238,7 +238,6 @@ const MainMarquee = (props: Props) => {
                   </OrangeText>
                 </>
               ) : null}
-              <GreenText>.</GreenText>
               {nextStation.linesList.filter(
                 (line) => line.id !== nextStation.line?.id
               ).length > 0 && (
