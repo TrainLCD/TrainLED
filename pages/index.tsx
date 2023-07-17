@@ -1,17 +1,19 @@
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import Head from "next/head";
-import { memo, useCallback, useEffect } from "react";
+import { memo, useCallback, useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { lineAtom } from "../atoms/line";
 import { stationAtom } from "../atoms/station";
 import { trainTypeAtom } from "../atoms/trainType";
 import BoundsPanel from "../components/BoundsPanel";
+import Container from "../components/Container";
+import HorizontalSpacer from "../components/HorizontalSpacer";
+import LineName from "../components/LineName";
 import LinesPanel from "../components/LinesPanel";
 import Loading from "../components/Loading";
 import MainMarquee from "../components/MainMarquee";
 import MainTopText from "../components/MainTopText";
 import { parenthesisRegexp } from "../constants/regexp";
-import useBounds from "../hooks/useBounds";
 import useClosestStation from "../hooks/useClosestStation";
 import useCurrentLanguageState from "../hooks/useCurrentLanguageState";
 import useFetchNearbyStation from "../hooks/useFetchNearbyStation";
@@ -20,26 +22,9 @@ import useStationList from "../hooks/useStationList";
 import useWakeLock from "../hooks/useWakeLock";
 import { Line, Station, TrainType } from "../models/grpc";
 
-const Container = styled.main`
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  height: 100%;
-  user-select: none;
-`;
-
-const LineName = styled.h2`
-  line-height: 1.5;
-  margin: 0;
-  text-align: center;
-`;
 const CautionText = styled.p`
   line-height: 1.5;
   text-align: center;
-`;
-
-const HorizontalSpacer = styled.div`
-  height: 5vh;
 `;
 
 const CreditContainer = styled.div`
@@ -53,52 +38,40 @@ const TrainLCDLink = styled.a`
   text-align: center;
 `;
 
-const Home = () => {
-  const [{ station, stations, selectedBound }, setStationAtom] =
-    useAtom(stationAtom);
+const LineScene = () => {
+  const { station } = useAtomValue(stationAtom);
   const [{ selectedLine }, setLineAtom] = useAtom(lineAtom);
-  const setTrainTypeAtom = useSetAtom(trainTypeAtom);
-
-  const [fetchLinesLoading, hasFetchLinesError] = useFetchNearbyStation();
-  const { fetchSelectedTrainTypeStations, loading: fetchStationsLoading } =
-    useStationList();
-
-  const { bounds } = useBounds();
-
-  const requestWakeLock = useWakeLock();
-
-  useEffect(() => {
-    fetchSelectedTrainTypeStations();
-  }, [fetchSelectedTrainTypeStations]);
-
-  const { arrived, approaching, newStation } = useClosestStation(
-    station,
-    selectedBound,
-    stations,
-    selectedLine
-  );
-
-  const nextStations = useNextStations(stations, newStation, selectedLine);
-
-  const langState = useCurrentLanguageState();
+  const [fetchLinesLoading] = useFetchNearbyStation();
 
   const handleSelectLine = useCallback(
-    (line: Line) => setLineAtom((prev) => ({ ...prev, selectedLine: line })),
+    (line: Line) => {
+      setLineAtom((prev) => ({ ...prev, selectedLine: line }));
+    },
     [setLineAtom]
   );
 
-  const handleSelectedBound = useCallback(
-    async (selectedBound: Station, index: number) => {
-      setStationAtom((prev) => ({ ...prev, selectedBound }));
-      setLineAtom((prev) => ({
-        ...prev,
-        selectedDirection: !index ? "INBOUND" : "OUTBOUND",
-      }));
-
-      requestWakeLock();
-    },
-    [requestWakeLock, setLineAtom, setStationAtom]
+  return (
+    <>
+      <LineName>
+        {selectedLine
+          ? selectedLine.nameShort.replace(parenthesisRegexp, "")
+          : "TrainLED"}
+      </LineName>
+      <LineName>{station?.name ?? ""}</LineName>
+      {fetchLinesLoading && <Loading />}
+      <LinesPanel
+        lines={station?.linesList ?? []}
+        onSelect={handleSelectLine}
+      />
+    </>
   );
+};
+
+const BoundScene = () => {
+  const setTrainTypeAtom = useSetAtom(trainTypeAtom);
+  const [{ station }, setStationAtom] = useAtom(stationAtom);
+  const [{ selectedLine }, setLineAtom] = useAtom(lineAtom);
+  const { fetchSelectedTrainTypeStations } = useStationList();
 
   const clearSelectedLine = useCallback(() => {
     setTrainTypeAtom((prev) => ({
@@ -128,6 +101,112 @@ const Home = () => {
     [setTrainTypeAtom]
   );
 
+  const requestWakeLock = useWakeLock();
+
+  const handleSelectedBound = useCallback(
+    async (selectedBound: Station, index: number) => {
+      requestWakeLock();
+
+      setStationAtom((prev) => ({ ...prev, selectedBound }));
+      setLineAtom((prev) => ({
+        ...prev,
+        selectedDirection: !index ? "INBOUND" : "OUTBOUND",
+      }));
+    },
+    [requestWakeLock, setLineAtom, setStationAtom]
+  );
+
+  useEffect(() => {
+    fetchSelectedTrainTypeStations();
+  }, [fetchSelectedTrainTypeStations]);
+
+  if (!station) {
+    return null;
+  }
+
+  return (
+    <Container>
+      <LineName>
+        {selectedLine && selectedLine.nameShort.replace(parenthesisRegexp, "")}
+      </LineName>
+      <LineName>{station?.name ?? ""}</LineName>
+      <BoundsPanel
+        onBack={clearSelectedLine}
+        onSelect={handleSelectedBound}
+        onTrainTypeSelect={handleTrainTypeSelect}
+      />
+    </Container>
+  );
+};
+
+const LEDScene = () => {
+  const { station, stations, selectedBound } = useAtomValue(stationAtom);
+  const { selectedLine } = useAtomValue(lineAtom);
+  const { arrived, approaching, newStation } = useClosestStation(
+    station,
+    selectedBound,
+    stations,
+    selectedLine
+  );
+  const nextStations = useNextStations(stations, newStation, selectedLine);
+  const langState = useCurrentLanguageState();
+
+  if (!selectedLine) {
+    return null;
+  }
+
+  return (
+    <Container>
+      <MainTopText
+        arrived={arrived}
+        approaching={approaching}
+        currentStation={newStation}
+        nextStation={nextStations[1]}
+        language={langState}
+      />
+      <HorizontalSpacer />
+      <MainMarquee
+        arrived={arrived}
+        approaching={approaching}
+        nextStation={nextStations[1]}
+        afterNextStation={nextStations[2]}
+        line={selectedLine}
+      />
+    </Container>
+  );
+};
+
+const Home = () => {
+  const { selectedBound } = useAtomValue(stationAtom);
+  const [{ selectedLine }, setLineAtom] = useAtom(lineAtom);
+
+  const scene = useMemo<"LINE" | "BOUND" | "LED">(() => {
+    if (selectedLine && selectedBound) {
+      return "LED";
+    }
+    if (!selectedLine) {
+      return "LINE";
+    }
+    if (selectedLine && !selectedBound) {
+      return "BOUND";
+    }
+
+    return "LINE";
+  }, [selectedBound, selectedLine]);
+
+  const Scene = useMemo(() => {
+    switch (scene) {
+      case "LINE":
+        return LineScene;
+      case "BOUND":
+        return BoundScene;
+      case "LED":
+        return LEDScene;
+      default:
+        return LineScene;
+    }
+  }, [scene]);
+
   return (
     <Container>
       <Head>
@@ -135,45 +214,10 @@ const Home = () => {
         <meta name="description" content="A joking navigation app" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {!selectedBound ? (
-        <LineName>
-          {selectedLine
-            ? selectedLine.nameShort.replace(parenthesisRegexp, "")
-            : "TrainLED"}
-        </LineName>
-      ) : null}
-      {(fetchLinesLoading || fetchStationsLoading) && <Loading />}
-      {!selectedBound && station ? <LineName>{station.name}</LineName> : null}
-      {!selectedLine && station ? (
-        <LinesPanel lines={station.linesList} onSelect={handleSelectLine} />
-      ) : null}
-      {selectedLine && !selectedBound ? (
-        <BoundsPanel
-          onBack={clearSelectedLine}
-          onSelect={handleSelectedBound}
-          onTrainTypeSelect={handleTrainTypeSelect}
-        />
-      ) : null}
-      {selectedBound && selectedLine ? (
-        <>
-          <MainTopText
-            arrived={arrived}
-            approaching={approaching}
-            currentStation={newStation}
-            nextStation={nextStations[1]}
-            language={langState}
-          />
-          <HorizontalSpacer />
-          <MainMarquee
-            arrived={arrived}
-            approaching={approaching}
-            nextStation={nextStations[1]}
-            afterNextStation={nextStations[2]}
-            line={selectedLine}
-          />
-        </>
-      ) : null}
-      {!selectedBound ? (
+
+      <Scene />
+
+      {scene !== "LED" && (
         <CreditContainer>
           <CautionText>※TrainLEDはβ版です。</CautionText>
           <TrainLCDLink
@@ -184,7 +228,7 @@ const Home = () => {
             TrainLCDアプリをダウンロード
           </TrainLCDLink>
         </CreditContainer>
-      ) : null}
+      )}
     </Container>
   );
 };
