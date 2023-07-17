@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import Marquee from "react-fast-marquee";
 import styled from "styled-components";
 import { lineAtom } from "../atoms/line";
+import { navigationAtom } from "../atoms/navigation";
 import { trainTypeAtom } from "../atoms/trainType";
 import { parenthesisRegexp } from "../constants/regexp";
 import { StopCondition } from "../generated/stationapi_pb";
@@ -52,16 +53,15 @@ const LanguageSpacer = styled.div`
 type Props = {
   nextStation: Station | undefined;
   afterNextStation: Station | undefined;
-  arrived: boolean;
-  approaching: boolean;
   line: Line;
 };
 
 const MainMarquee = (props: Props) => {
-  const { nextStation, line, arrived, approaching, afterNextStation } = props;
+  const { nextStation, line, afterNextStation } = props;
 
   const { trainType } = useAtomValue(trainTypeAtom);
   const { selectedDirection } = useAtomValue(lineAtom);
+  const { arrived, approaching } = useAtomValue(navigationAtom);
 
   const { bounds } = useBounds();
 

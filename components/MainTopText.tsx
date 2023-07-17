@@ -1,6 +1,9 @@
 // 対処法が今のところないので一旦無視する
+import { useAtomValue } from "jotai";
 import styled from "styled-components";
+import { navigationAtom } from "../atoms/navigation";
 import { LanguageState } from "../hooks/useCurrentLanguageState";
+import useCurrentStation from "../hooks/useCurrentStation";
 import type { Station } from "../models/grpc";
 
 const Container = styled.div`
@@ -44,27 +47,22 @@ const OrangeText = styled.p`
 `;
 
 type Props = {
-  currentStation: Station | null;
   nextStation: Station | null;
-  arrived: boolean;
-  approaching: boolean;
   language: LanguageState;
 };
 type SwitchedStationTextProps = {
-  arrived: boolean;
-  approaching: boolean;
-  currentStation: Station | null;
   nextStation: Station | null;
   language: LanguageState;
 };
 
 const SwitchedStationText = ({
-  arrived,
-  approaching,
-  currentStation,
   nextStation,
   language,
 }: SwitchedStationTextProps) => {
+  const { arrived, approaching } = useAtomValue(navigationAtom);
+
+  const currentStation = useCurrentStation();
+
   if (arrived && currentStation) {
     return (
       <TextContainer arrived>

@@ -1,9 +1,9 @@
-import { useAtomValue } from "jotai";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useAtom, useAtomValue } from "jotai";
+import { useCallback, useEffect, useRef } from "react";
 import { lineAtom } from "../atoms/line";
-import geolocationOptions from "../constants/geolocationOptions";
-import { LineType } from "../generated/stationapi_pb";
-import { Line, Station } from "../models/grpc";
+import { navigationAtom } from "../atoms/navigation";
+import { stationAtom } from "../atoms/station";
+import { LineType, Station } from "../models/grpc";
 import {
   getAvgStationBetweenDistances,
   scoreStationDistances,
@@ -15,34 +15,15 @@ import {
   getArrivedThreshold,
 } from "../utils/threshold";
 
-const useClosestStation = (
-  station: Station | null,
-  selectedBound: Station | null,
-  stations: Station[],
-  selectedLine: Line | null
-): {
-  arrived: boolean;
-  approaching: boolean;
-  newStation: Station | null;
-} => {
-  const { selectedDirection } = useAtomValue(lineAtom);
-  const [location, setLocation] = useState<GeolocationPosition>();
-  const [arrived, setArrived] = useState(false);
-  const [approaching, setApproaching] = useState(false);
-  const [newStation, setNewStation] = useState<Station | null>(null);
-
+const useProcessLocation = () => {
+  const [{ station, stations, selectedBound }, setStationAtom] =
+    useAtom(stationAtom);
+  const { selectedDirection, selectedLine } = useAtomValue(lineAtom);
   const isMountedRef = useRef(false);
 
-  const displayedNextStation = getNextStation(stations, station);
+  const [{ location }, setNavigationAtom] = useAtom(navigationAtom);
 
-  useEffect(() => {
-    const noop = () => {};
-    navigator.geolocation.watchPosition(
-      setLocation,
-      noop, // FIXME: エラー処理実装
-      geolocationOptions
-    );
-  }, []);
+  const displayedNextStation = getNextStation(stations, station);
 
   const isArrived = useCallback(
     (nearestStation: Station, avgDistance: number): boolean => {
@@ -117,16 +98,21 @@ const useClosestStation = (
     const arrived = isArrived(nearestStation, avg);
     const approaching = isApproaching(nearestStation, avg);
 
-    setArrived(arrived);
-    setApproaching(approaching);
+    setNavigationAtom((prev) => ({ ...prev, arrived, approaching }));
 
     if (arrived || !isMountedRef.current) {
-      setNewStation(nearestStation);
+      setStationAtom((prev) => ({ ...prev, station: nearestStation }));
       isMountedRef.current = true;
     }
-  }, [isApproaching, isArrived, location, selectedBound, stations]);
-
-  return { arrived, approaching, newStation };
+  }, [
+    isApproaching,
+    isArrived,
+    location,
+    selectedBound,
+    setNavigationAtom,
+    setStationAtom,
+    stations,
+  ]);
 };
 
-export default useClosestStation;
+export default useProcessLocation;

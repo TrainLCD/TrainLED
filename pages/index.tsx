@@ -14,12 +14,13 @@ import Loading from "../components/Loading";
 import MainMarquee from "../components/MainMarquee";
 import MainTopText from "../components/MainTopText";
 import { parenthesisRegexp } from "../constants/regexp";
-import useClosestStation from "../hooks/useClosestStation";
 import useCurrentLanguageState from "../hooks/useCurrentLanguageState";
 import useFetchNearbyStation from "../hooks/useFetchNearbyStation";
 import useNextStations from "../hooks/useNextStations";
 import useStationList from "../hooks/useStationList";
+import useUpdateClosestStationOnce from "../hooks/useUpdateClosestStationOnce";
 import useWakeLock from "../hooks/useWakeLock";
+import useWatchClosestStation from "../hooks/useWatchClosestStation";
 import { Line, Station, TrainType } from "../models/grpc";
 
 const CautionText = styled.p`
@@ -42,6 +43,12 @@ const LineScene = () => {
   const { station } = useAtomValue(stationAtom);
   const setLineAtom = useSetAtom(lineAtom);
   const [fetchLinesLoading] = useFetchNearbyStation();
+
+  const { update: updateCurrentStationOnce } = useUpdateClosestStationOnce();
+
+  useEffect(() => {
+    updateCurrentStationOnce();
+  }, [updateCurrentStationOnce]);
 
   const handleSelectLine = useCallback(
     (line: Line) => {
@@ -132,32 +139,22 @@ const BoundScene = () => {
 const LEDScene = () => {
   const { station, stations, selectedBound } = useAtomValue(stationAtom);
   const { selectedLine } = useAtomValue(lineAtom);
-  const { arrived, approaching, newStation } = useClosestStation(
-    station,
-    selectedBound,
-    stations,
-    selectedLine
-  );
-  const nextStations = useNextStations(stations, newStation, selectedLine);
+  const nextStations = useNextStations(stations, station, selectedLine);
   const langState = useCurrentLanguageState();
+
+  const locationUpdatePaused = useMemo(() => !selectedBound, [selectedBound]);
+
+  useWatchClosestStation(locationUpdatePaused);
 
   if (!selectedLine) {
     return null;
   }
 
   return (
-    <Container>
-      <MainTopText
-        arrived={arrived}
-        approaching={approaching}
-        currentStation={newStation}
-        nextStation={nextStations[1]}
-        language={langState}
-      />
+    <Container fullHeight>
+      <MainTopText nextStation={nextStations[1]} language={langState} />
       <HorizontalSpacer />
       <MainMarquee
-        arrived={arrived}
-        approaching={approaching}
         nextStation={nextStations[1]}
         afterNextStation={nextStations[2]}
         line={selectedLine}
@@ -198,7 +195,7 @@ const Home = () => {
   }, [scene]);
 
   return (
-    <Container>
+    <Container fullHeight>
       <Head>
         <title>TrainLED</title>
         <meta name="description" content="A joking navigation app" />
