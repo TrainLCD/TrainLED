@@ -40,7 +40,7 @@ const TrainLCDLink = styled.a`
 
 const LineScene = () => {
   const { station } = useAtomValue(stationAtom);
-  const [{ selectedLine }, setLineAtom] = useAtom(lineAtom);
+  const setLineAtom = useSetAtom(lineAtom);
   const [fetchLinesLoading] = useFetchNearbyStation();
 
   const handleSelectLine = useCallback(
@@ -52,12 +52,6 @@ const LineScene = () => {
 
   return (
     <>
-      <LineName>
-        {selectedLine
-          ? selectedLine.nameShort.replace(parenthesisRegexp, "")
-          : "TrainLED"}
-      </LineName>
-      <LineName>{station?.name ?? ""}</LineName>
       {fetchLinesLoading && <Loading />}
       <LinesPanel
         lines={station?.linesList ?? []}
@@ -70,7 +64,7 @@ const LineScene = () => {
 const BoundScene = () => {
   const setTrainTypeAtom = useSetAtom(trainTypeAtom);
   const [{ station }, setStationAtom] = useAtom(stationAtom);
-  const [{ selectedLine }, setLineAtom] = useAtom(lineAtom);
+  const setLineAtom = useSetAtom(lineAtom);
   const { fetchSelectedTrainTypeStations } = useStationList();
 
   const clearSelectedLine = useCallback(() => {
@@ -126,10 +120,6 @@ const BoundScene = () => {
 
   return (
     <Container>
-      <LineName>
-        {selectedLine && selectedLine.nameShort.replace(parenthesisRegexp, "")}
-      </LineName>
-      <LineName>{station?.name ?? ""}</LineName>
       <BoundsPanel
         onBack={clearSelectedLine}
         onSelect={handleSelectedBound}
@@ -177,8 +167,8 @@ const LEDScene = () => {
 };
 
 const Home = () => {
-  const { selectedBound } = useAtomValue(stationAtom);
-  const [{ selectedLine }, setLineAtom] = useAtom(lineAtom);
+  const { station, selectedBound } = useAtomValue(stationAtom);
+  const { selectedLine } = useAtomValue(lineAtom);
 
   const scene = useMemo<"LINE" | "BOUND" | "LED">(() => {
     if (selectedLine && selectedBound) {
@@ -214,6 +204,17 @@ const Home = () => {
         <meta name="description" content="A joking navigation app" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+
+      {scene !== "LED" && (
+        <>
+          <LineName>
+            {selectedLine
+              ? selectedLine.nameShort.replace(parenthesisRegexp, "")
+              : "TrainLED"}
+          </LineName>
+          <LineName>{station?.name ?? ""}</LineName>
+        </>
+      )}
 
       <Scene />
 
