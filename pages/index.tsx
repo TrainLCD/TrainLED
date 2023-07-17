@@ -17,9 +17,8 @@ import useCurrentLanguageState from "../hooks/useCurrentLanguageState";
 import useFetchNearbyStation from "../hooks/useFetchNearbyStation";
 import useNextStations from "../hooks/useNextStations";
 import useStationList from "../hooks/useStationList";
+import useWakeLock from "../hooks/useWakeLock";
 import { Line, Station, TrainType } from "../models/grpc";
-
-const isClient = () => typeof navigator !== "undefined";
 
 const Container = styled.main`
   display: flex;
@@ -66,6 +65,8 @@ const Home = () => {
 
   const { bounds } = useBounds();
 
+  const requestWakeLock = useWakeLock();
+
   useEffect(() => {
     fetchSelectedTrainTypeStations();
   }, [fetchSelectedTrainTypeStations]);
@@ -93,16 +94,10 @@ const Home = () => {
         ...prev,
         selectedDirection: !index ? "INBOUND" : "OUTBOUND",
       }));
-      if (isClient() && "wakeLock" in navigator) {
-        try {
-          await (navigator as any).wakeLock.request("screen");
-        } catch (err: any) {
-          const msg = `${err.name}, ${err.message}`;
-          console.error(msg);
-        }
-      }
+
+      requestWakeLock();
     },
-    [setLineAtom, setStationAtom]
+    [requestWakeLock, setLineAtom, setStationAtom]
   );
 
   const clearSelectedLine = useCallback(() => {
