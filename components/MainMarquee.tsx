@@ -97,7 +97,7 @@ const MainMarquee = (props: Props) => {
 
   const trainTypeTexts = useMemo(() => {
     if (getIsLoopLine(line, trainType) && selectedDirection) {
-      [
+      return [
         selectedDirection === "INBOUND" ? "内回り" : "外回り",
         selectedDirection === "INBOUND" ? "Counter-clockwise" : "Clockwise",
       ];
@@ -179,7 +179,7 @@ const MainMarquee = (props: Props) => {
                     <>
                       <CrimsonText>
                         {nextStation.name}
-                        駅は一部列車は通過いたします。
+                        は一部列車は通過いたします。
                       </CrimsonText>
                       <OrangeText>ご注意ください。</OrangeText>
                     </>
@@ -267,7 +267,7 @@ const MainMarquee = (props: Props) => {
                     <>
                       <CrimsonText>
                         {nextStation.name}
-                        駅は一部列車は通過いたします。
+                        は一部列車は通過いたします。
                       </CrimsonText>
                       <OrangeText>ご注意ください。</OrangeText>
                     </>
@@ -373,3 +373,4 @@ const MainMarquee = (props: Props) => {
 };
 
 export default MainMarquee;
+/////
