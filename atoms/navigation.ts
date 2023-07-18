@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 
-type Scenes = "LINE" | "SEARCH" | "BOUND" | "LED";
+export type Scenes = "LINE" | "SEARCH" | "BOUND" | "LED";
 
 type NavigationAtom = {
   arrived: boolean;

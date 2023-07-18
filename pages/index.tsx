@@ -132,6 +132,7 @@ const LineScene = () => {
 
   return (
     <Container fullHeight>
+      <CommonHeader />
       {fetchLinesLoading && <Loading />}
       <LinesPanel
         lines={station?.linesList ?? []}
@@ -140,9 +141,39 @@ const LineScene = () => {
       <SearchStationButtonContainer>
         <Button onClick={handleSearchStationClick}>駅を指定</Button>
       </SearchStationButtonContainer>
+      <CommonFooter />
     </Container>
   );
 };
+
+const CommonHeader = () => {
+  const { station } = useAtomValue(stationAtom);
+  const { selectedLine } = useAtomValue(lineAtom);
+
+  return (
+    <>
+      <Heading>
+        {selectedLine
+          ? selectedLine.nameShort.replace(parenthesisRegexp, "")
+          : "TrainLED"}
+      </Heading>
+      <Heading>{station?.name ?? ""}</Heading>
+    </>
+  );
+};
+
+const CommonFooter = () => (
+  <CreditContainer>
+    <CautionText>※TrainLEDはβ版です。</CautionText>
+    <TrainLCDLink
+      href="https://trainlcd.app/"
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      TrainLCDアプリをダウンロード
+    </TrainLCDLink>
+  </CreditContainer>
+);
 
 const SearchScene = () => {
   const { search } = useSearchStation();
@@ -187,6 +218,7 @@ const SearchScene = () => {
 
   return (
     <Container fullHeight>
+      <CommonHeader />
       <Heading>駅を指定</Heading>
       <SearchForm onSubmit={handleSubmit}>
         <StationNameInput
@@ -214,6 +246,7 @@ const SearchScene = () => {
           ))}
         </SearchResultListContainer>
       </SearchForm>
+      <CommonFooter />
     </Container>
   );
 };
@@ -276,12 +309,14 @@ const BoundScene = () => {
   }
 
   return (
-    <Container>
+    <Container fullHeight>
+      <CommonHeader />
       <BoundsPanel
         onBack={clearSelectedLine}
         onSelect={handleSelectedBound}
         onTrainTypeSelect={handleTrainTypeSelect}
       />
+      <CommonFooter />
     </Container>
   );
 };
@@ -356,31 +391,7 @@ const Home = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      {scene !== "LED" && scene !== "SEARCH" && (
-        <>
-          <Heading>
-            {selectedLine
-              ? selectedLine.nameShort.replace(parenthesisRegexp, "")
-              : "TrainLED"}
-          </Heading>
-          <Heading>{station?.name ?? ""}</Heading>
-        </>
-      )}
-
       <Scene />
-
-      {scene !== "LED" && scene !== "SEARCH" && (
-        <CreditContainer>
-          <CautionText>※TrainLEDはβ版です。</CautionText>
-          <TrainLCDLink
-            href="https://trainlcd.app/"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            TrainLCDアプリをダウンロード
-          </TrainLCDLink>
-        </CreditContainer>
-      )}
     </>
   );
 };
