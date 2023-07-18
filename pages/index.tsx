@@ -74,6 +74,7 @@ const StationNameInput = styled.input`
   font-size: 1rem;
   font-family: "JF-Dot-jiskan24";
   width: 320px;
+  border-radius: 0;
 
   ::placeholder {
     opacity: 0.5;
