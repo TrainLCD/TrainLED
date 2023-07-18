@@ -91,7 +91,7 @@ const SearchResultListContainer = styled.ul`
   list-style-type: none;
   padding: 0;
   border: 1px solid #fff;
-  height: 320px;
+  height: 240px;
   overflow-x: hidden;
   overflow-y: scroll;
 `;
