@@ -100,10 +100,6 @@ const SearchResultListContent = styled.li<{ centering?: boolean }>`
   padding: 12px;
   border-bottom: 1px solid #fff;
   text-align: ${({ centering }) => (centering ? "center" : "left")};
-
-  :last-child {
-    border-bottom: none;
-  }
 `;
 
 const LineScene = () => {
