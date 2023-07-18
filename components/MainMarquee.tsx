@@ -236,6 +236,7 @@ const MainMarquee = (props: Props) => {
                       ? `(${afterNextStation.stationNumbersList[0]?.stationNumber})`
                       : ""}
                   </OrangeText>
+                  <GreenText>.</GreenText>
                 </>
               ) : null}
               <GreenText>.</GreenText>
@@ -243,6 +244,7 @@ const MainMarquee = (props: Props) => {
                 (line) => line.id !== nextStation.line?.id
               ).length > 0 && (
                 <>
+                  <HorizontalSpacer />
                   <GreenText>Please change here for</GreenText>
                   <HorizontalSpacer />
                   <OrangeText>the {transferTexts[1]}</OrangeText>
@@ -324,12 +326,14 @@ const MainMarquee = (props: Props) => {
                       ? `(${afterNextStation.stationNumbersList[0]?.stationNumber})`
                       : ""}
                   </OrangeText>
+                  <GreenText>.</GreenText>
                 </>
               ) : null}
               {nextStation.linesList.filter(
                 (line) => line.id !== nextStation.line?.id
               ).length > 0 && (
                 <>
+                  <HorizontalSpacer />
                   <GreenText>Please change here for</GreenText>
                   <HorizontalSpacer />
                   <OrangeText>the {transferTexts[1]}</OrangeText>
@@ -369,7 +373,6 @@ const MainMarquee = (props: Props) => {
             )}`}</GreenText>
             <HorizontalSpacer />
             <OrangeText>{trainTypeTexts[1]}</OrangeText>
-            <HorizontalSpacer />
             <GreenText>train for</GreenText>
             <HorizontalSpacer />
             <OrangeText>{boundTexts[1]}</OrangeText>
