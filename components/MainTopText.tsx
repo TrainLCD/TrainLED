@@ -31,6 +31,17 @@ const GreenText = styled.p`
   font-size: 5vw;
 `;
 
+const StationInfoGroup = styled.div`
+  flex: 1;
+`;
+
+const StateText = styled.p`
+  width: 100%;
+  max-width: 22.5%;
+  color: green;
+  font-size: 5vw;
+`;
+
 const OrangeTextContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -44,6 +55,21 @@ const OrangeText = styled.p`
   flex: 1;
   font-size: 7.5vw;
   white-space: pre-wrap;
+`;
+
+const NumberingText = styled.p`
+  line-height: 1.25;
+  color: orange;
+  margin: 0;
+  flex: 1;
+  font-size: 5vw;
+  white-space: pre-wrap;
+`;
+
+const EnglighTextsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 `;
 
 type Props = {
@@ -81,14 +107,19 @@ const SwitchedStationText = ({
           </OrangeTextContainer>
         ) : null}
         {language === "en" ? (
-          <OrangeTextContainer>
-            <OrangeText>
-              {currentStation.nameRoman}
-              {currentStation.stationNumbersList.length
-                ? `\n(${currentStation.stationNumbersList[0]?.stationNumber})`
-                : ""}
-            </OrangeText>
-          </OrangeTextContainer>
+          <>
+            <StationInfoGroup>
+              <OrangeTextContainer>
+                <OrangeText>{currentStation.nameRoman}</OrangeText>
+              </OrangeTextContainer>
+
+              <NumberingText>
+                {currentStation.stationNumbersList.length
+                  ? `(${currentStation.stationNumbersList[0]?.stationNumber})`
+                  : ""}
+              </NumberingText>
+            </StationInfoGroup>
+          </>
         ) : null}
       </TextContainer>
     );
@@ -99,7 +130,7 @@ const SwitchedStationText = ({
       <TextContainer>
         {language === "ja" ? (
           <>
-            <GreenText>まもなく</GreenText>
+            <StateText>まもなく</StateText>
             <OrangeTextContainer>
               {nextStation.name.split("").map((c, i) => (
                 <OrangeText key={`${c}${i}`}>{c}</OrangeText>
@@ -109,7 +140,7 @@ const SwitchedStationText = ({
         ) : null}
         {language === "jaKana" ? (
           <>
-            <GreenText>まもなく</GreenText>
+            <StateText>まもなく</StateText>
             <OrangeTextContainer>
               {nextStation.nameKatakana.split("").map((c, i) => (
                 <OrangeText key={`${c}${i}`}>{c}</OrangeText>
@@ -119,13 +150,18 @@ const SwitchedStationText = ({
         ) : null}
         {language === "en" ? (
           <>
-            <GreenText>Soon</GreenText>
-            <OrangeText>
-              {nextStation.nameRoman}
-              {nextStation.stationNumbersList.length
-                ? `\n(${nextStation.stationNumbersList[0]?.stationNumber})`
-                : ""}
-            </OrangeText>
+            <StateText>Soon</StateText>
+            <StationInfoGroup>
+              <OrangeTextContainer>
+                <OrangeText>{nextStation.nameRoman}</OrangeText>
+              </OrangeTextContainer>
+
+              <NumberingText>
+                {nextStation.stationNumbersList.length
+                  ? `(${nextStation.stationNumbersList[0]?.stationNumber})`
+                  : ""}
+              </NumberingText>
+            </StationInfoGroup>
           </>
         ) : null}
       </TextContainer>
@@ -139,7 +175,7 @@ const SwitchedStationText = ({
     <TextContainer>
       {language === "ja" ? (
         <>
-          <GreenText>次は</GreenText>
+          <StateText>次は</StateText>
           <OrangeTextContainer>
             {nextStation.name.split("").map((c, i) => (
               <OrangeText key={`${c}${i}`}>{c}</OrangeText>
@@ -149,7 +185,7 @@ const SwitchedStationText = ({
       ) : null}
       {language === "jaKana" ? (
         <>
-          <GreenText>次は</GreenText>
+          <StateText>次は</StateText>
           <OrangeTextContainer>
             {nextStation.nameKatakana.split("").map((c, i) => (
               <OrangeText key={`${c}${i}`}>{c}</OrangeText>
@@ -159,15 +195,18 @@ const SwitchedStationText = ({
       ) : null}
       {language === "en" ? (
         <>
-          <GreenText>Next</GreenText>
-          <OrangeTextContainer>
-            <OrangeText>
-              {nextStation.nameRoman}
+          <StateText>Next</StateText>
+          <StationInfoGroup>
+            <OrangeTextContainer>
+              <OrangeText>{nextStation.nameRoman}</OrangeText>
+            </OrangeTextContainer>
+
+            <NumberingText>
               {nextStation.stationNumbersList.length
-                ? `\n(${nextStation.stationNumbersList[0]?.stationNumber})`
+                ? `(${nextStation.stationNumbersList[0]?.stationNumber})`
                 : ""}
-            </OrangeText>
-          </OrangeTextContainer>
+            </NumberingText>
+          </StationInfoGroup>
         </>
       ) : null}
     </TextContainer>

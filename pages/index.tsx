@@ -131,7 +131,7 @@ const LineScene = () => {
   );
 
   return (
-    <>
+    <Container fullHeight>
       {fetchLinesLoading && <Loading />}
       <LinesPanel
         lines={station?.linesList ?? []}
@@ -140,7 +140,7 @@ const LineScene = () => {
       <SearchStationButtonContainer>
         <Button onClick={handleSearchStationClick}>駅を指定</Button>
       </SearchStationButtonContainer>
-    </>
+    </Container>
   );
 };
 
@@ -349,7 +349,7 @@ const Home = () => {
   }, [scene]);
 
   return (
-    <Container fullHeight>
+    <>
       <Head>
         <title>TrainLED</title>
         <meta name="description" content="A joking navigation app" />
@@ -381,7 +381,7 @@ const Home = () => {
           </TrainLCDLink>
         </CreditContainer>
       )}
-    </Container>
+    </>
   );
 };
 
