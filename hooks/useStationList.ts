@@ -62,6 +62,7 @@ const useStationList = (): {
       ) {
         setTrainTypeAtom((prev) => ({
           ...prev,
+          trainType: findLocalType(trainTypesList),
           fetchedTrainTypes: [
             {
               id: 0,
@@ -76,15 +77,16 @@ const useStationList = (): {
               linesList: [],
               direction: TrainDirection.BOTH,
             },
+            ...trainTypesList,
           ],
         }));
+      } else {
+        setTrainTypeAtom((prev) => ({
+          ...prev,
+          trainType: findLocalType(trainTypesList),
+          fetchedTrainTypes: trainTypesList,
+        }));
       }
-
-      setTrainTypeAtom((prev) => ({
-        ...prev,
-        trainType: findLocalType(trainTypesList),
-        fetchedTrainTypes: [...prev.fetchedTrainTypes, ...trainTypesList],
-      }));
 
       // 各停・快速・特急種別がある場合は該当種別を自動選択する
       const trainTypeString = getTrainTypeString(selectedLine, station);
