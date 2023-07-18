@@ -162,7 +162,9 @@ const SearchScene = () => {
     async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       const result = await search(query);
-      setSearchResult(result);
+      if (result) {
+        setSearchResult(result);
+      }
       setAlreadySearched(true);
     },
     [query, search]

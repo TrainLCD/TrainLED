@@ -62,12 +62,11 @@ export const PREFS_JA = [
 
 type ReturnValue = {
   loading: boolean;
-  search: (query: string) => Promise<StationForSearch[]>;
+  search: (query: string) => Promise<StationForSearch[] | undefined>;
   submitStation: (station: StationForSearch) => void;
 };
 
 const useSearchStation = (): ReturnValue => {
-  const [dirty, setDirty] = useState(false);
   const [byNameError, setByNameError] = useState<Error | null>(null);
   const [byCoordinatesError, setByCoordinatesError] = useState<Error | null>(
     null
@@ -125,7 +124,7 @@ const useSearchStation = (): ReturnValue => {
 
   useEffect(() => {
     const fetchAsync = async () => {
-      if (!location?.coords || dirty) {
+      if (!location?.coords) {
         return;
       }
       try {
@@ -154,17 +153,16 @@ const useSearchStation = (): ReturnValue => {
     };
 
     fetchAsync();
-  }, [dirty, grpcClient, location?.coords, processStations]);
+  }, [grpcClient, location?.coords, processStations]);
 
   const search = useCallback(
-    async (query: string): Promise<StationForSearch[]> => {
+    async (query: string): Promise<StationForSearch[] | undefined> => {
       const trimmedQuery = query.trim();
       const trimmedPrevQuery = prevQueryRef.current?.trim();
       if (!trimmedQuery.length || trimmedQuery === trimmedPrevQuery) {
-        return [];
+        return;
       }
 
-      setDirty(true);
       // try {
       //   const eligibility = await checkEligibility(trimmedQuery)
 
