@@ -163,36 +163,6 @@ const useSearchStation = (): ReturnValue => {
         return;
       }
 
-      // try {
-      //   const eligibility = await checkEligibility(trimmedQuery)
-
-      //   switch (eligibility) {
-      //     case 'eligible':
-      //       setDevState((prev) => ({ ...prev, token: trimmedQuery }))
-      //       await AsyncStorage.setItem(
-      //         ASYNC_STORAGE_KEYS.DEV_MODE_ENABLED,
-      //         'true'
-      //       )
-      //       await AsyncStorage.setItem(
-      //         ASYNC_STORAGE_KEYS.DEV_MODE_TOKEN,
-      //         trimmedQuery
-      //       )
-      //       Alert.alert(
-      //         translate('warning'),
-      //         translate('enabledDevModeDescription'),
-      //         [{ text: 'OK', onPress: onPressBack }]
-      //       )
-      //       break
-      //     // トークンが無効のときも何もしない
-      //     default:
-      //       break
-      //   }
-      // } catch (err) {
-      //   Alert.alert(translate('errorTitle'), translate('apiErrorText'))
-      // } finally {
-      //   setLoadingEligibility(false)
-      // }
-
       prevQueryRef.current = trimmedQuery;
 
       try {
