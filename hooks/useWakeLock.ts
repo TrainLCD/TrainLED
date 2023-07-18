@@ -1,17 +1,14 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 
 const isClient = typeof window !== "undefined";
 
 const useWakeLock = (): (() => Promise<void>) => {
-  const wakeLockRef = useRef<any | null>(null);
-
   const requestWakeLock = useCallback(async () => {
     const untypedNavigator = navigator as any;
     if (isClient && "wakeLock" in navigator) {
       try {
-        const wakeLock = await untypedNavigator.wakeLock.request("screen");
+        await untypedNavigator.wakeLock.request("screen");
         console.log("Wake Lock is active");
-        wakeLockRef.current = wakeLock;
       } catch (err: any) {
         const msg = `${err.name}, ${err.message}`;
         console.error(msg);
@@ -36,12 +33,6 @@ const useWakeLock = (): (() => Promise<void>) => {
     }
     return () => undefined;
   }, [handleVisibilityChange]);
-
-  useEffect(() => {
-    wakeLockRef.current?.addEventListener("release", () => {
-      console.log("Wake Lock was released");
-    });
-  }, []);
 
   return requestWakeLock;
 };
