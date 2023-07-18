@@ -243,7 +243,7 @@ const MainMarquee = (props: Props) => {
                 (line) => line.id !== nextStation.line?.id
               ).length > 0 && (
                 <>
-                  <GreenText>. Please change here for</GreenText>
+                  <GreenText>Please change here for</GreenText>
                   <HorizontalSpacer />
                   <OrangeText>the {transferTexts[1]}</OrangeText>
                   <GreenText>.</GreenText>
