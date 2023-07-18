@@ -25,6 +25,7 @@ import MainMarquee from "../components/MainMarquee";
 import MainTopText from "../components/MainTopText";
 import { parenthesisRegexp } from "../constants/regexp";
 import useCurrentLanguageState from "../hooks/useCurrentLanguageState";
+import useCurrentLine from "../hooks/useCurrentLine";
 import useFetchNearbyStation from "../hooks/useFetchNearbyStation";
 import useNextStations from "../hooks/useNextStations";
 import useSearchStation from "../hooks/useSearchStation";
@@ -323,15 +324,15 @@ const BoundScene = () => {
 
 const LEDScene = () => {
   const { station, stations, selectedBound } = useAtomValue(stationAtom);
-  const { selectedLine } = useAtomValue(lineAtom);
-  const nextStations = useNextStations(stations, station, selectedLine);
+  const currentLine = useCurrentLine();
+  const nextStations = useNextStations(stations, station, currentLine);
   const langState = useCurrentLanguageState();
 
   const locationUpdatePaused = useMemo(() => !selectedBound, [selectedBound]);
 
   useWatchClosestStation(locationUpdatePaused);
 
-  if (!selectedLine) {
+  if (!currentLine) {
     return null;
   }
 
@@ -342,7 +343,7 @@ const LEDScene = () => {
       <MainMarquee
         nextStation={nextStations[1]}
         afterNextStation={nextStations[2]}
-        line={selectedLine}
+        line={currentLine}
       />
     </Container>
   );

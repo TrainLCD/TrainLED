@@ -373,6 +373,7 @@ const MainMarquee = (props: Props) => {
             )}`}</GreenText>
             <HorizontalSpacer />
             <OrangeText>{trainTypeTexts[1]}</OrangeText>
+            <HorizontalSpacer />
             <GreenText>train for</GreenText>
             <HorizontalSpacer />
             <OrangeText>{boundTexts[1]}</OrangeText>
