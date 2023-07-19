@@ -236,7 +236,6 @@ const MainMarquee = (props: Props) => {
                       ? `(${afterNextStation.stationNumbersList[0]?.stationNumber})`
                       : ""}
                   </OrangeText>
-                  <GreenText>.</GreenText>
                 </>
               ) : null}
               <GreenText>.</GreenText>
@@ -326,7 +325,6 @@ const MainMarquee = (props: Props) => {
                       ? `(${afterNextStation.stationNumbersList[0]?.stationNumber})`
                       : ""}
                   </OrangeText>
-                  <GreenText>.</GreenText>
                 </>
               ) : null}
               {nextStation.linesList.filter(
