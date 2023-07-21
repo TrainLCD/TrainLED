@@ -154,7 +154,7 @@ const useStationList = (): {
         ),
       }));
 
-      if (station?.hasTrainTypes) {
+      if (selectedLine.station?.hasTrainTypes) {
         await fetchTrainTypes();
       }
 
@@ -168,8 +168,8 @@ const useStationList = (): {
     grpcClient,
     selectedDirection,
     selectedLine?.id,
+    selectedLine?.station?.hasTrainTypes,
     setStationState,
-    station?.hasTrainTypes,
   ]);
 
   const fetchSelectedTrainTypeStations = useCallback(async () => {
