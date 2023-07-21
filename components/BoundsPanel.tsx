@@ -5,6 +5,7 @@ import { lineAtom } from "../atoms/line";
 import { trainTypeAtom } from "../atoms/trainType";
 import useBounds from "../hooks/useBounds";
 import useCurrentLine from "../hooks/useCurrentLine";
+import useTrainTypeLabels from "../hooks/useTrainTypeLabels";
 import { LineDirection } from "../models/bound";
 import type { Station, TrainType } from "../models/grpc";
 import {
@@ -45,6 +46,7 @@ const TrainTypeSelect = styled.select`
   min-width: 240px;
   font-family: "JF-Dot-jiskan24";
   margin-top: 8px;
+  text-align: center;
 `;
 
 const ButtonInnerText = styled.span`
@@ -62,6 +64,7 @@ const BoundsPanel = ({ onSelect, onBack, onTrainTypeSelect }: Props) => {
   const { trainType, fetchedTrainTypes } = useAtomValue(trainTypeAtom);
 
   const currentLine = useCurrentLine();
+  const trainTypeLabels = useTrainTypeLabels(fetchedTrainTypes);
   const { withTrainTypes, bounds } = useBounds();
 
   const handleChange = useCallback(
@@ -128,9 +131,12 @@ const BoundsPanel = ({ onSelect, onBack, onTrainTypeSelect }: Props) => {
       {withTrainTypes && (
         <TrainTypeInputContainer>
           <TrainTypeSelect value={trainType?.id ?? 0} onChange={handleChange}>
-            {fetchedTrainTypes.map((tt) => (
-              <option key={tt.id} value={tt.id}>
-                {tt.name}
+            {trainTypeLabels.map((label, idx) => (
+              <option
+                key={fetchedTrainTypes[idx]?.id}
+                value={fetchedTrainTypes[idx]?.id}
+              >
+                {label}
               </option>
             ))}
           </TrainTypeSelect>
