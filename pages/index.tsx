@@ -310,7 +310,7 @@ const BoundScene = () => {
   }
 
   return (
-    <Container fullHeight>
+    <Container>
       <CommonHeader />
       <BoundsPanel
         onBack={clearSelectedLine}
