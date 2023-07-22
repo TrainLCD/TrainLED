@@ -1,4 +1,4 @@
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import { useEffect, useMemo } from "react";
 import { navigationAtom } from "../atoms/navigation";
 import { stationAtom } from "../atoms/station";
@@ -13,7 +13,7 @@ import useSortedDistanceStations from "./useSortedDistanceStations";
 const useProcessLocation = () => {
   const [{ stations, selectedBound }, setStationAtom] = useAtom(stationAtom);
 
-  const [{ location }, setNavigationAtom] = useAtom(navigationAtom);
+  const setNavigationAtom = useSetAtom(navigationAtom);
 
   const currentLine = useCurrentLine();
   const sortedStations = useSortedDistanceStations();
