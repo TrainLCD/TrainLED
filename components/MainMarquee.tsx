@@ -68,9 +68,11 @@ const MainMarquee = (props: Props) => {
   const boundTexts = useMemo(() => {
     const index = selectedDirection === "INBOUND" ? 0 : 1;
     const jaText = bounds[index]
+      .filter((station) => station)
       .map((station) => station.name.replace(parenthesisRegexp, ""))
       .join("・");
     const enText = bounds[index]
+      .filter((station) => station)
       .map(
         (station) =>
           `${station.nameRoman.replace(parenthesisRegexp, "")}${
