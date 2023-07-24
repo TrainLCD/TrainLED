@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue } from "jotai";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { lineAtom } from "../atoms/line";
 import { navigationAtom } from "../atoms/navigation";
 import { stationAtom } from "../atoms/station";
@@ -19,11 +19,13 @@ const useProcessLocation = () => {
   const [{ station, stations, selectedBound }, setStationAtom] =
     useAtom(stationAtom);
   const { selectedDirection, selectedLine } = useAtomValue(lineAtom);
-  const isMountedRef = useRef(false);
 
   const [{ location }, setNavigationAtom] = useAtom(navigationAtom);
 
-  const displayedNextStation = getNextStation(stations, station);
+  const displayedNextStation = useMemo(
+    () => getNextStation(stations, station),
+    [station, stations]
+  );
 
   const isArrived = useCallback(
     (nearestStation: Station, avgDistance: number): boolean => {
@@ -100,9 +102,8 @@ const useProcessLocation = () => {
 
     setNavigationAtom((prev) => ({ ...prev, arrived, approaching }));
 
-    if (arrived || !isMountedRef.current) {
+    if (arrived) {
       setStationAtom((prev) => ({ ...prev, station: nearestStation }));
-      isMountedRef.current = true;
     }
   }, [
     isApproaching,

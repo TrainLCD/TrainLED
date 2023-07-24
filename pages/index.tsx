@@ -29,6 +29,7 @@ import useCurrentLanguageState from "../hooks/useCurrentLanguageState";
 import useCurrentLine from "../hooks/useCurrentLine";
 import useFetchNearbyStation from "../hooks/useFetchNearbyStation";
 import useNextStations from "../hooks/useNextStations";
+import useProcessLocation from "../hooks/useProcessLocation";
 import useSearchStation from "../hooks/useSearchStation";
 import useStationList from "../hooks/useStationList";
 import useUpdateClosestStationOnce from "../hooks/useUpdateClosestStationOnce";
@@ -344,9 +345,8 @@ const LEDScene = () => {
   const nextStations = useNextStations(stations, station, currentLine);
   const langState = useCurrentLanguageState();
 
-  const locationUpdatePaused = useMemo(() => !selectedBound, [selectedBound]);
-
-  useWatchClosestStation(locationUpdatePaused);
+  useProcessLocation();
+  useWatchClosestStation();
 
   if (!currentLine) {
     return null;

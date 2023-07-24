@@ -2,17 +2,11 @@ import { useSetAtom } from "jotai";
 import { useEffect } from "react";
 import { navigationAtom } from "../atoms/navigation";
 import geolocationOptions from "../constants/geolocationOptions";
-import useProcessLocation from "./useProcessLocation";
 
-const useWatchClosestStation = (paused = true) => {
+const useWatchClosestStation = () => {
   const setNavigationAtom = useSetAtom(navigationAtom);
-  useProcessLocation();
 
   useEffect(() => {
-    if (paused) {
-      return;
-    }
-
     const setLocation = (location: GeolocationPosition) =>
       setNavigationAtom((prev) => ({ ...prev, location }));
 
@@ -23,7 +17,7 @@ const useWatchClosestStation = (paused = true) => {
     );
 
     return () => navigator.geolocation.clearWatch(watchingId);
-  }, [paused, setNavigationAtom]);
+  }, [setNavigationAtom]);
 };
 
 export default useWatchClosestStation;
