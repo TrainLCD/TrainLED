@@ -1,6 +1,6 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { useRouter } from "next/router";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import styled from "styled-components";
 import { lineAtom } from "../atoms/line";
 import { stationAtom } from "../atoms/station";
@@ -14,9 +14,10 @@ import useFetchNearbyStation from "../hooks/useFetchNearbyStation";
 import useUpdateClosestStationOnce from "../hooks/useUpdateClosestStationOnce";
 import { Line } from "../models/grpc";
 
-const SearchStationButtonContainer = styled.div`
+const SearchStationButtonContainer = styled.div<{ padTop?: boolean }>`
   display: flex;
   justify-content: center;
+  margin-top: ${({ padTop }) => (padTop ? "24px" : "0")};
 `;
 
 const HomePage = () => {
@@ -25,7 +26,11 @@ const HomePage = () => {
   const [fetchLinesLoading] = useFetchNearbyStation();
 
   const router = useRouter();
-  useUpdateClosestStationOnce();
+  const { update, loading } = useUpdateClosestStationOnce();
+
+  useEffect(() => {
+    update();
+  }, [update]);
 
   const handleSelectLine = useCallback(
     (line: Line) => {
@@ -49,6 +54,11 @@ const HomePage = () => {
       />
       <SearchStationButtonContainer>
         <Button onClick={handleSearchStationClick}>駅を指定</Button>
+      </SearchStationButtonContainer>
+      <SearchStationButtonContainer padTop>
+        <Button onClick={update} disabled={loading}>
+          位置情報を更新
+        </Button>
       </SearchStationButtonContainer>
       <CommonFooter />
     </Container>

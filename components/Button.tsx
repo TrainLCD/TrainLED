@@ -11,6 +11,10 @@ export default styled.button<{ bgColor?: string }>`
   background-color: ${({ bgColor }) => bgColor || "#212121"};
   min-width: 240px;
 
+  &:disabled {
+    opacity: 0.5;
+  }
+
   &:focus {
     outline: none;
   }
