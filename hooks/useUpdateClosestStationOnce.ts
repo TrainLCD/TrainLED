@@ -1,12 +1,12 @@
 import { useSetAtom } from "jotai";
-import { useCallback } from "react";
+import { useEffect } from "react";
 import { navigationAtom } from "../atoms/navigation";
 import geolocationOptions from "../constants/geolocationOptions";
 
-const useUpdateClosestStationOnce = (): { update: () => void } => {
+const useUpdateClosestStationOnce = () => {
   const setNavigationAtom = useSetAtom(navigationAtom);
 
-  const update = useCallback(() => {
+  useEffect(() => {
     const setLocation = (location: GeolocationPosition) =>
       setNavigationAtom((prev) => ({ ...prev, location }));
 
@@ -16,8 +16,6 @@ const useUpdateClosestStationOnce = (): { update: () => void } => {
       geolocationOptions
     );
   }, [setNavigationAtom]);
-
-  return { update };
 };
 
 export default useUpdateClosestStationOnce;

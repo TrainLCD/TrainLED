@@ -40,6 +40,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
+        <title>{APP_NAME}</title>
         <link
           rel="preload"
           href="/JF-Dot-jiskan24.woff2"

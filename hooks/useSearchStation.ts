@@ -117,7 +117,7 @@ const useSearchStation = (): ReturnValue => {
           sortRequired ? b.linesList.length - a.linesList.length : 0
         );
 
-      return foundStations as Station[];
+      return foundStations;
     },
     []
   );

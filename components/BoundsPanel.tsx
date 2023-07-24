@@ -1,7 +1,6 @@
 import { useAtomValue } from "jotai";
 import { ChangeEvent, memo, useCallback } from "react";
 import styled from "styled-components";
-import { lineAtom } from "../atoms/line";
 import { trainTypeAtom } from "../atoms/trainType";
 import useBounds from "../hooks/useBounds";
 import useCurrentLine from "../hooks/useCurrentLine";
@@ -60,7 +59,6 @@ type Props = {
 };
 
 const BoundsPanel = ({ onSelect, onBack, onTrainTypeSelect }: Props) => {
-  const { selectedDirection } = useAtomValue(lineAtom);
   const { trainType, fetchedTrainTypes } = useAtomValue(trainTypeAtom);
 
   const currentLine = useCurrentLine();
@@ -92,12 +90,10 @@ const BoundsPanel = ({ onSelect, onBack, onTrainTypeSelect }: Props) => {
       }
 
       if (
-        (getIsYamanoteLine(currentLine.id) ||
-          getIsOsakaLoopLine(currentLine.id)) &&
-        selectedDirection
+        getIsYamanoteLine(currentLine.id) ||
+        (getIsOsakaLoopLine(currentLine.id) && !trainType)
       ) {
-        const directionName =
-          selectedDirection === "INBOUND" ? "内回り" : "外回り";
+        const directionName = direction === "INBOUND" ? "内回り" : "外回り";
         return `${directionName}(${stations
           .map((station) => station.name)
           .join("・")})`;
@@ -105,7 +101,7 @@ const BoundsPanel = ({ onSelect, onBack, onTrainTypeSelect }: Props) => {
 
       return `${stations.map((station) => station.name).join("・")}方面`;
     },
-    [currentLine, selectedDirection]
+    [currentLine, trainType]
   );
 
   const renderLines = useCallback(() => {
