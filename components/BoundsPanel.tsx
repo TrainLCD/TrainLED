@@ -21,8 +21,7 @@ const Title = styled.h3`
 `;
 
 const BackButtonContainer = styled.div`
-  margin-top: 32px;
-  margin-bottom: 20px;
+  margin-top: 24px;
   display: flex;
   justify-content: center;
 `;
