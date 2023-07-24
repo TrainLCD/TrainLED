@@ -132,7 +132,7 @@ const LineScene = () => {
   );
 
   return (
-    <Container fullHeight>
+    <Container>
       <CommonHeader />
       {fetchLinesLoading && <Loading />}
       <LinesPanel
@@ -218,7 +218,7 @@ const SearchScene = () => {
   );
 
   return (
-    <Container fullHeight>
+    <Container>
       <CommonHeader />
       <Heading>駅を指定</Heading>
       <SearchForm onSubmit={handleSubmit}>
@@ -350,7 +350,7 @@ const LEDScene = () => {
 };
 
 const Home = () => {
-  const { station, selectedBound } = useAtomValue(stationAtom);
+  const { selectedBound } = useAtomValue(stationAtom);
   const { selectedLine } = useAtomValue(lineAtom);
   const [{ scene }, setNavigationAtom] = useAtom(navigationAtom);
 
