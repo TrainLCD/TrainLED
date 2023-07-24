@@ -177,6 +177,10 @@ const CommonFooter = () => (
   </CreditContainer>
 );
 
+const BackButtonContainer = styled.div`
+  align-self: center;
+`;
+
 const SearchScene = () => {
   const { search } = useSearchStation();
   const [query, setQuery] = useState("");
@@ -221,6 +225,10 @@ const SearchScene = () => {
     [setNavigationAtom, setStationAtom]
   );
 
+  const handleBackButtonClick = useCallback(() => {
+    setNavigationAtom((prev) => ({ ...prev, scene: "LINE" }));
+  }, [setNavigationAtom]);
+
   return (
     <Container>
       <CommonHeader />
@@ -236,7 +244,7 @@ const SearchScene = () => {
             <SearchResultListContent centering>
               駅名を入力してください
             </SearchResultListContent>
-          )}{" "}
+          )}
           {!searchResult.length && alreadySearched && (
             <SearchResultListContent centering>
               結果がないゾイ
@@ -252,6 +260,9 @@ const SearchScene = () => {
           ))}
         </SearchResultListContainer>
       </SearchForm>
+      <BackButtonContainer>
+        <Button onClick={handleBackButtonClick}>戻る</Button>
+      </BackButtonContainer>
       <CommonFooter />
     </Container>
   );
