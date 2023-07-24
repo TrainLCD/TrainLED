@@ -1,4 +1,6 @@
 import { useAtomValue } from "jotai";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { stationAtom } from "../atoms/station";
 import Container from "../components/Container";
 import HorizontalSpacer from "../components/HorizontalSpacer";
@@ -12,12 +14,20 @@ import useWatchClosestStation from "../hooks/useWatchClosestStation";
 
 const LEDPage = () => {
   const { station, stations } = useAtomValue(stationAtom);
+
   const currentLine = useCurrentLine();
   const nextStations = useNextStations(stations, station, currentLine);
   const langState = useCurrentLanguageState();
+  const router = useRouter();
 
   useProcessLocation();
   useWatchClosestStation();
+
+  useEffect(() => {
+    if (!currentLine) {
+      router.replace("/");
+    }
+  }, [currentLine, router]);
 
   if (!currentLine) {
     return null;
