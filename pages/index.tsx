@@ -7,6 +7,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import styled from "styled-components";
@@ -182,6 +183,8 @@ const SearchScene = () => {
   const [searchResult, setSearchResult] = useState<StationForSearch[]>([]);
   const [alreadySearched, setAlreadySearched] = useState(false);
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const setStationAtom = useSetAtom(stationAtom);
   const setNavigationAtom = useSetAtom(navigationAtom);
 
@@ -193,6 +196,7 @@ const SearchScene = () => {
   const handleSubmit = useCallback(
     async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      inputRef.current?.blur();
       const result = await search(query);
       if (result) {
         setSearchResult(result);
@@ -223,6 +227,7 @@ const SearchScene = () => {
       <Heading>駅を指定</Heading>
       <SearchForm onSubmit={handleSubmit}>
         <StationNameInput
+          ref={inputRef}
           onChange={handleChange}
           placeholder="実は入力できるんすよ"
         />
