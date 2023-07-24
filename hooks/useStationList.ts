@@ -38,6 +38,11 @@ const useStationList = (): {
         return;
       }
 
+      setStationState((prev) => ({
+        ...prev,
+        stations: [],
+      }));
+
       setLoading(true);
 
       const req = new GetTrainTypesByStationIdRequest();
@@ -124,7 +129,14 @@ const useStationList = (): {
       setError(err as any);
       setLoading(false);
     }
-  }, [fetchedTrainTypes, grpcClient, selectedLine, setTrainTypeAtom, station]);
+  }, [
+    fetchedTrainTypes,
+    grpcClient,
+    selectedLine,
+    setStationState,
+    setTrainTypeAtom,
+    station,
+  ]);
 
   const fetchInitialStationList = useCallback(async () => {
     const lineId = selectedLine?.id;
@@ -176,6 +188,11 @@ const useStationList = (): {
     if (!selectedLine) {
       return;
     }
+
+    setStationState((prev) => ({
+      ...prev,
+      stations: [],
+    }));
 
     setLoading(true);
 
