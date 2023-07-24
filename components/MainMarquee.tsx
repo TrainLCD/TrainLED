@@ -65,20 +65,6 @@ const MainMarquee = (props: Props) => {
 
   const { bounds } = useBounds();
 
-  const aOrAn = useMemo(() => {
-    const first = line.nameRoman[0].toLowerCase();
-    switch (first) {
-      case "a":
-      case "e":
-      case "i":
-      case "o":
-      case "u":
-        return "an";
-      default:
-        return "a";
-    }
-  }, [line.nameRoman]);
-
   const boundTexts = useMemo(() => {
     const index = selectedDirection === "INBOUND" ? 0 : 1;
     const jaText = bounds[index]
@@ -365,7 +351,7 @@ const MainMarquee = (props: Props) => {
             <HorizontalSpacer />
             <GreenText>です。</GreenText>
             <HorizontalSpacer wide />
-            <GreenText>{`This is ${aOrAn} ${line.nameRoman.replace(
+            <GreenText>{`This is the ${line.nameRoman.replace(
               parenthesisRegexp,
               ""
             )}`}</GreenText>
