@@ -2,7 +2,7 @@
   "name": "TrainLED",
   "short_name": "TrainLED",
   "icons": [
-    { "src": "/favicon.ico", "type": "image/x-icon", "sizes": "32x32" },
+    { "src": "/favicon.ico", "type": "image/x-icon", "sizes": "16x16 32x32" },
     { "src": "/icons/icon-192.png", "type": "image/png", "sizes": "192x192" },
     { "src": "/icons/icon-512.png", "type": "image/png", "sizes": "512x512" },
     {
