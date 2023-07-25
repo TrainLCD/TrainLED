@@ -1,7 +1,7 @@
 import { useSetAtom } from "jotai";
 import { useCallback, useState } from "react";
 import { navigationAtom } from "../atoms/navigation";
-import geolocationOptions from "../constants/geolocationOptions";
+import useCurrentPosition from "./useCurrentPosition";
 
 const useUpdateClosestStationOnce = (): {
   update: () => void;
@@ -10,20 +10,22 @@ const useUpdateClosestStationOnce = (): {
   const setNavigationAtom = useSetAtom(navigationAtom);
   const [loading, setLoading] = useState(false);
 
-  const update = useCallback(() => {
-    setLoading(true);
-
-    const setLocation = (location: GeolocationPosition) => {
+  const setLocation = useCallback(
+    (location: GeolocationPosition) => {
       setLoading(false);
       setNavigationAtom((prev) => ({ ...prev, location }));
-    };
+    },
+    [setNavigationAtom]
+  );
 
-    navigator.geolocation.getCurrentPosition(
-      setLocation,
-      null,
-      geolocationOptions
-    );
-  }, [setNavigationAtom]);
+  const { fetchCurrentPosition } = useCurrentPosition({
+    onPositionUpdate: setLocation,
+  });
+
+  const update = useCallback(() => {
+    setLoading(true);
+    fetchCurrentPosition();
+  }, [fetchCurrentPosition]);
 
   return { update, loading };
 };

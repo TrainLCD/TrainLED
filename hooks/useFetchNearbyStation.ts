@@ -2,8 +2,8 @@ import { useAtom } from "jotai";
 import { useCallback, useState } from "react";
 import { stationAtom } from "../atoms/station";
 import { GetStationByCoordinatesRequest } from "../generated/stationapi_pb";
+import useCurrentPosition from "./useCurrentPosition";
 import useGRPC from "./useGRPC";
-import useGeolocation from "./useGeolocation";
 
 const useFetchNearbyStation = (): [
   boolean,
@@ -45,14 +45,17 @@ const useFetchNearbyStation = (): [
     [grpcClient, setStation, station]
   );
 
-  const onLocation = useCallback(
+  const handlePositionUpdate = useCallback(
     (pos: GeolocationPosition) => {
       fetchStation(pos.coords);
     },
     [fetchStation]
   );
 
-  useGeolocation(onLocation, setError);
+  useCurrentPosition({
+    enableAutoFetch: true,
+    onPositionUpdate: handlePositionUpdate,
+  });
 
   return [loading, error];
 };
