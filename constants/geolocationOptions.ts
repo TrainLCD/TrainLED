@@ -1,1 +1,3 @@
-export default {} as PositionOptions;
+export default {
+  enableHighAccuracy: true,
+} as PositionOptions;
