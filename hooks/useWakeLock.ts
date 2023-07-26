@@ -1,37 +1,28 @@
-import { useCallback, useEffect } from "react";
-
-const isClient = typeof window !== "undefined";
+import { useCallback, useEffect, useRef } from "react";
 
 const useWakeLock = (): (() => Promise<void>) => {
+  const wakeLock = useRef(null);
+
   const requestWakeLock = useCallback(async () => {
     const untypedNavigator = navigator as any;
-    if (isClient && "wakeLock" in navigator) {
-      try {
-        await untypedNavigator.wakeLock.request("screen");
-        console.log("Wake Lock is active");
-      } catch (err: any) {
-        const msg = `${err.name}, ${err.message}`;
-        console.error(msg);
-      }
+    try {
+      wakeLock.current = await untypedNavigator.wakeLock.request();
+      console.log("Wake Lock is active");
+    } catch (err: any) {
+      console.error(`${err.name}, ${err.message}`);
     }
   }, []);
 
   const handleVisibilityChange = useCallback(async () => {
-    if (document.visibilityState === "visible") {
+    if (wakeLock.current !== null && document.visibilityState === "visible") {
       await requestWakeLock();
     }
   }, [requestWakeLock]);
 
   useEffect(() => {
-    if (isClient) {
-      document.addEventListener("visibilitychange", handleVisibilityChange);
-      return () =>
-        document.removeEventListener(
-          "visibilitychange",
-          handleVisibilityChange
-        );
-    }
-    return () => undefined;
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, [handleVisibilityChange]);
 
   return requestWakeLock;
