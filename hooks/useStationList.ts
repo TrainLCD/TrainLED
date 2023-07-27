@@ -158,16 +158,16 @@ const useStationList = (): {
         return;
       }
 
-      setStationState((prev) => ({
-        ...prev,
-        stations: dropEitherJunctionStation(
-          data.stationsList,
-          selectedDirection
-        ),
-      }));
-
       if (selectedLine.station?.hasTrainTypes) {
         await fetchTrainTypes();
+      } else {
+        setStationState((prev) => ({
+          ...prev,
+          stations: dropEitherJunctionStation(
+            data.stationsList,
+            selectedDirection
+          ),
+        }));
       }
 
       setLoading(false);
