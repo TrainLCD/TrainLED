@@ -46,6 +46,7 @@ const TrainTypeSelect = styled.select`
   font-family: "JF-Dot-jiskan24";
   margin-top: 8px;
   text-align: center;
+  max-width: 100%;
 
   :disabled {
     opacity: 0.5;
