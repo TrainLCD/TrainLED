@@ -1,6 +1,7 @@
 import { useAtomValue } from "jotai";
 import { ChangeEvent, memo, useCallback } from "react";
 import styled from "styled-components";
+import { navigationAtom } from "../atoms/navigation";
 import { trainTypeAtom } from "../atoms/trainType";
 import useBounds from "../hooks/useBounds";
 import useCurrentLine from "../hooks/useCurrentLine";
@@ -45,6 +46,10 @@ const TrainTypeSelect = styled.select`
   font-family: "JF-Dot-jiskan24";
   margin-top: 8px;
   text-align: center;
+
+  :disabled {
+    opacity: 0.5;
+  }
 `;
 
 const ButtonInnerText = styled.span`
@@ -59,6 +64,7 @@ type Props = {
 
 const BoundsPanel = ({ onSelect, onBack, onTrainTypeSelect }: Props) => {
   const { trainType, fetchedTrainTypes } = useAtomValue(trainTypeAtom);
+  const { loading } = useAtomValue(navigationAtom);
 
   const currentLine = useCurrentLine();
   const trainTypeLabels = useTrainTypeLabels(fetchedTrainTypes);
@@ -103,27 +109,31 @@ const BoundsPanel = ({ onSelect, onBack, onTrainTypeSelect }: Props) => {
     [currentLine, trainType]
   );
 
-  const renderLines = useCallback(() => {
-    return bounds?.map((group, index) => {
-      return (
-        group[0] && (
-          <ListItem key={group[0]?.id}>
-            <Button onClick={() => onSelect(group[0], index)}>
-              <ButtonInnerText>
-                {getBoundTypeText(group, !index ? "INBOUND" : "OUTBOUND")}
-              </ButtonInnerText>
-            </Button>
-          </ListItem>
-        )
-      );
-    });
-  }, [bounds, getBoundTypeText, onSelect]);
+  const renderBounds = useCallback(
+    () =>
+      bounds?.map(
+        (group, index) =>
+          group[0] && (
+            <ListItem key={group[0]?.id}>
+              <Button
+                disabled={loading}
+                onClick={() => onSelect(group[0], index)}
+              >
+                <ButtonInnerText>
+                  {getBoundTypeText(group, !index ? "INBOUND" : "OUTBOUND")}
+                </ButtonInnerText>
+              </Button>
+            </ListItem>
+          )
+      ),
+    [bounds, getBoundTypeText, loading, onSelect]
+  );
 
   return (
     <Container>
       <Title>行き先極度選択（しなさい）</Title>
-      <List>{renderLines()}</List>
-      {withTrainTypes && (
+      <List>{loading ? <p>Loading...</p> : renderBounds()}</List>
+      {withTrainTypes ? (
         <TrainTypeInputContainer>
           <TrainTypeSelect value={trainType?.id ?? 0} onChange={handleChange}>
             {trainTypeLabels.map((label, idx) => (
@@ -134,6 +144,18 @@ const BoundsPanel = ({ onSelect, onBack, onTrainTypeSelect }: Props) => {
                 {label}
               </option>
             ))}
+          </TrainTypeSelect>
+        </TrainTypeInputContainer>
+      ) : (
+        <TrainTypeInputContainer>
+          <TrainTypeSelect
+            disabled
+            value={trainType?.id ?? 0}
+            onChange={handleChange}
+          >
+            <option>
+              {loading ? "読み込み中" : "選択可能な種別はありません"}
+            </option>
           </TrainTypeSelect>
         </TrainTypeInputContainer>
       )}

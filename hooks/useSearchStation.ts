@@ -1,4 +1,4 @@
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { navigationAtom } from "../atoms/navigation";
 import { stationAtom } from "../atoms/station";
@@ -71,7 +71,7 @@ const useSearchStation = (): ReturnValue => {
   const [byCoordinatesError, setByCoordinatesError] = useState<Error | null>(
     null
   );
-  const [loading, setLoading] = useState(false);
+  const [{ loading }, setNavigationAtom] = useAtom(navigationAtom);
   const prevQueryRef = useRef<string>();
 
   const { location } = useAtomValue(navigationAtom);
@@ -128,7 +128,7 @@ const useSearchStation = (): ReturnValue => {
         return;
       }
       try {
-        setLoading(true);
+        setNavigationAtom((prev) => ({ ...prev, loading: true }));
 
         const byCoordinatesReq = new GetStationByCoordinatesRequest();
         byCoordinatesReq.setLatitude(location.coords.latitude);
@@ -145,15 +145,15 @@ const useSearchStation = (): ReturnValue => {
               .map((s) => s as Station) || []
           );
         }
-        setLoading(false);
+        setNavigationAtom((prev) => ({ ...prev, loading: false }));
       } catch (err) {
         setByCoordinatesError(err as Error);
-        setLoading(false);
+        setNavigationAtom((prev) => ({ ...prev, loading: false }));
       }
     };
 
     fetchAsync();
-  }, [grpcClient, location?.coords, processStations]);
+  }, [grpcClient, location?.coords, processStations, setNavigationAtom]);
 
   const search = useCallback(
     async (query: string): Promise<StationForSearch[] | undefined> => {
@@ -166,7 +166,7 @@ const useSearchStation = (): ReturnValue => {
       prevQueryRef.current = trimmedQuery;
 
       try {
-        setLoading(true);
+        setNavigationAtom((prev) => ({ ...prev, loading: true }));
 
         const byNameReq = new GetStationsByNameRequest();
         byNameReq.setStationName(trimmedQuery);
@@ -183,14 +183,14 @@ const useSearchStation = (): ReturnValue => {
             true
           );
         }
-        setLoading(false);
+        setNavigationAtom((prev) => ({ ...prev, loading: false }));
       } catch (err) {
         setByNameError(err as Error);
-        setLoading(false);
+        setNavigationAtom((prev) => ({ ...prev, loading: false }));
       }
       return [];
     },
-    [grpcClient, processStations]
+    [grpcClient, processStations, setNavigationAtom]
   );
 
   // useEffect(() => {

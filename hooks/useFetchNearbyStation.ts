@@ -1,5 +1,6 @@
 import { useAtom } from "jotai";
 import { useCallback, useState } from "react";
+import { navigationAtom } from "../atoms/navigation";
 import { stationAtom } from "../atoms/station";
 import { GetStationByCoordinatesRequest } from "../generated/stationapi_pb";
 import useCurrentPosition from "./useCurrentPosition";
@@ -10,7 +11,7 @@ const useFetchNearbyStation = (): [
   GeolocationPositionError | null
 ] => {
   const [{ station }, setStation] = useAtom(stationAtom);
-  const [loading, setLoading] = useState(true);
+  const [{ loading }, setNavigationAtom] = useAtom(navigationAtom);
   const [error, setError] = useState<GeolocationPositionError | null>(null);
 
   const grpcClient = useGRPC();
@@ -21,7 +22,7 @@ const useFetchNearbyStation = (): [
         return;
       }
 
-      setLoading(true);
+      setNavigationAtom((prev) => ({ ...prev, loading: true }));
 
       try {
         const { latitude, longitude } = coords;
@@ -36,13 +37,13 @@ const useFetchNearbyStation = (): [
           ...prev,
           station: data?.stationsList[0] || null,
         }));
-        setLoading(false);
+        setNavigationAtom((prev) => ({ ...prev, loading: false }));
       } catch (err) {
         setError(err as GeolocationPositionError);
-        setLoading(false);
+        setNavigationAtom((prev) => ({ ...prev, loading: false }));
       }
     },
-    [grpcClient, setStation, station]
+    [grpcClient, setNavigationAtom, setStation, station]
   );
 
   const handlePositionUpdate = useCallback(

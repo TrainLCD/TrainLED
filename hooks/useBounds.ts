@@ -66,20 +66,6 @@ const useBounds = (): {
     [currentStation, stations]
   );
 
-  const inboundStations = useMemo(
-    () =>
-      inboundStationsForLoopLine(stations, stations[currentIndex], currentLine),
-    [currentIndex, currentLine, stations]
-  );
-  const outboundStations = useMemo(
-    () =>
-      outboundStationsForLoopLine(
-        stations,
-        stations[currentIndex],
-        currentLine
-      ),
-    [currentIndex, currentLine, stations]
-  );
   useEffect(() => {
     const inboundStations = inboundStationsForLoopLine(
       stations,

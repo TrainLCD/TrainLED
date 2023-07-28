@@ -1,6 +1,7 @@
 import { useAtom, useAtomValue } from "jotai";
 import { useCallback, useEffect, useState } from "react";
 import { lineAtom } from "../atoms/line";
+import { navigationAtom } from "../atoms/navigation";
 import { stationAtom } from "../atoms/station";
 import { trainTypeAtom } from "../atoms/trainType";
 import {
@@ -24,12 +25,12 @@ const useStationList = (): {
   loading: boolean;
   error: Error | null;
 } => {
-  const [{ station }, setStationState] = useAtom(stationAtom);
+  const [{ station }, setStationAtom] = useAtom(stationAtom);
   const [{ trainType, fetchedTrainTypes }, setTrainTypeAtom] =
     useAtom(trainTypeAtom);
   const { selectedLine, selectedDirection } = useAtomValue(lineAtom);
+  const [{ loading }, setNavigationAtom] = useAtom(navigationAtom);
   const grpcClient = useGRPC();
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const fetchTrainTypes = useCallback(async () => {
@@ -38,12 +39,7 @@ const useStationList = (): {
         return;
       }
 
-      setStationState((prev) => ({
-        ...prev,
-        stations: [],
-      }));
-
-      setLoading(true);
+      setNavigationAtom((prev) => ({ ...prev, loading: true }));
 
       const req = new GetTrainTypesByStationIdRequest();
       req.setStationId(selectedLine.station.id);
@@ -124,16 +120,16 @@ const useStationList = (): {
           break;
       }
 
-      setLoading(false);
+      setNavigationAtom((prev) => ({ ...prev, loading: false }));
     } catch (err) {
       setError(err as any);
-      setLoading(false);
+      setNavigationAtom((prev) => ({ ...prev, loading: false }));
     }
   }, [
     fetchedTrainTypes,
     grpcClient,
     selectedLine,
-    setStationState,
+    setNavigationAtom,
     setTrainTypeAtom,
     station,
   ]);
@@ -145,7 +141,7 @@ const useStationList = (): {
     }
 
     try {
-      setLoading(true);
+      setNavigationAtom((prev) => ({ ...prev, loading: true }));
 
       const req = new GetStationByLineIdRequest();
       req.setLineId(lineId);
@@ -154,14 +150,14 @@ const useStationList = (): {
       )?.toObject();
 
       if (!data) {
-        setLoading(false);
+        setNavigationAtom((prev) => ({ ...prev, loading: false }));
         return;
       }
 
       if (selectedLine.station?.hasTrainTypes) {
         await fetchTrainTypes();
       } else {
-        setStationState((prev) => ({
+        setStationAtom((prev) => ({
           ...prev,
           stations: dropEitherJunctionStation(
             data.stationsList,
@@ -170,10 +166,10 @@ const useStationList = (): {
         }));
       }
 
-      setLoading(false);
+      setNavigationAtom((prev) => ({ ...prev, loading: false }));
     } catch (err) {
       setError(err as any);
-      setLoading(false);
+      setNavigationAtom((prev) => ({ ...prev, loading: false }));
     }
   }, [
     fetchTrainTypes,
@@ -181,20 +177,15 @@ const useStationList = (): {
     selectedDirection,
     selectedLine?.id,
     selectedLine?.station?.hasTrainTypes,
-    setStationState,
+    setNavigationAtom,
+    setStationAtom,
   ]);
 
   const fetchSelectedTrainTypeStations = useCallback(async () => {
     if (!selectedLine) {
       return;
     }
-
-    setStationState((prev) => ({
-      ...prev,
-      stations: [],
-    }));
-
-    setLoading(true);
+    setNavigationAtom((prev) => ({ ...prev, loading: true }));
 
     try {
       if (!trainType?.groupId) {
@@ -205,51 +196,49 @@ const useStationList = (): {
         )?.toObject();
 
         if (!data) {
-          setLoading(false);
+          setNavigationAtom((prev) => ({ ...prev, loading: false }));
           return;
         }
 
-        setStationState((prev) => ({
+        setStationAtom((prev) => ({
           ...prev,
           stations: data.stationsList,
         }));
-
-        setLoading(false);
+        setNavigationAtom((prev) => ({ ...prev, loading: false }));
         return;
       }
 
       const req = new GetStationsByLineGroupIdRequest();
-      req.setLineGroupId(trainType?.groupId);
+      req.setLineGroupId(trainType.groupId);
       const data = (
         await grpcClient?.getStationsByLineGroupId(req, null)
       )?.toObject();
 
       if (!data) {
-        setLoading(false);
+        setNavigationAtom((prev) => ({ ...prev, loading: false }));
         return;
       }
 
-      setStationState((prev) => ({
+      setStationAtom((prev) => ({
         ...prev,
         stations: dropEitherJunctionStation(
           data.stationsList,
           selectedDirection
         ),
       }));
-      setTrainTypeAtom((prev) => ({ ...prev }));
 
-      setLoading(false);
+      setNavigationAtom((prev) => ({ ...prev, loading: false }));
     } catch (err) {
       setError(err as any);
-      setLoading(false);
+      setNavigationAtom((prev) => ({ ...prev, loading: false }));
     }
   }, [
     grpcClient,
     selectedDirection,
     selectedLine,
-    setStationState,
-    setTrainTypeAtom,
-    trainType?.groupId,
+    setNavigationAtom,
+    setStationAtom,
+    trainType,
   ]);
 
   useEffect(() => {
