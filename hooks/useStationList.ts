@@ -9,6 +9,7 @@ import {
   GetStationsByLineGroupIdRequest,
   GetTrainTypesByStationIdRequest,
   TrainDirection,
+  TrainTypeKind,
 } from "../generated/stationapi_pb";
 import dropEitherJunctionStation from "../utils/dropJunctionStation";
 import {
@@ -77,6 +78,7 @@ const useStationList = (): {
               color: "",
               linesList: [],
               direction: TrainDirection.BOTH,
+              kind: TrainTypeKind.DEFAULT
             },
             ...trainTypesList,
           ],
