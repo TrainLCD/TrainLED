@@ -75,7 +75,7 @@ const MainMarquee = (props: Props) => {
       .filter((station) => station)
       .map(
         (station) =>
-          `${station.nameRoman.replace(parenthesisRegexp, "")}${
+          `${station.nameRoman?.replace(parenthesisRegexp, "")}${
             station.stationNumbersList[0]?.stationNumber
               ? `(${station.stationNumbersList[0]?.stationNumber})`
               : ""
@@ -127,10 +127,10 @@ const MainMarquee = (props: Props) => {
       filteredLines.length > 1
         ? filteredLines
             .slice(0, filteredLines.length - 1)
-            .map((line) => line.nameRoman.replace(parenthesisRegexp, ""))
+            .map((line) => line.nameRoman?.replace(parenthesisRegexp, ""))
             .join(", the ")
         : filteredLines
-            .map((line) => line.nameRoman.replace(parenthesisRegexp, ""))
+            .map((line) => line.nameRoman?.replace(parenthesisRegexp, ""))
             .join("");
 
     if (filteredLines.length <= 1) {
@@ -355,7 +355,7 @@ const MainMarquee = (props: Props) => {
             <HorizontalSpacer />
             <GreenText>です。</GreenText>
             <HorizontalSpacer wide />
-            <GreenText>{`This is the ${line.nameRoman.replace(
+            <GreenText>{`This is the ${line?.nameRoman?.replace(
               parenthesisRegexp,
               ""
             )}`}</GreenText>
