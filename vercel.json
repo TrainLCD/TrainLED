@@ -1,3 +1,0 @@
-{
-    "installCommand": "sh ./scripts/prepare-vercel.sh"
-}
