@@ -1,5 +1,4 @@
 import { useCallback, useEffect } from "react";
-import geolocationOptions from "../constants/geolocationOptions";
 
 const useCurrentPosition = ({
   enableAutoFetch = false,
@@ -10,26 +9,22 @@ const useCurrentPosition = ({
   onPositionUpdate: (position: GeolocationPosition) => void;
   onPositionError?: (error: GeolocationPositionError) => void | null;
 }): { fetchCurrentPosition: () => void; watchPosition: () => number } => {
-  const noop = useCallback(() => undefined, []);
-
   const fetchCurrentPosition = useCallback(
     () =>
       navigator.geolocation.getCurrentPosition(
-        onPositionUpdate || noop,
+        onPositionUpdate,
         onPositionError,
-        geolocationOptions
+        { enableHighAccuracy: true }
       ),
-    [noop, onPositionError, onPositionUpdate]
+    [onPositionError, onPositionUpdate]
   );
 
   const watchPosition = useCallback(
     () =>
-      navigator.geolocation.watchPosition(
-        onPositionUpdate || noop,
-        onPositionError,
-        geolocationOptions
-      ),
-    [noop, onPositionError, onPositionUpdate]
+      navigator.geolocation.watchPosition(onPositionUpdate, onPositionError, {
+        enableHighAccuracy: true,
+      }),
+    [onPositionError, onPositionUpdate]
   );
 
   useEffect(() => {

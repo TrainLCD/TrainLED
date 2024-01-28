@@ -1,4 +1,4 @@
-import { Line, Station } from "../models/grpc";
+import { Line, Station } from "../generated/proto/stationapi_pb";
 
 const YAMANOTE_LINE_MAJOR_STATIONS_ID = [
   1130205, // 渋谷

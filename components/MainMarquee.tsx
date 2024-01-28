@@ -6,9 +6,8 @@ import { lineAtom } from "../atoms/line";
 import { navigationAtom } from "../atoms/navigation";
 import { trainTypeAtom } from "../atoms/trainType";
 import { parenthesisRegexp } from "../constants/regexp";
-import { StopCondition } from "../generated/stationapi_pb";
+import { Line, Station, StopCondition } from "../generated/proto/stationapi_pb";
 import useBounds from "../hooks/useBounds";
-import type { Line, Station } from "../models/grpc";
 import {
   getIsLoopLine,
   getIsMeijoLine,
@@ -56,6 +55,8 @@ type Props = {
   line: Line;
 };
 
+const SCROLL_SPEED = 750;
+
 const MainMarquee = (props: Props) => {
   const { nextStation, line, afterNextStation } = props;
 
@@ -76,8 +77,8 @@ const MainMarquee = (props: Props) => {
       .map(
         (station) =>
           `${station.nameRoman?.replace(parenthesisRegexp, "")}${
-            station.stationNumbersList[0]?.stationNumber
-              ? `(${station.stationNumbersList[0]?.stationNumber})`
+            station.stationNumbers[0]?.stationNumber
+              ? `(${station.stationNumbers[0]?.stationNumber})`
               : ""
           }`
       )
@@ -120,7 +121,7 @@ const MainMarquee = (props: Props) => {
       return "";
     }
 
-    const filteredLines = nextStation.linesList.filter(
+    const filteredLines = nextStation.lines.filter(
       (line) => line.id !== nextStation.line?.id
     );
     const headTextForEn =
@@ -163,7 +164,7 @@ const MainMarquee = (props: Props) => {
   if (approaching && !arrived) {
     return (
       <Container>
-        <Marquee gradient={false} speed={300}>
+        <Marquee gradient={false} speed={SCROLL_SPEED}>
           <InnerContainer>
             <LanguageSpacer />
             <TextContainer>
@@ -176,7 +177,7 @@ const MainMarquee = (props: Props) => {
                   <GreenText>の次は</GreenText>
                   <OrangeText>{afterNextStation.name}</OrangeText>
                   <GreenText>に停車いたします。</GreenText>
-                  {nextStation.stopCondition !== StopCondition.ALL && (
+                  {nextStation.stopCondition !== StopCondition.All && (
                     <>
                       <CrimsonText>
                         {nextStation.name}
@@ -188,7 +189,7 @@ const MainMarquee = (props: Props) => {
                 </>
               ) : null}
               <HorizontalSpacer />
-              {nextStation.linesList.filter(
+              {nextStation.lines.filter(
                 (line) => line.id !== nextStation.line?.id
               ).length > 0 && (
                 <>
@@ -204,8 +205,8 @@ const MainMarquee = (props: Props) => {
               <HorizontalSpacer />
               <OrangeText>
                 {nextStation.nameRoman}
-                {nextStation.stationNumbersList.length
-                  ? `(${nextStation.stationNumbersList[0]?.stationNumber})`
+                {nextStation.stationNumbers.length
+                  ? `(${nextStation.stationNumbers[0]?.stationNumber})`
                   : ""}
               </OrangeText>
               {afterNextStation ? (
@@ -214,22 +215,22 @@ const MainMarquee = (props: Props) => {
                   <HorizontalSpacer />
                   <OrangeText>
                     {nextStation.nameRoman}
-                    {nextStation.stationNumbersList.length
-                      ? `(${nextStation.stationNumbersList[0]?.stationNumber})`
+                    {nextStation.stationNumbers.length
+                      ? `(${nextStation.stationNumbers[0]?.stationNumber})`
                       : ""}
                   </OrangeText>
                   <GreenText>, will be </GreenText>
                   <HorizontalSpacer />
                   <OrangeText>
                     {afterNextStation.nameRoman}
-                    {afterNextStation.stationNumbersList.length
-                      ? `(${afterNextStation.stationNumbersList[0]?.stationNumber})`
+                    {afterNextStation.stationNumbers.length
+                      ? `(${afterNextStation.stationNumbers[0]?.stationNumber})`
                       : ""}
                   </OrangeText>
                 </>
               ) : null}
               <GreenText>.</GreenText>
-              {nextStation.linesList.filter(
+              {nextStation.lines.filter(
                 (line) => line.id !== nextStation.line?.id
               ).length > 0 && (
                 <>
@@ -252,7 +253,7 @@ const MainMarquee = (props: Props) => {
   if (!approaching && !arrived) {
     return (
       <Container>
-        <Marquee gradient={false} speed={300}>
+        <Marquee gradient={false} speed={SCROLL_SPEED}>
           <InnerContainer>
             <LanguageSpacer />
             <TextContainer>
@@ -265,7 +266,7 @@ const MainMarquee = (props: Props) => {
                   <GreenText>の次は</GreenText>
                   <OrangeText>{afterNextStation.name}</OrangeText>
                   <GreenText>に停車いたします。</GreenText>
-                  {nextStation.stopCondition !== StopCondition.ALL && (
+                  {nextStation.stopCondition !== StopCondition.All && (
                     <>
                       <CrimsonText>
                         {nextStation.name}
@@ -277,7 +278,7 @@ const MainMarquee = (props: Props) => {
                 </>
               ) : null}
               <HorizontalSpacer />
-              {nextStation.linesList.filter(
+              {nextStation.lines.filter(
                 (line) => line.id !== nextStation.line?.id
               ).length > 0 && (
                 <>
@@ -293,8 +294,8 @@ const MainMarquee = (props: Props) => {
               <HorizontalSpacer />
               <OrangeText>
                 {nextStation.nameRoman}
-                {nextStation.stationNumbersList.length
-                  ? `(${nextStation.stationNumbersList[0]?.stationNumber})`
+                {nextStation.stationNumbers.length
+                  ? `(${nextStation.stationNumbers[0]?.stationNumber})`
                   : ""}
               </OrangeText>
               {afterNextStation ? (
@@ -303,21 +304,21 @@ const MainMarquee = (props: Props) => {
                   <HorizontalSpacer />
                   <OrangeText>
                     {nextStation.nameRoman}
-                    {nextStation.stationNumbersList.length
-                      ? `(${nextStation.stationNumbersList[0]?.stationNumber})`
+                    {nextStation.stationNumbers.length
+                      ? `(${nextStation.stationNumbers[0]?.stationNumber})`
                       : ""}
                   </OrangeText>
                   <GreenText>, will be </GreenText>
                   <HorizontalSpacer />
                   <OrangeText>
                     {afterNextStation.nameRoman}
-                    {afterNextStation.stationNumbersList.length
-                      ? `(${afterNextStation.stationNumbersList[0]?.stationNumber})`
+                    {afterNextStation.stationNumbers.length
+                      ? `(${afterNextStation.stationNumbers[0]?.stationNumber})`
                       : ""}
                   </OrangeText>
                 </>
               ) : null}
-              {nextStation.linesList.filter(
+              {nextStation.lines.filter(
                 (line) => line.id !== nextStation.line?.id
               ).length > 0 && (
                 <>
@@ -339,7 +340,7 @@ const MainMarquee = (props: Props) => {
 
   return (
     <Container>
-      <Marquee gradient={false} speed={300}>
+      <Marquee gradient={false} speed={SCROLL_SPEED}>
         <InnerContainer>
           <LanguageSpacer />
           <TextContainer>

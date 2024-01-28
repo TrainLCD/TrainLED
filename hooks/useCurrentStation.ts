@@ -1,7 +1,7 @@
 import { useAtomValue } from "jotai";
 import { useEffect, useState } from "react";
 import { stationAtom } from "../atoms/station";
-import { Station } from "../models/grpc";
+import { Station } from "../generated/proto/stationapi_pb";
 import getIsPass from "../utils/isPass";
 
 const useCurrentStation = ({

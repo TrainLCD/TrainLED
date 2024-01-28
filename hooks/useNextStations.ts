@@ -2,8 +2,9 @@ import { useAtomValue } from "jotai";
 import { useCallback, useEffect, useState } from "react";
 import { lineAtom } from "../atoms/line";
 import { trainTypeAtom } from "../atoms/trainType";
-import type { Line, Station } from "../models/grpc";
+import { Line, Station } from "../generated/proto/stationapi_pb";
 import getCurrentStationIndex from "../utils/currentStationIndex";
+import dropEitherJunctionStation from "../utils/dropJunctionStation";
 import getIsPass from "../utils/isPass";
 import { getIsLoopLine } from "../utils/loopLine";
 
@@ -49,10 +50,15 @@ const useNextStations = (
     const ns = getIsLoopLine(selectedLine, trainType)
       ? getStationsForLoopLine(currentIndex)
       : getStations(currentIndex);
-    setNextStations(ns.filter((s) => !getIsPass(s)));
+    setNextStations(
+      dropEitherJunctionStation(ns, selectedDirection).filter(
+        (s) => !getIsPass(s)
+      )
+    );
   }, [
     getStations,
     getStationsForLoopLine,
+    selectedDirection,
     selectedLine,
     station,
     stations,

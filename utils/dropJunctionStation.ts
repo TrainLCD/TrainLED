@@ -1,5 +1,5 @@
+import { Station } from "../generated/proto/stationapi_pb";
 import { LineDirection } from "../models/bound";
-import { Station } from "../models/grpc";
 
 // ２路線の接続駅は前の路線の最後の駅データを捨てる
 const dropEitherJunctionStation = (

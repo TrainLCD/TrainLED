@@ -1,6 +1,6 @@
 import range from "lodash/range";
+import { Line, Station, TrainType } from "../generated/proto/stationapi_pb";
 import { LineDirection } from "../models/bound";
-import { Line, Station, TrainType } from "../models/grpc";
 import { TrainTypeString } from "../models/trainType";
 
 const CHUO_LINE_RAPID_START_ID = 1131201;

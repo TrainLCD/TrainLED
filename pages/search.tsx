@@ -9,7 +9,6 @@ import CommonHeader from "../components/CommonHeader";
 import Container from "../components/Container";
 import Heading from "../components/Heading";
 import useSearchStation from "../hooks/useSearchStation";
-import StationForSearch from "../models/StationForSearch";
 
 const SearchForm = styled.form`
   display: flex;
@@ -62,11 +61,10 @@ const BackButtonContainer = styled.div`
 `;
 
 const SearchPage = () => {
-  const { search } = useSearchStation();
+  const { stations, isLoading, search, submitStation } = useSearchStation();
   const router = useRouter();
 
   const [query, setQuery] = useState("");
-  const [searchResult, setSearchResult] = useState<StationForSearch[]>([]);
   const [alreadySearched, setAlreadySearched] = useState(false);
 
   const setStationAtom = useSetAtom(stationAtom);
@@ -82,28 +80,10 @@ const SearchPage = () => {
     async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       inputRef.current?.blur();
-      const result = await search(query);
-      if (result) {
-        setSearchResult(result);
-      }
+      await search(query);
       setAlreadySearched(true);
     },
     [query, search]
-  );
-
-  const handleStationClick = useCallback(
-    (station: StationForSearch) => {
-      const { nameForSearch, ...reducedStation } = station;
-      setSearchResult([]);
-      setQuery("");
-
-      setStationAtom((prev) => ({
-        ...prev,
-        station: reducedStation,
-      }));
-      router.push("/");
-    },
-    [router, setStationAtom]
   );
 
   return (
@@ -117,22 +97,25 @@ const SearchPage = () => {
           placeholder="実は入力できるんすよ"
         />
         <SearchResultListContainer>
-          {!searchResult.length && query.length === 0 && !alreadySearched && (
-            <SearchResultListContent centering>
-              駅名を入力してください
-            </SearchResultListContent>
-          )}
-          {!searchResult.length && alreadySearched && (
+          {!stations.length &&
+            query.length === 0 &&
+            !alreadySearched &&
+            !isLoading && (
+              <SearchResultListContent centering>
+                駅名を入力してください
+              </SearchResultListContent>
+            )}
+          {!stations.length && alreadySearched && !isLoading && (
             <SearchResultListContent centering>
               結果がないゾイ
             </SearchResultListContent>
           )}
-          {searchResult.map((station) => (
+          {stations.map((station) => (
             <SearchResultListContent
-              onClick={handleStationClick.bind(this, station)}
+              onClick={() => submitStation(station)}
               key={station.id}
             >
-              {station.nameForSearch}
+              {station.name}
             </SearchResultListContent>
           ))}
         </SearchResultListContainer>

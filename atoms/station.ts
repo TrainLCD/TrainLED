@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { Station } from "../models/grpc";
+import { Station } from "../generated/proto/stationapi_pb";
 
 type StationAtom = {
   station: Station | null;

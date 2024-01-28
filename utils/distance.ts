@@ -1,6 +1,6 @@
 import * as geolib from "geolib";
 import { COMPUTE_DISTANCE_ACCURACY } from "../constants/location";
-import type { Station } from "../models/grpc";
+import { Station } from "../generated/proto/stationapi_pb";
 
 // 駅配列から平均駅間距離（直線距離）を求める
 export const getAvgStationBetweenDistances = (stations: Station[]): number =>
@@ -31,13 +31,15 @@ export const scoreStationDistances = (
       { latitude, longitude },
       { latitude: station.latitude, longitude: station.longitude }
     );
-    return { ...station, distance };
+    return new Station({ ...station, distance });
   });
   scored.sort((a, b) => {
-    if (a.distance < b.distance) {
+    const aDistance = a.distance ?? 0;
+    const bDistance = b.distance ?? 0;
+    if (aDistance < bDistance) {
       return -1;
     }
-    if (a.distance > b.distance) {
+    if (aDistance > bDistance) {
       return 1;
     }
     return 0;

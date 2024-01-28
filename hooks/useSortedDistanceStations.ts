@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { navigationAtom } from "../atoms/navigation";
 import { stationAtom } from "../atoms/station";
 import { COMPUTE_DISTANCE_ACCURACY } from "../constants/location";
-import { Station } from "../models/grpc";
+import { Station } from "../generated/proto/stationapi_pb";
 
 const useSortedDistanceStations = (): Station[] => {
   const { location } = useAtomValue(navigationAtom);
@@ -20,13 +20,15 @@ const useSortedDistanceStations = (): Station[] => {
           { latitude: s.latitude, longitude: s.longitude },
           COMPUTE_DISTANCE_ACCURACY
         );
-        return { ...s, distance };
+        return new Station({ ...s, distance });
       });
       scored.sort((a, b) => {
-        if (a.distance < b.distance) {
+        const aDistance = a.distance ?? 0;
+        const bDistance = b.distance ?? 0;
+        if (aDistance < bDistance) {
           return -1;
         }
-        if (a.distance > b.distance) {
+        if (aDistance > bDistance) {
           return 1;
         }
         return 0;

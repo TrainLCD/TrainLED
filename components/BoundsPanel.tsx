@@ -1,13 +1,11 @@
 import { useAtomValue } from "jotai";
 import { ChangeEvent, memo, useCallback } from "react";
 import styled from "styled-components";
-import { navigationAtom } from "../atoms/navigation";
 import { trainTypeAtom } from "../atoms/trainType";
-import useBounds from "../hooks/useBounds";
+import { Station, TrainType } from "../generated/proto/stationapi_pb";
 import useCurrentLine from "../hooks/useCurrentLine";
 import useTrainTypeLabels from "../hooks/useTrainTypeLabels";
 import { LineDirection } from "../models/bound";
-import type { Station, TrainType } from "../models/grpc";
 import {
   getIsMeijoLine,
   getIsOsakaLoopLine,
@@ -53,23 +51,34 @@ const TrainTypeSelect = styled.select`
   }
 `;
 
+const TrainTypeOption = styled.option`
+  background-color: ${({ theme }) => theme.bgColor || "#212121"};
+  color: white;
+`;
+
 const ButtonInnerText = styled.span`
   font-weight: bold;
 `;
 
 type Props = {
+  isLoading: boolean;
+  bounds: [Station[], Station[]];
   onSelect: (boundStation: Station, index: number) => void;
   onBack: () => void;
   onTrainTypeSelect: (trainType: TrainType) => void;
 };
 
-const BoundsPanel = ({ onSelect, onBack, onTrainTypeSelect }: Props) => {
+const BoundsPanel = ({
+  isLoading,
+  bounds,
+  onSelect,
+  onBack,
+  onTrainTypeSelect,
+}: Props) => {
   const { trainType, fetchedTrainTypes } = useAtomValue(trainTypeAtom);
-  const { loading } = useAtomValue(navigationAtom);
 
   const currentLine = useCurrentLine();
   const trainTypeLabels = useTrainTypeLabels(fetchedTrainTypes);
-  const { withTrainTypes, bounds } = useBounds();
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLSelectElement>) => {
@@ -117,7 +126,7 @@ const BoundsPanel = ({ onSelect, onBack, onTrainTypeSelect }: Props) => {
           group[0] && (
             <ListItem key={group[0]?.id}>
               <Button
-                disabled={loading}
+                disabled={isLoading}
                 onClick={() => onSelect(group[0], index)}
               >
                 <ButtonInnerText>
@@ -127,40 +136,25 @@ const BoundsPanel = ({ onSelect, onBack, onTrainTypeSelect }: Props) => {
             </ListItem>
           )
       ),
-    [bounds, getBoundTypeText, loading, onSelect]
+    [bounds, getBoundTypeText, isLoading, onSelect]
   );
 
   return (
     <Container>
       <Title>行き先極度選択（しなさい）</Title>
-      <List>{loading ? <p>Loading...</p> : renderBounds()}</List>
-      {withTrainTypes ? (
-        <TrainTypeInputContainer>
-          <TrainTypeSelect value={trainType?.id ?? 0} onChange={handleChange}>
-            {trainTypeLabels.map((label, idx) => (
-              <option
-                key={fetchedTrainTypes[idx]?.id}
-                value={fetchedTrainTypes[idx]?.id}
-              >
-                {label}
-              </option>
-            ))}
-          </TrainTypeSelect>
-        </TrainTypeInputContainer>
-      ) : (
-        <TrainTypeInputContainer>
-          <TrainTypeSelect
-            disabled
-            value={trainType?.id ?? 0}
-            onChange={handleChange}
-          >
-            <option>
-              {loading ? "読み込み中" : "選択可能な種別はありません"}
-            </option>
-          </TrainTypeSelect>
-        </TrainTypeInputContainer>
-      )}
-
+      <List>{isLoading ? <p>Loading...</p> : renderBounds()}</List>
+      <TrainTypeInputContainer>
+        <TrainTypeSelect value={trainType?.id ?? 0} onChange={handleChange}>
+          {trainTypeLabels.map((label, idx) => (
+            <TrainTypeOption
+              key={fetchedTrainTypes[idx]?.id}
+              value={fetchedTrainTypes[idx]?.id}
+            >
+              {label}
+            </TrainTypeOption>
+          ))}
+        </TrainTypeSelect>
+      </TrainTypeInputContainer>
       <BackButtonContainer>
         <Button onClick={onBack}>戻る</Button>
       </BackButtonContainer>

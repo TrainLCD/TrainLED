@@ -1,4 +1,4 @@
-import type { Station } from "../models/grpc";
+import { Station } from "../generated/proto/stationapi_pb";
 
 const getCurrentStationIndex = (
   stations: Station[],

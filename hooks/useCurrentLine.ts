@@ -2,7 +2,7 @@ import { useAtomValue } from "jotai";
 import { useMemo } from "react";
 import { lineAtom } from "../atoms/line";
 import { stationAtom } from "../atoms/station";
-import { Line } from "../models/grpc";
+import { Line } from "../generated/proto/stationapi_pb";
 import useCurrentStation from "./useCurrentStation";
 
 const useCurrentLine = (): Line | null => {

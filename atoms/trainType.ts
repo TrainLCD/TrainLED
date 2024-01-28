@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { TrainType } from "../models/grpc";
+import { TrainType } from "../generated/proto/stationapi_pb";
 
 type TrainTypeAtom = {
   trainType: TrainType | null;

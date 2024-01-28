@@ -1,14 +1,15 @@
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useQuery } from "@connectrpc/connect-query";
+import { useAtomValue, useSetAtom } from "jotai";
+import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { navigationAtom } from "../atoms/navigation";
 import { stationAtom } from "../atoms/station";
 import {
-  GetStationByCoordinatesRequest,
-  GetStationsByNameRequest,
-} from "../generated/stationapi_pb";
-import StationForSearch from "../models/StationForSearch";
-import { Station } from "../models/grpc";
-import useGRPC from "./useGRPC";
+  getStationsByCoordinates,
+  getStationsByName,
+} from "../generated/proto/stationapi-StationAPI_connectquery";
+import { Station } from "../generated/proto/stationapi_pb";
+import { groupStations } from "../utils/groupStations";
 
 export const PREFS_JA = [
   "北海道",
@@ -61,65 +62,41 @@ export const PREFS_JA = [
 ];
 
 type ReturnValue = {
-  loading: boolean;
-  search: (query: string) => Promise<StationForSearch[] | undefined>;
-  submitStation: (station: StationForSearch) => void;
+  stations: Station[];
+  isLoading: boolean;
+  search: (query: string) => Promise<Station[] | undefined>;
+  submitStation: (station: Station) => void;
 };
 
 const useSearchStation = (): ReturnValue => {
-  const [byNameError, setByNameError] = useState<Error | null>(null);
-  const [byCoordinatesError, setByCoordinatesError] = useState<Error | null>(
-    null
-  );
-  const [{ loading }, setNavigationAtom] = useAtom(navigationAtom);
+  const [nearbyStations, setNearbyStations] = useState<Station[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const prevQueryRef = useRef<string>();
 
   const { location } = useAtomValue(navigationAtom);
   const setStationAtom = useSetAtom(stationAtom);
 
-  const grpcClient = useGRPC();
+  const router = useRouter();
 
-  const processStations = useCallback(
-    (stations: Station[], sortRequired?: boolean): Station[] => {
-      const foundStations = stations
-        .map((g, i, arr) => {
-          const sameNameAndDifferentPrefStations = arr.filter(
-            (s) => s.name === g.name && s.prefectureId !== g.prefectureId
-          );
-          if (sameNameAndDifferentPrefStations.length) {
-            return {
-              ...g,
-              nameForSearch: `${g.name}(${PREFS_JA[g.prefectureId - 1]})`,
-            };
-          }
-          return {
-            ...g,
-            nameForSearch: g.name,
-          };
-        })
-        .map((g, i, arr) => {
-          const sameNameStations = arr.filter(
-            (s) => s.nameForSearch === g.nameForSearch
-          );
-          if (sameNameStations.length) {
-            return sameNameStations.reduce((acc, cur) => ({
-              ...acc,
-              lines: Array.from(new Set([...acc.linesList, ...cur.linesList])),
-            }));
-          }
-          return g;
-        })
-        .filter(
-          (g, i, arr) =>
-            arr.findIndex((s) => s.nameForSearch === g.nameForSearch) === i
-        )
-        .sort((a, b) =>
-          sortRequired ? b.linesList.length - a.linesList.length : 0
-        );
+  const { data: byCoordinatesData, isLoading: isLoadingByCoordinates } =
+    useQuery(
+      getStationsByCoordinates,
+      {
+        latitude: location?.coords.latitude,
+        longitude: location?.coords.longitude,
+        limit: 100,
+      },
+      { enabled: !!location }
+    );
 
-      return foundStations;
+  const { data: byNameData, isLoading: isLoadingByName } = useQuery(
+    getStationsByName,
+    {
+      stationName: searchQuery,
+      limit: 100,
     },
-    []
+    { enabled: searchQuery.length > 0 }
   );
 
   useEffect(() => {
@@ -127,89 +104,52 @@ const useSearchStation = (): ReturnValue => {
       if (!location?.coords) {
         return;
       }
-      try {
-        setNavigationAtom((prev) => ({ ...prev, loading: true }));
 
-        const byCoordinatesReq = new GetStationByCoordinatesRequest();
-        byCoordinatesReq.setLatitude(location.coords.latitude);
-        byCoordinatesReq.setLongitude(location.coords.longitude);
-        byCoordinatesReq.setLimit(10);
-        const byCoordinatesData = (
-          await grpcClient?.getStationsByCoordinates(byCoordinatesReq, null)
-        )?.toObject();
-
-        if (byCoordinatesData?.stationsList) {
-          processStations(
-            byCoordinatesData?.stationsList
-              .filter((s) => !!s)
-              .map((s) => s as Station) || []
-          );
-        }
-        setNavigationAtom((prev) => ({ ...prev, loading: false }));
-      } catch (err) {
-        setByCoordinatesError(err as Error);
-        setNavigationAtom((prev) => ({ ...prev, loading: false }));
+      if (byCoordinatesData?.stations) {
+        const stations =
+          byCoordinatesData?.stations
+            .filter((s) => !!s)
+            .map((s) => s as Station) || [];
+        setNearbyStations(stations);
       }
     };
 
     fetchAsync();
-  }, [grpcClient, location?.coords, processStations, setNavigationAtom]);
+  }, [byCoordinatesData?.stations, location?.coords]);
 
   const search = useCallback(
-    async (query: string): Promise<StationForSearch[] | undefined> => {
+    async (query: string): Promise<Station[] | undefined> => {
       const trimmedQuery = query.trim();
       const trimmedPrevQuery = prevQueryRef.current?.trim();
       if (!trimmedQuery.length || trimmedQuery === trimmedPrevQuery) {
         return;
       }
 
-      prevQueryRef.current = trimmedQuery;
-
-      try {
-        setNavigationAtom((prev) => ({ ...prev, loading: true }));
-
-        const byNameReq = new GetStationsByNameRequest();
-        byNameReq.setStationName(trimmedQuery);
-        byNameReq.setLimit(10);
-        const byNameData = (
-          await grpcClient?.getStationsByName(byNameReq, null)
-        )?.toObject();
-
-        if (byNameData?.stationsList) {
-          return processStations(
-            byNameData?.stationsList
-              ?.filter((s) => !!s)
-              .map((s) => s as Station),
-            true
-          );
-        }
-        setNavigationAtom((prev) => ({ ...prev, loading: false }));
-      } catch (err) {
-        setByNameError(err as Error);
-        setNavigationAtom((prev) => ({ ...prev, loading: false }));
+      if (trimmedQuery.length) {
+        prevQueryRef.current = trimmedQuery;
+        setSearchQuery(trimmedQuery);
       }
-      return [];
     },
-    [grpcClient, processStations, setNavigationAtom]
+    []
   );
 
-  // useEffect(() => {
-  //   if (byNameError || byCoordinatesError) {
-  //     Alert.alert(translate("errorTitle"), translate("apiErrorText"));
-  //   }
-  // }, [byCoordinatesError, byNameError]);
-
   const submitStation = useCallback(
-    (station: StationForSearch) => {
+    (station: Station) => {
       setStationAtom((prev) => ({
         ...prev,
         station,
       }));
+      router.push("/");
     },
-    [setStationAtom]
+    [router, setStationAtom]
   );
 
-  return { loading, search, submitStation };
+  return {
+    stations: groupStations(byNameData?.stations ?? nearbyStations),
+    isLoading: isLoadingByCoordinates || isLoadingByName,
+    search,
+    submitStation,
+  };
 };
 
 export default useSearchStation;

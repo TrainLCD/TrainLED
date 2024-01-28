@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo } from "react";
 import { lineAtom } from "../atoms/line";
 import { navigationAtom } from "../atoms/navigation";
 import { stationAtom } from "../atoms/station";
-import { LineType, Station } from "../models/grpc";
+import { LineType, Station } from "../generated/proto/stationapi_pb";
 import {
   getAvgStationBetweenDistances,
   scoreStationDistances,
@@ -58,7 +58,7 @@ const useProcessLocation = () => {
         !getIsPass(displayedNextStation);
       if (
         isNextStationIsNextStop &&
-        selectedLine?.lineType !== LineType.BULLETTRAIN
+        selectedLine?.lineType !== LineType.BulletTrain
       ) {
         return true;
       }

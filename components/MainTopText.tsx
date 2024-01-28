@@ -2,9 +2,9 @@
 import { useAtomValue } from "jotai";
 import styled from "styled-components";
 import { navigationAtom } from "../atoms/navigation";
+import { Station } from "../generated/proto/stationapi_pb";
 import { LanguageState } from "../hooks/useCurrentLanguageState";
 import useCurrentStation from "../hooks/useCurrentStation";
-import type { Station } from "../models/grpc";
 
 const Container = styled.div`
   width: 100%;
@@ -114,8 +114,8 @@ const SwitchedStationText = ({
               </OrangeTextContainer>
 
               <NumberingText>
-                {currentStation.stationNumbersList.length
-                  ? `(${currentStation.stationNumbersList[0]?.stationNumber})`
+                {currentStation.stationNumbers.length
+                  ? `(${currentStation.stationNumbers[0]?.stationNumber})`
                   : ""}
               </NumberingText>
             </StationInfoGroup>
@@ -157,8 +157,8 @@ const SwitchedStationText = ({
               </OrangeTextContainer>
 
               <NumberingText>
-                {nextStation.stationNumbersList.length
-                  ? `(${nextStation.stationNumbersList[0]?.stationNumber})`
+                {nextStation.stationNumbers.length
+                  ? `(${nextStation.stationNumbers[0]?.stationNumber})`
                   : ""}
               </NumberingText>
             </StationInfoGroup>
@@ -202,8 +202,8 @@ const SwitchedStationText = ({
             </OrangeTextContainer>
 
             <NumberingText>
-              {nextStation.stationNumbersList.length
-                ? `(${nextStation.stationNumbersList[0]?.stationNumber})`
+              {nextStation.stationNumbers.length
+                ? `(${nextStation.stationNumbers[0]?.stationNumber})`
                 : ""}
             </NumberingText>
           </StationInfoGroup>

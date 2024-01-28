@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { parenthesisRegexp } from "../constants/regexp";
-import { Line, TrainType } from "../models/grpc";
+import { Line, TrainType } from "../generated/proto/stationapi_pb";
 import useCurrentLine from "./useCurrentLine";
 
 const useTrainTypeLabels = (trainTypes: TrainType[]) => {
@@ -10,24 +10,24 @@ const useTrainTypeLabels = (trainTypes: TrainType[]) => {
 
   useEffect(() => {
     const labels = trainTypes.map((tt) => {
-      const solo = tt.linesList.length === 1;
+      const solo = tt.lines.length === 1;
       if (solo || !tt.id) {
         return tt.name;
       }
 
-      const allTrainTypeIds = tt.linesList.map((l) => l.trainType?.typeId);
-      const allCompanyIds = tt.linesList.map((l) => l.company?.id);
+      const allTrainTypeIds = tt.lines.map((l) => l.trainType?.typeId);
+      const allCompanyIds = tt.lines.map((l) => l.company?.id);
       const isAllSameTrainType = allTrainTypeIds.every((v, i, a) => v === a[0]);
       const isAllSameOperator = allCompanyIds.every((v, i, a) => v === a[0]);
 
-      const duplicatedCompanyIds = tt.linesList
+      const duplicatedCompanyIds = tt.lines
         .map((l) => l.company?.id)
         .filter((id, idx, self) => self.indexOf(id) !== idx);
-      const duplicatedTypeIds = tt.linesList
+      const duplicatedTypeIds = tt.lines
         .map((l) => l.trainType?.typeId)
         .filter((id, idx, self) => self.indexOf(id) !== idx);
 
-      const reducedBySameOperatorLines = tt.linesList.reduce<Line[]>(
+      const reducedBySameOperatorLines = tt.lines.reduce<Line[]>(
         (lines, line) => {
           const isCurrentOperatedSameCompany = duplicatedCompanyIds.every(
             (id) => id === line.company?.id
@@ -51,11 +51,13 @@ const useTrainTypeLabels = (trainTypes: TrainType[]) => {
 
           if (hasSameCompanySameTypeLine) {
             line.company &&
-              lines.push({
-                ...line,
-                nameShort: `${line.company?.nameShort}線`,
-                nameRoman: `${line.company?.nameEnglishShort} Line`,
-              });
+              lines.push(
+                new Line({
+                  ...line,
+                  nameShort: `${line.company?.nameShort}線`,
+                  nameRoman: `${line.company?.nameEnglishShort} Line`,
+                })
+              );
             return lines;
           }
 
@@ -82,7 +84,7 @@ const useTrainTypeLabels = (trainTypes: TrainType[]) => {
       }
 
       if (isAllSameTrainType && isAllSameOperator) {
-        const otherLinesText = tt.linesList
+        const otherLinesText = tt.lines
           .filter((l) => l.id !== currentLine?.id)
           .map((l) => l.nameShort.replace(parenthesisRegexp, ""))
           .filter((txt, idx, self) => self.indexOf(txt) === idx)

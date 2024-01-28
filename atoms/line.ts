@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { Line } from "../models/grpc";
+import { Line } from "../generated/proto/stationapi_pb";
 
 type Direction = "INBOUND" | "OUTBOUND";
 

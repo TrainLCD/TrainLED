@@ -1,5 +1,4 @@
-import { StopCondition } from "../generated/stationapi_pb";
-import { Station } from "../models/grpc";
+import { Station, StopCondition } from "../generated/proto/stationapi_pb";
 
 const getIsPass = (station: Station | undefined): boolean => {
   if (!station) {
@@ -7,14 +6,14 @@ const getIsPass = (station: Station | undefined): boolean => {
   }
 
   switch (station.stopCondition) {
-    case StopCondition.ALL:
+    case StopCondition.All:
       return false;
-    case StopCondition.NOT:
+    case StopCondition.Not:
       return true;
     // TrainLEDでは一旦、一時・休日停車等に一旦対応しない
-    case StopCondition.PARTIAL:
-    case StopCondition.WEEKDAY:
-    case StopCondition.HOLIDAY:
+    case StopCondition.Partial:
+    case StopCondition.Weekday:
+    case StopCondition.Holiday:
       return false;
     default:
       return false;
