@@ -1,6 +1,7 @@
+import { ConnectError } from "@connectrpc/connect";
 import { useQuery } from "@connectrpc/connect-query";
 import { useAtom, useAtomValue } from "jotai";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { lineAtom } from "../atoms/line";
 import { stationAtom } from "../atoms/station";
 import { trainTypeAtom } from "../atoms/trainType";
@@ -20,15 +21,11 @@ const useUpdateStationList = (
   fetchAutomatically = true
 ): {
   isLoading: boolean;
-  error: Error | null;
+  error: ConnectError | null;
 } => {
   const [{ stations }, setStationState] = useAtom(stationAtom);
-  const [{ trainType, fetchedTrainTypes }, setTrainTypeState] =
-    useAtom(trainTypeAtom);
+  const [{ trainType }, setTrainTypeState] = useAtom(trainTypeAtom);
   const { selectedLine } = useAtomValue(lineAtom);
-  const [loadedTrainTypeId, setLoadedTrainTypeId] = useState<
-    number | undefined
-  >(trainType?.groupId);
 
   const {
     data: trainTypesByStationIdData,
@@ -136,11 +133,7 @@ const useUpdateStationList = (
       stations: stationsByLineGroupIdData?.stations ?? [],
       allStations: stationsByLineGroupIdData?.stations ?? [],
     }));
-
-    setLoadedTrainTypeId((prev) =>
-      prev !== trainType?.groupId ? trainType?.groupId : prev
-    );
-  }, [setStationState, stationsByLineGroupIdData?.stations, trainType]);
+  }, [setStationState, stationsByLineGroupIdData?.stations]);
 
   useEffect(() => {
     if (!stations.length && fetchAutomatically) {
