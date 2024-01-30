@@ -143,18 +143,20 @@ const BoundsPanel = ({
     <Container>
       <Title>行き先極度選択（しなさい）</Title>
       <List>{isLoading ? <p>Loading...</p> : renderBounds()}</List>
-      <TrainTypeInputContainer>
-        <TrainTypeSelect value={trainType?.id ?? 0} onChange={handleChange}>
-          {trainTypeLabels.map((label, idx) => (
-            <TrainTypeOption
-              key={fetchedTrainTypes[idx]?.id}
-              value={fetchedTrainTypes[idx]?.id}
-            >
-              {label}
-            </TrainTypeOption>
-          ))}
-        </TrainTypeSelect>
-      </TrainTypeInputContainer>
+      {fetchedTrainTypes.length > 0 && (
+        <TrainTypeInputContainer>
+          <TrainTypeSelect value={trainType?.id ?? 0} onChange={handleChange}>
+            {trainTypeLabels.map((label, idx) => (
+              <TrainTypeOption
+                key={fetchedTrainTypes[idx]?.id}
+                value={fetchedTrainTypes[idx]?.id}
+              >
+                {label}
+              </TrainTypeOption>
+            ))}
+          </TrainTypeSelect>
+        </TrainTypeInputContainer>
+      )}
       <BackButtonContainer>
         <Button onClick={onBack}>戻る</Button>
       </BackButtonContainer>
