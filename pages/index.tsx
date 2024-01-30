@@ -22,7 +22,7 @@ const SearchStationButtonContainer = styled.div<{ padTop?: boolean }>`
 const HomePage = () => {
   const { station } = useAtomValue(stationAtom);
   const setLineAtom = useSetAtom(lineAtom);
-  const { isLoading } = useFetchNearbyStation();
+  const { isLoading, update } = useFetchNearbyStation();
 
   const router = useRouter();
 
@@ -47,9 +47,9 @@ const HomePage = () => {
         <Button onClick={handleSearchStationClick}>駅を指定</Button>
       </SearchStationButtonContainer>
       <SearchStationButtonContainer padTop>
-        {/* <Button onClick={update} disabled={loading}>
+        <Button onClick={update} disabled={isLoading}>
           位置情報を更新
-        </Button> */}
+        </Button>
       </SearchStationButtonContainer>
       <CommonFooter />
     </Container>

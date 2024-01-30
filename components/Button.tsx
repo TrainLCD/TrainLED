@@ -10,6 +10,7 @@ export default styled.button<{ bgColor?: string }>`
   font-family: "JF-Dot-jiskan24";
   background-color: ${({ bgColor }) => bgColor || "#212121"};
   min-width: 240px;
+  cursor: pointer;
 
   &:disabled {
     opacity: 0.5;
