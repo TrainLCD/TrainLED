@@ -29,7 +29,7 @@ const useUpdateNearbyStation = (): {
     data,
     isLoading,
     error: apiError,
-  } = useQuery(getStationsByCoordinates, queryInput);
+  } = useQuery(getStationsByCoordinates, queryInput, { enabled: !!coords });
 
   const queryClient = useQueryClient();
 
