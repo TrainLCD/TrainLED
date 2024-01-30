@@ -55,7 +55,7 @@ type Props = {
   line: Line;
 };
 
-const SCROLL_SPEED = 750;
+const SCROLL_SPEED = 500;
 
 const MainMarquee = (props: Props) => {
   const { nextStation, line, afterNextStation } = props;
