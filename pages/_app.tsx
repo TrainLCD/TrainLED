@@ -38,7 +38,7 @@ a {
 
 const APP_NAME = "TrainLED";
 const APP_DESCRIPTION = "A joking navigation app.";
-const APP_BASE_URL = "https://led.trainlcd.app";
+const APP_BASE_URL = process.env.NEXT_PUBLIC_APP_BASE_URL ?? "";
 
 const finalTransport = createGrpcWebTransport({
   baseUrl: process.env.NEXT_PUBLIC_SAPI_URL ?? "",
