@@ -10,23 +10,13 @@ const CreditContainer = styled.div`
 const CautionText = styled.p`
   line-height: 1.5;
   text-align: center;
-`;
-
-const TrainLCDLink = styled.a`
-  line-height: 1.5;
-  text-align: center;
+  margin: 8px 0;
 `;
 
 const CommonFooter = () => (
   <CreditContainer>
     <CautionText>※TrainLEDはβ版です。</CautionText>
-    <TrainLCDLink
-      href="https://trainlcd.app/"
-      rel="noopener noreferrer"
-      target="_blank"
-    >
-      TrainLCDアプリをダウンロード
-    </TrainLCDLink>
+    <CautionText>スマホを横向きにすると楽しいよ</CautionText>
   </CreditContainer>
 );
 
