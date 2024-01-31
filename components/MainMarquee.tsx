@@ -8,6 +8,7 @@ import { trainTypeAtom } from "../atoms/trainType";
 import { parenthesisRegexp } from "../constants/regexp";
 import { Line, Station, StopCondition } from "../generated/proto/stationapi_pb";
 import useBounds from "../hooks/useBounds";
+import useCurrentStation from "../hooks/useCurrentStation";
 import {
   getIsLoopLine,
   getIsMeijoLine,
@@ -55,16 +56,32 @@ type Props = {
   line: Line;
 };
 
-const SCROLL_SPEED = 500;
+const MIN_SCROLL_SPEED = 350;
+const MAX_SCROLL_SPEED = 700;
 
-const MainMarquee = (props: Props) => {
-  const { nextStation, line, afterNextStation } = props;
-
+const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
   const { trainType } = useAtomValue(trainTypeAtom);
   const { selectedDirection } = useAtomValue(lineAtom);
   const { arrived, approaching } = useAtomValue(navigationAtom);
 
   const { bounds } = useBounds();
+  const currentStation = useCurrentStation();
+
+  const scrollSpeed = (() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    const computedScrollSpeed = window.innerWidth / 2;
+    const tooNarrowScreen = window.innerWidth < 450;
+    const tooWideScreen = window.innerWidth > 1000;
+    if (tooNarrowScreen) {
+      return MIN_SCROLL_SPEED;
+    }
+    if (tooWideScreen) {
+      return MAX_SCROLL_SPEED;
+    }
+    return computedScrollSpeed;
+  })();
 
   const boundTexts = useMemo(() => {
     const index = selectedDirection === "INBOUND" ? 0 : 1;
@@ -117,12 +134,13 @@ const MainMarquee = (props: Props) => {
   }, [line, nextStation, selectedDirection, trainType]);
 
   const transferTexts = useMemo(() => {
-    if (!nextStation) {
+    const targetStation = nextStation ?? currentStation;
+    if (!targetStation) {
       return "";
     }
 
-    const filteredLines = nextStation.lines.filter(
-      (line) => line.id !== nextStation.line?.id
+    const filteredLines = targetStation.lines.filter(
+      (line) => line.id !== targetStation.line?.id
     );
     const headTextForEn =
       filteredLines.length > 1
@@ -155,7 +173,70 @@ const MainMarquee = (props: Props) => {
         .replace(parenthesisRegexp, ""),
       `${headTextForEn} and the ${tailTextForEn}`,
     ];
-  }, [nextStation]);
+  }, [currentStation, nextStation]);
+
+  if ((arrived || !nextStation) && currentStation) {
+    return (
+      <Container>
+        <Marquee gradient={false} speed={scrollSpeed}>
+          <InnerContainer>
+            <LanguageSpacer />
+            <TextContainer>
+              <GreenText>ただいま</GreenText>
+              <OrangeText>{currentStation.name}</OrangeText>
+              <HorizontalSpacer />
+              <CrimsonText>終点</CrimsonText>
+              <HorizontalSpacer />
+              <GreenText>です。</GreenText>
+              <HorizontalSpacer />
+              {currentStation.lines.filter(
+                (line) => line.id !== currentStation.line?.id
+              ).length > 0 && (
+                <>
+                  <OrangeText>{transferTexts[0]}</OrangeText>
+                  <HorizontalSpacer />
+                  <GreenText>はお乗り換えです。</GreenText>
+                </>
+              )}
+
+              <GreenText>今日も、</GreenText>
+              <OrangeText>{currentStation.line?.nameShort}</OrangeText>
+              <GreenText>
+                をご利用くださいまして、ありがとうございました。
+              </GreenText>
+
+              <LanguageSpacer />
+
+              <GreenText>Now stopping at</GreenText>
+              <HorizontalSpacer />
+              <OrangeText>
+                {currentStation.nameRoman}
+                {currentStation.stationNumbers.length
+                  ? `(${currentStation.stationNumbers[0]?.stationNumber})`
+                  : ""}
+              </OrangeText>
+              <HorizontalSpacer />
+              <CrimsonText> last stop</CrimsonText>
+              <GreenText>.</GreenText>
+              {currentStation.lines.filter(
+                (line) => line.id !== currentStation.line?.id
+              ).length > 0 && (
+                <>
+                  <HorizontalSpacer />
+                  <GreenText>Please change here for</GreenText>
+                  <HorizontalSpacer />
+                  <OrangeText>the {transferTexts[1]}</OrangeText>
+                  <GreenText>.</GreenText>
+                </>
+              )}
+            </TextContainer>
+            <HorizontalSpacer />
+            <LanguageSpacer />
+          </InnerContainer>
+        </Marquee>
+      </Container>
+    );
+  }
 
   if (!nextStation) {
     return <Container />;
@@ -164,12 +245,19 @@ const MainMarquee = (props: Props) => {
   if (approaching && !arrived) {
     return (
       <Container>
-        <Marquee gradient={false} speed={SCROLL_SPEED}>
+        <Marquee gradient={false} speed={scrollSpeed}>
           <InnerContainer>
             <LanguageSpacer />
             <TextContainer>
               <GreenText>まもなく</GreenText>
               <OrangeText>{nextStation.name}</OrangeText>
+              {!afterNextStation ? (
+                <>
+                  <HorizontalSpacer />
+                  <CrimsonText>終点</CrimsonText>
+                  <HorizontalSpacer />
+                </>
+              ) : null}
               <GreenText>です。</GreenText>
               {afterNextStation ? (
                 <>
@@ -209,6 +297,13 @@ const MainMarquee = (props: Props) => {
                   ? `(${nextStation.stationNumbers[0]?.stationNumber})`
                   : ""}
               </OrangeText>
+              {!afterNextStation ? (
+                <>
+                  <HorizontalSpacer />
+                  <CrimsonText> last stop</CrimsonText>
+                  <GreenText>.</GreenText>
+                </>
+              ) : null}
               {afterNextStation ? (
                 <>
                   <GreenText>. The stop after </GreenText>
@@ -227,6 +322,7 @@ const MainMarquee = (props: Props) => {
                       ? `(${afterNextStation.stationNumbers[0]?.stationNumber})`
                       : ""}
                   </OrangeText>
+                  <GreenText>.</GreenText>
                 </>
               ) : null}
               <GreenText>.</GreenText>
@@ -253,12 +349,19 @@ const MainMarquee = (props: Props) => {
   if (!approaching && !arrived) {
     return (
       <Container>
-        <Marquee gradient={false} speed={SCROLL_SPEED}>
+        <Marquee gradient={false} speed={scrollSpeed}>
           <InnerContainer>
             <LanguageSpacer />
             <TextContainer>
               <GreenText>次は</GreenText>
               <OrangeText>{nextStation.name}</OrangeText>
+              {!afterNextStation ? (
+                <>
+                  <HorizontalSpacer />
+                  <CrimsonText>終点</CrimsonText>
+                  <HorizontalSpacer />
+                </>
+              ) : null}
               <GreenText>です。</GreenText>
               {afterNextStation ? (
                 <>
@@ -298,6 +401,13 @@ const MainMarquee = (props: Props) => {
                   ? `(${nextStation.stationNumbers[0]?.stationNumber})`
                   : ""}
               </OrangeText>
+              {!afterNextStation ? (
+                <>
+                  <HorizontalSpacer />
+                  <CrimsonText>last stop</CrimsonText>
+                  <GreenText>.</GreenText>
+                </>
+              ) : null}
               {afterNextStation ? (
                 <>
                   <GreenText>. The stop after </GreenText>
@@ -316,6 +426,7 @@ const MainMarquee = (props: Props) => {
                       ? `(${afterNextStation.stationNumbers[0]?.stationNumber})`
                       : ""}
                   </OrangeText>
+                  <GreenText>.</GreenText>
                 </>
               ) : null}
               {nextStation.lines.filter(
@@ -340,7 +451,7 @@ const MainMarquee = (props: Props) => {
 
   return (
     <Container>
-      <Marquee gradient={false} speed={SCROLL_SPEED}>
+      <Marquee gradient={false} speed={scrollSpeed}>
         <InnerContainer>
           <LanguageSpacer />
           <TextContainer>

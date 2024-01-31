@@ -66,12 +66,6 @@ const NumberingText = styled.p`
   white-space: pre-wrap;
 `;
 
-const EnglighTextsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-`;
-
 type Props = {
   nextStation: Station | null;
   language: LanguageState;
@@ -89,7 +83,7 @@ const SwitchedStationText = ({
 
   const currentStation = useCurrentStation();
 
-  if (arrived && currentStation) {
+  if ((arrived || !nextStation) && currentStation) {
     return (
       <TextContainer arrived>
         {language === "ja" ? (
