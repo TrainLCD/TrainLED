@@ -1,7 +1,6 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 
 const useCurrentPosition = ({
-  enableAutoFetch = false,
   onPositionUpdate,
   onPositionError,
 }: {
@@ -26,13 +25,6 @@ const useCurrentPosition = ({
       }),
     [onPositionError, onPositionUpdate]
   );
-
-  useEffect(() => {
-    if (!enableAutoFetch) {
-      return;
-    }
-    fetchCurrentPosition();
-  }, [enableAutoFetch, fetchCurrentPosition]);
 
   return { fetchCurrentPosition, watchPosition };
 };
