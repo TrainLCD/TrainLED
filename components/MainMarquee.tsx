@@ -57,7 +57,7 @@ type Props = {
   line: Line;
 };
 
-const MIN_SCROLL_SPEED = 350;
+const MIN_SCROLL_SPEED = 400;
 const MAX_SCROLL_SPEED = 700;
 
 const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
