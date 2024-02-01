@@ -67,18 +67,11 @@ const NumberingText = styled.p`
 `;
 
 type Props = {
-  nextStation: Station | null;
-  language: LanguageState;
-};
-type SwitchedStationTextProps = {
-  nextStation: Station | null;
+  nextStation: Station | undefined;
   language: LanguageState;
 };
 
-const SwitchedStationText = ({
-  nextStation,
-  language,
-}: SwitchedStationTextProps) => {
+const SwitchedStationText = ({ nextStation, language }: Props) => {
   const { arrived, approaching } = useAtomValue(navigationAtom);
 
   const currentStation = useCurrentStation();

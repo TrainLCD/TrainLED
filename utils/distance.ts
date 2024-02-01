@@ -21,28 +21,28 @@ export const getAvgStationBetweenDistances = (stations: Station[]): number =>
         return acc + distance;
       }, 0) / stations.length;
 
-export const scoreStationDistances = (
+export const getNearestStation = (
   stations: Station[],
   latitude: number,
   longitude: number
-): Station[] => {
-  const scored = stations.map((station) => {
-    const distance = geolib.getDistance(
-      { latitude, longitude },
-      { latitude: station.latitude, longitude: station.longitude }
-    );
-    return new Station({ ...station, distance });
-  });
-  scored.sort((a, b) => {
-    const aDistance = a.distance ?? 0;
-    const bDistance = b.distance ?? 0;
-    if (aDistance < bDistance) {
-      return -1;
-    }
-    if (aDistance > bDistance) {
-      return 1;
-    }
-    return 0;
-  });
-  return scored;
+): Station | null => {
+  const nearestCoords = geolib.findNearest(
+    { latitude, longitude },
+    stations.map((s) => ({ latitude: s.latitude, longitude: s.longitude }))
+  ) as { latitude: number; longitude: number };
+
+  const nearestStation = stations.find(
+    (s) =>
+      s.latitude == nearestCoords.latitude &&
+      s.longitude === nearestCoords.longitude
+  );
+
+  if (!nearestStation) {
+    return null;
+  }
+  const distance = geolib.getDistance(
+    { latitude, longitude },
+    { latitude: nearestStation.latitude, longitude: nearestStation.longitude }
+  );
+  return new Station({ ...nearestStation, distance });
 };

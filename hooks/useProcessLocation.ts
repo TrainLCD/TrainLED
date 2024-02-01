@@ -1,12 +1,12 @@
 import { useAtom, useAtomValue } from "jotai";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { lineAtom } from "../atoms/line";
 import { navigationAtom } from "../atoms/navigation";
 import { stationAtom } from "../atoms/station";
 import { LineType, Station } from "../generated/proto/stationapi_pb";
 import {
   getAvgStationBetweenDistances,
-  scoreStationDistances,
+  getNearestStation,
 } from "../utils/distance";
 import getNextStation from "../utils/getNextStation";
 import getIsPass from "../utils/isPass";
@@ -14,18 +14,31 @@ import {
   getApproachingThreshold,
   getArrivedThreshold,
 } from "../utils/threshold";
+import useCurrentPosition from "./useCurrentPosition";
 
 const useProcessLocation = () => {
   const [{ station, stations, selectedBound }, setStationAtom] =
     useAtom(stationAtom);
   const { selectedDirection, selectedLine } = useAtomValue(lineAtom);
-
   const [{ location }, setNavigationAtom] = useAtom(navigationAtom);
+
+  const watchIdRef = useRef<number | null>(null);
 
   const displayedNextStation = useMemo(
     () => getNextStation(stations, station),
     [station, stations]
   );
+
+  const handlePositionUpdate = useCallback(
+    (location: GeolocationPosition) => {
+      setNavigationAtom((prev) => ({ ...prev, location }));
+    },
+    [setNavigationAtom]
+  );
+
+  const { watchPosition } = useCurrentPosition({
+    onPositionUpdate: handlePositionUpdate,
+  });
 
   const isArrived = useCallback(
     (nearestStation: Station, avgDistance: number): boolean => {
@@ -85,25 +98,39 @@ const useProcessLocation = () => {
   );
 
   useEffect(() => {
+    if (!selectedBound) {
+      return () => {
+        watchIdRef.current &&
+          navigator.geolocation.clearWatch(watchIdRef.current);
+      };
+    }
+
+    watchIdRef.current = watchPosition();
+    return () => {
+      watchIdRef.current &&
+        navigator.geolocation.clearWatch(watchIdRef.current);
+    };
+  }, [selectedBound, watchPosition]);
+
+  useEffect(() => {
     if (!location || !selectedBound) {
       return;
     }
     const { latitude, longitude } = location.coords;
 
-    const scoredStations = scoreStationDistances(
-      stations,
-      latitude,
-      longitude
-    ).filter((s) => !getIsPass(s));
-    const nearestStation = scoredStations[0];
+    const station = getNearestStation(stations, latitude, longitude);
+    if (!station) {
+      return;
+    }
+
     const avg = getAvgStationBetweenDistances(stations);
-    const arrived = isArrived(nearestStation, avg);
-    const approaching = isApproaching(nearestStation, avg);
+    const arrived = isArrived(station, avg);
+    const approaching = isApproaching(station, avg);
 
     setNavigationAtom((prev) => ({ ...prev, arrived, approaching }));
 
     if (arrived) {
-      setStationAtom((prev) => ({ ...prev, station: nearestStation }));
+      setStationAtom((prev) => ({ ...prev, station }));
     }
   }, [
     isApproaching,
@@ -113,6 +140,7 @@ const useProcessLocation = () => {
     setNavigationAtom,
     setStationAtom,
     stations,
+    watchPosition,
   ]);
 };
 

@@ -10,18 +10,20 @@ import useCurrentLanguageState from "../hooks/useCurrentLanguageState";
 import useCurrentLine from "../hooks/useCurrentLine";
 import useNextStations from "../hooks/useNextStations";
 import useProcessLocation from "../hooks/useProcessLocation";
-import useWatchClosestStation from "../hooks/useWatchClosestStation";
 
 const LEDPage = () => {
   const { station, stations } = useAtomValue(stationAtom);
 
   const currentLine = useCurrentLine();
-  const nextStations = useNextStations(stations, station, currentLine);
+  const [, nextStation, afterNextStation] = useNextStations(
+    stations,
+    station,
+    currentLine
+  );
   const langState = useCurrentLanguageState();
   const router = useRouter();
 
   useProcessLocation();
-  useWatchClosestStation();
 
   useEffect(() => {
     if (!currentLine) {
@@ -35,11 +37,11 @@ const LEDPage = () => {
 
   return (
     <Container fullHeight>
-      <MainTopText nextStation={nextStations[1]} language={langState} />
+      <MainTopText nextStation={nextStation} language={langState} />
       <HorizontalSpacer />
       <MainMarquee
-        nextStation={nextStations[1]}
-        afterNextStation={nextStations[2]}
+        nextStation={nextStation}
+        afterNextStation={afterNextStation}
         line={currentLine}
       />
     </Container>
