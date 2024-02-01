@@ -15,7 +15,7 @@ const useNextStations = (
 ): Station[] => {
   const [nextStations, setNextStations] = useState<Station[]>([]);
   const { selectedDirection } = useAtomValue(lineAtom);
-  const { trainType } = useAtomValue(trainTypeAtom);
+  const { selectedTrainType } = useAtomValue(trainTypeAtom);
 
   const getStationsForLoopLine = useCallback(
     (currentStationIndex: number): Station[] => {
@@ -47,7 +47,7 @@ const useNextStations = (
 
   useEffect(() => {
     const currentIndex = getCurrentStationIndex(stations, station);
-    const ns = getIsLoopLine(selectedLine, trainType)
+    const ns = getIsLoopLine(selectedLine, selectedTrainType)
       ? getStationsForLoopLine(currentIndex)
       : getStations(currentIndex);
     setNextStations(
@@ -60,9 +60,9 @@ const useNextStations = (
     getStationsForLoopLine,
     selectedDirection,
     selectedLine,
+    selectedTrainType,
     station,
     stations,
-    trainType,
   ]);
 
   return nextStations;

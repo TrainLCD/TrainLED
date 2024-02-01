@@ -41,7 +41,10 @@ const APP_DESCRIPTION = "A joking navigation app.";
 const APP_BASE_URL = process.env.NEXT_PUBLIC_APP_BASE_URL ?? "";
 
 const finalTransport = createGrpcWebTransport({
-  baseUrl: process.env.NEXT_PUBLIC_SAPI_URL ?? "",
+  baseUrl:
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:50051"
+      : process.env.NEXT_PUBLIC_SAPI_URL ?? "",
 });
 
 const queryClient = new QueryClient({

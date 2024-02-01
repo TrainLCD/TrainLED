@@ -10,7 +10,7 @@ const useBounds = (): {
   bounds: [Station[], Station[]];
 } => {
   const { stations } = useAtomValue(stationAtom);
-  const { trainType } = useAtomValue(trainTypeAtom);
+  const { selectedTrainType } = useAtomValue(trainTypeAtom);
   const currentStation = useCurrentStation();
 
   const {
@@ -23,7 +23,7 @@ const useBounds = (): {
     const inboundStation = stations[stations.length - 1];
     const outboundStation = stations[0];
 
-    if (isLoopLine && !trainType) {
+    if (isLoopLine && !selectedTrainType) {
       return [inboundStationsForLoopLine, outboundStationsForLoopLine];
     }
 
@@ -40,8 +40,8 @@ const useBounds = (): {
     inboundStationsForLoopLine,
     isLoopLine,
     outboundStationsForLoopLine,
+    selectedTrainType,
     stations,
-    trainType,
   ]);
 
   return { bounds };

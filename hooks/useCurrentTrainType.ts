@@ -5,15 +5,17 @@ import { TrainType, TrainTypeKind } from "../generated/proto/stationapi_pb";
 import useCurrentLine from "./useCurrentLine";
 
 const useCurrentTrainType = (): TrainType | null => {
-  const { trainType } = useAtomValue(trainTypeAtom);
+  const { selectedTrainType } = useAtomValue(trainTypeAtom);
   const currentLine = useCurrentLine();
 
   const currentTrainType = useMemo(
     () =>
-      trainType?.lines?.length || trainType?.kind === TrainTypeKind.Branch
-        ? trainType?.lines?.find((l) => l.id === currentLine?.id)?.trainType
-        : trainType ?? null,
-    [currentLine?.id, trainType]
+      selectedTrainType?.lines?.length ||
+      selectedTrainType?.kind === TrainTypeKind.Branch
+        ? selectedTrainType?.lines?.find((l) => l.id === currentLine?.id)
+            ?.trainType
+        : selectedTrainType ?? null,
+    [currentLine?.id, selectedTrainType]
   );
 
   return currentTrainType ?? null;
