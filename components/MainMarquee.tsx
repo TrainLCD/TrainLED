@@ -9,6 +9,7 @@ import { parenthesisRegexp } from "../constants/regexp";
 import { Line, Station, StopCondition } from "../generated/proto/stationapi_pb";
 import useBounds from "../hooks/useBounds";
 import useCurrentStation from "../hooks/useCurrentStation";
+import { useIsLastStop } from "../hooks/useIsLastStop";
 import {
   getIsLoopLine,
   getIsMeijoLine,
@@ -66,6 +67,7 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
 
   const { bounds } = useBounds();
   const currentStation = useCurrentStation();
+  const isLastStop = useIsLastStop();
 
   const scrollSpeed = (() => {
     if (typeof window === "undefined") {
@@ -134,13 +136,12 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
   }, [line, nextStation, selectedDirection, trainType]);
 
   const transferTexts = useMemo(() => {
-    const targetStation = nextStation ?? currentStation;
-    if (!targetStation) {
+    if (!nextStation) {
       return "";
     }
 
-    const filteredLines = targetStation.lines.filter(
-      (line) => line.id !== targetStation.line?.id
+    const filteredLines = nextStation.lines.filter(
+      (line) => line.id !== nextStation.line?.id
     );
     const headTextForEn =
       filteredLines.length > 1
@@ -173,9 +174,9 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
         .replace(parenthesisRegexp, ""),
       `${headTextForEn} and the ${tailTextForEn}`,
     ];
-  }, [currentStation, nextStation]);
+  }, [nextStation]);
 
-  if ((arrived || !nextStation) && currentStation) {
+  if (arrived && isLastStop && currentStation) {
     return (
       <Container>
         <Marquee gradient={false} speed={scrollSpeed}>
@@ -324,8 +325,9 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
                   </OrangeText>
                   <GreenText>.</GreenText>
                 </>
-              ) : null}
-              <GreenText>.</GreenText>
+              ) : (
+                <GreenText>.</GreenText>
+              )}
               {nextStation.lines.filter(
                 (line) => line.id !== nextStation.line?.id
               ).length > 0 && (
