@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { trainTypeAtom } from "../atoms/trainType";
 import { Station, TrainType } from "../generated/proto/stationapi_pb";
 import useCurrentLine from "../hooks/useCurrentLine";
+import useCurrentStation from "../hooks/useCurrentStation";
 import useTrainTypeLabels from "../hooks/useTrainTypeLabels";
 import { LineDirection } from "../models/bound";
 import {
@@ -77,6 +78,7 @@ const BoundsPanel = ({
 }: Props) => {
   const { selectedTrainType, trainTypes } = useAtomValue(trainTypeAtom);
 
+  const station = useCurrentStation();
   const currentLine = useCurrentLine();
   const trainTypeLabels = useTrainTypeLabels(trainTypes);
 
@@ -99,9 +101,7 @@ const BoundsPanel = ({
       }
       const directionName = direction === "INBOUND" ? "右回り" : "左回り";
       if (getIsMeijoLine(currentLine.id)) {
-        return `${directionName}(${stations
-          .map((station) => station.name)
-          .join("・")})`;
+        return `${directionName}(${stations.map((s) => s.name).join("・")})`;
       }
 
       if (
@@ -109,12 +109,10 @@ const BoundsPanel = ({
         (getIsOsakaLoopLine(currentLine.id) && !selectedTrainType)
       ) {
         const directionName = direction === "INBOUND" ? "内回り" : "外回り";
-        return `${directionName}(${stations
-          .map((station) => station.name)
-          .join("・")})`;
+        return `${directionName}(${stations.map((s) => s.name).join("・")})`;
       }
 
-      return `${stations.map((station) => station.name).join("・")}方面`;
+      return `${stations.map((s) => s.name).join("・")}方面`;
     },
     [currentLine, selectedTrainType]
   );
@@ -143,11 +141,12 @@ const BoundsPanel = ({
     <Container>
       <Title>行き先極度選択（しなさい）</Title>
       <List>{isLoading ? <p>Loading...</p> : renderBounds()}</List>
-      {trainTypes.length > 0 && (
+      {station?.hasTrainTypes && trainTypes.length > 0 && (
         <TrainTypeInputContainer>
           <TrainTypeSelect
             value={selectedTrainType?.id ?? 0}
             onChange={handleChange}
+            disabled={isLoading}
           >
             {trainTypeLabels.map((label, idx) => (
               <TrainTypeOption

@@ -136,12 +136,12 @@ const useUpdateStationList = (): {
 
   return {
     isLoading:
-      stationByLineIdLoading ??
-      trainTypesByStationIdLoading ??
+      stationByLineIdLoading ||
+      trainTypesByStationIdLoading ||
       stationsByLineGroupIdLoading,
     error:
-      stationByLineIdError ??
-      trainTypesByStationIdError ??
+      stationByLineIdError ||
+      trainTypesByStationIdError ||
       stationsByLineGroupIdError,
   };
 };
