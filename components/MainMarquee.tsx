@@ -135,8 +135,8 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
         return ["特急", "Limited Express"];
       default:
         return [
-          selectedTrainType?.name ?? "",
-          selectedTrainType?.nameRoman ?? "",
+          selectedTrainType?.name?.replace(parenthesisRegexp, "") ?? "",
+          selectedTrainType?.nameRoman?.replace(parenthesisRegexp, "") ?? "",
         ];
     }
   }, [line, nextStation, selectedDirection, selectedTrainType]);
@@ -257,7 +257,9 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
             <LanguageSpacer />
             <TextContainer>
               <GreenText>まもなく</GreenText>
+              <HorizontalSpacer />
               <OrangeText>{nextStation.name}</OrangeText>
+              <HorizontalSpacer />
               {!afterNextStation ? (
                 <>
                   <HorizontalSpacer />
@@ -362,6 +364,7 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
             <LanguageSpacer />
             <TextContainer>
               <GreenText>次は</GreenText>
+              <HorizontalSpacer />
               <OrangeText>{nextStation.name}</OrangeText>
               {!afterNextStation ? (
                 <>
@@ -375,7 +378,9 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
                 <>
                   <OrangeText>{nextStation.name}</OrangeText>
                   <GreenText>の次は</GreenText>
+                  <HorizontalSpacer />
                   <OrangeText>{afterNextStation.name}</OrangeText>
+                  <HorizontalSpacer />
                   <GreenText>に停車いたします。</GreenText>
                   {nextStation.stopCondition !== StopCondition.All && (
                     <>
@@ -467,12 +472,14 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
               この電車は、{line.nameShort.replace(parenthesisRegexp, "")}
             </GreenText>
             <HorizontalSpacer />
-            <OrangeText>
-              {trainTypeTexts[0]}
-              <OrangeText>{` ${boundTexts[0]}`}</OrangeText>
-              行き
-            </OrangeText>
-            <HorizontalSpacer />
+            {trainTypeTexts[0] ? (
+              <>
+                <CrimsonText>{trainTypeTexts[0]}</CrimsonText>
+                <HorizontalSpacer />
+              </>
+            ) : null}
+            <OrangeText>{boundTexts[0]}</OrangeText>
+            <OrangeText>行き</OrangeText>
             <GreenText>です。</GreenText>
             <HorizontalSpacer wide />
             <GreenText>{`This is the ${line?.nameRoman?.replace(
@@ -480,7 +487,7 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
               ""
             )}`}</GreenText>
             <HorizontalSpacer />
-            <OrangeText>{trainTypeTexts[1]}</OrangeText>
+            <CrimsonText>{trainTypeTexts[1]}</CrimsonText>
             <HorizontalSpacer />
             <GreenText>train for</GreenText>
             <HorizontalSpacer />
