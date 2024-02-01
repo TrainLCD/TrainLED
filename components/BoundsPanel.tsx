@@ -75,21 +75,21 @@ const BoundsPanel = ({
   onBack,
   onTrainTypeSelect,
 }: Props) => {
-  const { trainType, fetchedTrainTypes } = useAtomValue(trainTypeAtom);
+  const { selectedTrainType, trainTypes } = useAtomValue(trainTypeAtom);
 
   const currentLine = useCurrentLine();
-  const trainTypeLabels = useTrainTypeLabels(fetchedTrainTypes);
+  const trainTypeLabels = useTrainTypeLabels(trainTypes);
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLSelectElement>) => {
-      const newTrainType = fetchedTrainTypes.find(
+      const newTrainType = trainTypes.find(
         (tt) => Number(e.currentTarget.value) === tt.id
       );
       if (newTrainType) {
         onTrainTypeSelect(newTrainType);
       }
     },
-    [fetchedTrainTypes, onTrainTypeSelect]
+    [trainTypes, onTrainTypeSelect]
   );
 
   const getBoundTypeText = useCallback(
@@ -106,7 +106,7 @@ const BoundsPanel = ({
 
       if (
         getIsYamanoteLine(currentLine.id) ||
-        (getIsOsakaLoopLine(currentLine.id) && !trainType)
+        (getIsOsakaLoopLine(currentLine.id) && !selectedTrainType)
       ) {
         const directionName = direction === "INBOUND" ? "内回り" : "外回り";
         return `${directionName}(${stations
@@ -116,7 +116,7 @@ const BoundsPanel = ({
 
       return `${stations.map((station) => station.name).join("・")}方面`;
     },
-    [currentLine, trainType]
+    [currentLine, selectedTrainType]
   );
 
   const renderBounds = useCallback(
@@ -143,13 +143,16 @@ const BoundsPanel = ({
     <Container>
       <Title>行き先極度選択（しなさい）</Title>
       <List>{isLoading ? <p>Loading...</p> : renderBounds()}</List>
-      {fetchedTrainTypes.length > 0 && (
+      {trainTypes.length > 0 && (
         <TrainTypeInputContainer>
-          <TrainTypeSelect value={trainType?.id ?? 0} onChange={handleChange}>
+          <TrainTypeSelect
+            value={selectedTrainType?.id ?? 0}
+            onChange={handleChange}
+          >
             {trainTypeLabels.map((label, idx) => (
               <TrainTypeOption
-                key={fetchedTrainTypes[idx]?.id}
-                value={fetchedTrainTypes[idx]?.id}
+                key={trainTypes[idx]?.id}
+                value={trainTypes[idx]?.id}
               >
                 {label}
               </TrainTypeOption>

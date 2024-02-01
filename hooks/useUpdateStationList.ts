@@ -17,14 +17,12 @@ import {
 } from "../generated/proto/stationapi_pb";
 import { findBranchLine, findLocalType } from "../utils/trainTypeString";
 
-const useUpdateStationList = (
-  fetchAutomatically = true
-): {
+const useUpdateStationList = (): {
   isLoading: boolean;
   error: ConnectError | null;
 } => {
   const [{ stations }, setStationState] = useAtom(stationAtom);
-  const [{ trainType }, setTrainTypeState] = useAtom(trainTypeAtom);
+  const [{ selectedTrainType }, setTrainTypeState] = useAtom(trainTypeAtom);
   const { selectedLine } = useAtomValue(lineAtom);
 
   const {
@@ -58,8 +56,8 @@ const useUpdateStationList = (
     error: stationsByLineGroupIdError,
   } = useQuery(
     getStationsByLineGroupId,
-    { lineGroupId: trainType?.groupId },
-    { enabled: !!trainType }
+    { lineGroupId: selectedTrainType?.groupId },
+    { enabled: !!selectedTrainType }
   );
 
   const fetchTrainTypes = useCallback(async () => {
@@ -77,7 +75,7 @@ const useUpdateStationList = (
     ) {
       setTrainTypeState((prev) => ({
         ...prev,
-        fetchedTrainTypes: [
+        trainTypes: [
           new TrainType({
             id: 0,
             typeId: 0,
@@ -99,10 +97,10 @@ const useUpdateStationList = (
 
     setTrainTypeState((prev) => ({
       ...prev,
-      fetchedTrainTypes: Array.from(
+      trainTypes: Array.from(
         new Map(
           [
-            ...prev.fetchedTrainTypes,
+            ...prev.trainTypes,
             ...(trainTypesByStationIdData?.trainTypes ?? []),
           ].map((tt) => [tt.id, tt])
         ).values()
@@ -114,7 +112,6 @@ const useUpdateStationList = (
     setStationState((prev) => ({
       ...prev,
       stations: stationByLineIdData?.stations ?? [],
-      allStations: stationByLineIdData?.stations ?? [],
     }));
 
     if (selectedLine?.station?.hasTrainTypes) {
@@ -131,15 +128,14 @@ const useUpdateStationList = (
     setStationState((prev) => ({
       ...prev,
       stations: stationsByLineGroupIdData?.stations ?? [],
-      allStations: stationsByLineGroupIdData?.stations ?? [],
     }));
   }, [setStationState, stationsByLineGroupIdData?.stations]);
 
   useEffect(() => {
-    if (!stations.length && fetchAutomatically) {
+    if (!stations.length) {
       fetchInitialStationList();
     }
-  }, [fetchAutomatically, fetchInitialStationList, stations.length]);
+  }, [fetchInitialStationList, stations.length]);
 
   useEffect(() => {
     fetchSelectedTrainTypeStations();

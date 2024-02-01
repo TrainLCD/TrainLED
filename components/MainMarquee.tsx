@@ -61,7 +61,7 @@ const MIN_SCROLL_SPEED = 350;
 const MAX_SCROLL_SPEED = 700;
 
 const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
-  const { trainType } = useAtomValue(trainTypeAtom);
+  const { selectedTrainType } = useAtomValue(trainTypeAtom);
   const { selectedDirection } = useAtomValue(lineAtom);
   const { arrived, approaching } = useAtomValue(navigationAtom);
 
@@ -102,8 +102,11 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
           }`
       )
       .join(" and ");
-    return [`${jaText}${getIsLoopLine(line, trainType) ? "方面" : ""}`, enText];
-  }, [bounds, line, selectedDirection, trainType]);
+    return [
+      `${jaText}${getIsLoopLine(line, selectedTrainType) ? "方面" : ""}`,
+      enText,
+    ];
+  }, [bounds, line, selectedDirection, selectedTrainType]);
 
   const trainTypeTexts = useMemo(() => {
     if (
@@ -131,9 +134,12 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
       case "ltdexp":
         return ["特急", "Limited Express"];
       default:
-        return [trainType?.name ?? "", trainType?.nameRoman ?? ""];
+        return [
+          selectedTrainType?.name ?? "",
+          selectedTrainType?.nameRoman ?? "",
+        ];
     }
-  }, [line, nextStation, selectedDirection, trainType]);
+  }, [line, nextStation, selectedDirection, selectedTrainType]);
 
   const transferTexts = useMemo(() => {
     if (!nextStation) {

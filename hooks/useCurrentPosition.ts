@@ -4,18 +4,20 @@ const useCurrentPosition = ({
   onPositionUpdate,
   onPositionError,
 }: {
-  enableAutoFetch?: boolean;
   onPositionUpdate: (position: GeolocationPosition) => void;
   onPositionError?: (error: GeolocationPositionError) => void | null;
-}): { fetchCurrentPosition: () => void; watchPosition: () => number } => {
-  const fetchCurrentPosition = useCallback(
+}): {
+  getCurrentPositionAsync: () => Promise<GeolocationPosition>;
+  watchPosition: () => number;
+} => {
+  const getCurrentPositionAsync = useCallback(
     () =>
-      navigator.geolocation.getCurrentPosition(
-        onPositionUpdate,
-        onPositionError,
-        { enableHighAccuracy: true }
+      new Promise<GeolocationPosition>((resolve, reject) =>
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+        })
       ),
-    [onPositionError, onPositionUpdate]
+    []
   );
 
   const watchPosition = useCallback(
@@ -26,7 +28,7 @@ const useCurrentPosition = ({
     [onPositionError, onPositionUpdate]
   );
 
-  return { fetchCurrentPosition, watchPosition };
+  return { getCurrentPositionAsync, watchPosition };
 };
 
 export default useCurrentPosition;

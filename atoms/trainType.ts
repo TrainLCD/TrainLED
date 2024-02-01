@@ -2,11 +2,11 @@ import { atom } from "jotai";
 import { TrainType } from "../generated/proto/stationapi_pb";
 
 type TrainTypeAtom = {
-  trainType: TrainType | null;
-  fetchedTrainTypes: TrainType[];
+  selectedTrainType: TrainType | null;
+  trainTypes: TrainType[];
 };
 
 export const trainTypeAtom = atom<TrainTypeAtom>({
-  trainType: null,
-  fetchedTrainTypes: [],
+  selectedTrainType: null,
+  trainTypes: [],
 });
