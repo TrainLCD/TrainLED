@@ -1,3 +1,5 @@
+import { createConnectQueryKey } from "@connectrpc/connect-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAtom, useSetAtom } from "jotai";
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
@@ -8,6 +10,11 @@ import BoundsPanel from "../components/BoundsPanel";
 import CommonFooter from "../components/CommonFooter";
 import CommonHeader from "../components/CommonHeader";
 import Container from "../components/Container";
+import {
+  getStationsByLineGroupId,
+  getStationsByLineId,
+  getTrainTypesByStationId,
+} from "../generated/proto/stationapi-StationAPI_connectquery";
 import { Station, TrainType } from "../generated/proto/stationapi_pb";
 import useBounds from "../hooks/useBounds";
 import useUpdateStationList from "../hooks/useUpdateStationList";
@@ -22,6 +29,7 @@ const BoundPage = () => {
   const requestWakeLock = useWakeLock();
   const router = useRouter();
   const { bounds } = useBounds();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!station) {
@@ -30,31 +38,24 @@ const BoundPage = () => {
   }, [router, station]);
 
   const clearSelectedLine = useCallback(() => {
-    setTrainTypeAtom((prev) => ({
-      ...prev,
-      trainType: null,
-      fetchedTrainTypes: [],
-    }));
-    setStationAtom((prev) => ({ ...prev, stations: [] }));
-    setLineAtom((prev) => ({ ...prev, selectedLine: null }));
+    const trainTypeQueryKey = createConnectQueryKey(getTrainTypesByStationId);
+    queryClient.invalidateQueries({ queryKey: trainTypeQueryKey });
+    const byLineIdQueryKey = createConnectQueryKey(getStationsByLineId);
+    queryClient.invalidateQueries({ queryKey: byLineIdQueryKey });
+    const byLineGroupIdQueryKey = createConnectQueryKey(
+      getStationsByLineGroupId
+    );
+    queryClient.invalidateQueries({ queryKey: byLineGroupIdQueryKey });
+
     router.replace("/");
-  }, [router, setLineAtom, setStationAtom, setTrainTypeAtom]);
+  }, [queryClient, router]);
 
   const handleTrainTypeSelect = useCallback(
-    async (trainType: TrainType) => {
-      if (trainType.id === 0) {
-        setTrainTypeAtom((prev) => ({
-          ...prev,
-          trainType: null,
-        }));
-        return;
-      }
-
+    (selectedTrainType: TrainType) =>
       setTrainTypeAtom((prev) => ({
         ...prev,
-        trainType,
-      }));
-    },
+        selectedTrainType,
+      })),
     [setTrainTypeAtom]
   );
 

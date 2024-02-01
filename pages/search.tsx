@@ -1,8 +1,6 @@
-import { useSetAtom } from "jotai";
 import { useRouter } from "next/router";
 import { ChangeEvent, FormEvent, useCallback, useRef, useState } from "react";
 import styled from "styled-components";
-import { stationAtom } from "../atoms/station";
 import Button from "../components/Button";
 import CommonFooter from "../components/CommonFooter";
 import CommonHeader from "../components/CommonHeader";
@@ -66,8 +64,6 @@ const SearchPage = () => {
 
   const [query, setQuery] = useState("");
   const [alreadySearched, setAlreadySearched] = useState(false);
-
-  const setStationAtom = useSetAtom(stationAtom);
 
   const inputRef = useRef<HTMLInputElement>(null);
 

@@ -11,7 +11,7 @@ import Container from "../components/Container";
 import LinesPanel from "../components/LinesPanel";
 import Loading from "../components/Loading";
 import { Line } from "../generated/proto/stationapi_pb";
-import useFetchNearbyStation from "../hooks/useUpdateNearbyStation";
+import useUpdateNearbyStation from "../hooks/useUpdateNearbyStation";
 
 const SearchStationButtonContainer = styled.div<{ padTop?: boolean }>`
   display: flex;
@@ -22,7 +22,8 @@ const SearchStationButtonContainer = styled.div<{ padTop?: boolean }>`
 const HomePage = () => {
   const { station } = useAtomValue(stationAtom);
   const setLineAtom = useSetAtom(lineAtom);
-  const { isLoading, update } = useFetchNearbyStation();
+
+  const { isLoading, update } = useUpdateNearbyStation();
 
   const router = useRouter();
 

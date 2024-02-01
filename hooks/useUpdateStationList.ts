@@ -1,6 +1,6 @@
 import { ConnectError } from "@connectrpc/connect";
 import { useQuery } from "@connectrpc/connect-query";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useCallback, useEffect } from "react";
 import { lineAtom } from "../atoms/line";
 import { stationAtom } from "../atoms/station";
@@ -21,21 +21,9 @@ const useUpdateStationList = (): {
   isLoading: boolean;
   error: ConnectError | null;
 } => {
-  const [{ stations }, setStationState] = useAtom(stationAtom);
+  const setStationState = useSetAtom(stationAtom);
   const [{ selectedTrainType }, setTrainTypeState] = useAtom(trainTypeAtom);
   const { selectedLine } = useAtomValue(lineAtom);
-
-  const {
-    data: trainTypesByStationIdData,
-    isLoading: trainTypesByStationIdLoading,
-    error: trainTypesByStationIdError,
-  } = useQuery(
-    getTrainTypesByStationId,
-    {
-      stationId: selectedLine?.station?.id,
-    },
-    { enabled: !!selectedLine?.station }
-  );
 
   const {
     data: stationByLineIdData,
@@ -47,7 +35,21 @@ const useUpdateStationList = (): {
       stationId: selectedLine?.station?.id,
       lineId: selectedLine?.id,
     },
-    { enabled: !!selectedLine?.station }
+    {
+      enabled: !!selectedLine,
+    }
+  );
+
+  const {
+    data: trainTypesByStationIdData,
+    isLoading: trainTypesByStationIdLoading,
+    error: trainTypesByStationIdError,
+  } = useQuery(
+    getTrainTypesByStationId,
+    {
+      stationId: selectedLine?.station?.id,
+    },
+    { enabled: !!selectedLine }
   );
 
   const {
@@ -56,12 +58,21 @@ const useUpdateStationList = (): {
     error: stationsByLineGroupIdError,
   } = useQuery(
     getStationsByLineGroupId,
-    { lineGroupId: selectedTrainType?.groupId },
+    {
+      lineGroupId: selectedTrainType?.groupId,
+    },
     { enabled: !!selectedTrainType }
   );
 
-  const fetchTrainTypes = useCallback(async () => {
-    const trainTypesList = trainTypesByStationIdData?.trainTypes ?? [];
+  const fetchTrainTypes = useCallback(() => {
+    const trainTypesList = Array.from(
+      new Map(
+        [...(trainTypesByStationIdData?.trainTypes ?? [])].map((tt) => [
+          tt.id,
+          tt,
+        ])
+      ).values()
+    );
 
     // 普通種別が登録済み: 非表示
     // 支線種別が登録されていているが、普通種別が登録されていない: 非表示
@@ -73,73 +84,55 @@ const useUpdateStationList = (): {
         (findBranchLine(trainTypesList) && !findLocalType(trainTypesList))
       )
     ) {
+      const localType = new TrainType({
+        id: 0,
+        typeId: 0,
+        groupId: 0,
+        name: "普通/各駅停車",
+        nameKatakana: "",
+        nameRoman: "Local",
+        nameChinese: "慢车/每站停车",
+        nameKorean: "보통/각역정차",
+        color: "",
+        lines: [],
+        direction: TrainDirection.Both,
+        kind: TrainTypeKind.Default,
+      });
+
       setTrainTypeState((prev) => ({
         ...prev,
-        trainTypes: [
-          new TrainType({
-            id: 0,
-            typeId: 0,
-            groupId: 0,
-            name: "普通/各駅停車",
-            nameKatakana: "",
-            nameRoman: "Local",
-            nameChinese: "慢车/每站停车",
-            nameKorean: "보통/각역정차",
-            color: "",
-            lines: [],
-            direction: TrainDirection.Both,
-            kind: TrainTypeKind.Default,
-          }),
-          ...trainTypesList,
-        ],
+        selectedTrainType: null,
+        trainTypes: [localType, ...trainTypesList],
+      }));
+    } else {
+      const firstLocalType = findLocalType(trainTypesList);
+      setTrainTypeState((prev) => ({
+        ...prev,
+        selectedTrainType: firstLocalType,
+        trainTypes: trainTypesList,
       }));
     }
+  }, [setTrainTypeState, trainTypesByStationIdData]);
 
-    setTrainTypeState((prev) => ({
-      ...prev,
-      trainTypes: Array.from(
-        new Map(
-          [
-            ...prev.trainTypes,
-            ...(trainTypesByStationIdData?.trainTypes ?? []),
-          ].map((tt) => [tt.id, tt])
-        ).values()
-      ),
-    }));
-  }, [setTrainTypeState, trainTypesByStationIdData?.trainTypes]);
+  useEffect(() => {
+    fetchTrainTypes();
+  }, [fetchTrainTypes]);
 
-  const fetchInitialStationList = useCallback(async () => {
+  useEffect(() => {
     setStationState((prev) => ({
       ...prev,
-      stations: stationByLineIdData?.stations ?? [],
+      stations: stationByLineIdData?.stations ?? prev.stations,
     }));
 
-    if (selectedLine?.station?.hasTrainTypes) {
-      await fetchTrainTypes();
-    }
+    setStationState((prev) => ({
+      ...prev,
+      stations: stationsByLineGroupIdData?.stations ?? prev.stations,
+    }));
   }, [
-    fetchTrainTypes,
-    selectedLine?.station?.hasTrainTypes,
     setStationState,
     stationByLineIdData?.stations,
+    stationsByLineGroupIdData?.stations,
   ]);
-
-  const fetchSelectedTrainTypeStations = useCallback(async () => {
-    setStationState((prev) => ({
-      ...prev,
-      stations: stationsByLineGroupIdData?.stations ?? [],
-    }));
-  }, [setStationState, stationsByLineGroupIdData?.stations]);
-
-  useEffect(() => {
-    if (!stations.length) {
-      fetchInitialStationList();
-    }
-  }, [fetchInitialStationList, stations.length]);
-
-  useEffect(() => {
-    fetchSelectedTrainTypeStations();
-  }, [fetchSelectedTrainTypeStations]);
 
   return {
     isLoading:

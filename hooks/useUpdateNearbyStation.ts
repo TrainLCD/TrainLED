@@ -1,35 +1,36 @@
 import { ConnectError } from "@connectrpc/connect";
 import { createConnectQueryKey, useQuery } from "@connectrpc/connect-query";
 import { useQueryClient } from "@tanstack/react-query";
-import { useSetAtom } from "jotai";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useAtom } from "jotai";
+import { useCallback, useEffect, useState } from "react";
 import { stationAtom } from "../atoms/station";
 import { getStationsByCoordinates } from "../generated/proto/stationapi-StationAPI_connectquery";
+import useCurrentPosition from "./useCurrentPosition";
 
 const useUpdateNearbyStation = (): {
   isLoading: boolean;
   error: ConnectError | GeolocationPositionError | null;
   update: () => void;
 } => {
-  const setStation = useSetAtom(stationAtom);
+  const [{ station }, setStation] = useAtom(stationAtom);
   const [coords, setCoords] = useState<GeolocationCoordinates | null>(null);
-  const [locationError, setLocationError] =
-    useState<GeolocationPositionError | null>(null);
 
-  const queryInput = useMemo(
-    () => ({
-      latitude: coords?.latitude,
-      longitude: coords?.longitude,
-      limit: 1,
-    }),
-    [coords?.latitude, coords?.longitude]
-  );
+  const { getCurrentPositionAsync } = useCurrentPosition();
 
   const {
     data,
     isLoading,
     error: apiError,
-  } = useQuery(getStationsByCoordinates, queryInput, { enabled: !!coords });
+    refetch,
+  } = useQuery(
+    getStationsByCoordinates,
+    {
+      latitude: coords?.latitude,
+      longitude: coords?.longitude,
+      limit: 1,
+    },
+    { enabled: !!coords && !station }
+  );
 
   const queryClient = useQueryClient();
 
@@ -42,25 +43,24 @@ const useUpdateNearbyStation = (): {
     }
   }, [data, setStation]);
 
-  const update = useCallback(() => {
-    navigator.geolocation.getCurrentPosition(
-      (pos) => setCoords(pos.coords),
-      setLocationError,
-      {
-        enableHighAccuracy: true,
-      }
-    );
+  const update = useCallback(async () => {
+    const newPos = await getCurrentPositionAsync();
+    setCoords(newPos.coords);
+
     const queryKey = createConnectQueryKey(getStationsByCoordinates);
-    queryClient.invalidateQueries({ queryKey });
-  }, [queryClient]);
+    await queryClient.invalidateQueries({ queryKey });
+    await refetch();
+  }, [getCurrentPositionAsync, queryClient, refetch]);
 
   useEffect(() => {
-    update();
-  }, [update]);
+    if (!station) {
+      update();
+    }
+  }, [station, update]);
 
   return {
     isLoading,
-    error: apiError || locationError,
+    error: apiError,
     update,
   };
 };

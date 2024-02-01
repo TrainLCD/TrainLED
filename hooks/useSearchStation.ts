@@ -1,13 +1,10 @@
 import { useQuery } from "@connectrpc/connect-query";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { navigationAtom } from "../atoms/navigation";
 import { stationAtom } from "../atoms/station";
-import {
-  getStationsByCoordinates,
-  getStationsByName,
-} from "../generated/proto/stationapi-StationAPI_connectquery";
+import { getStationsByName } from "../generated/proto/stationapi-StationAPI_connectquery";
 import { Station } from "../generated/proto/stationapi_pb";
 import { groupStations } from "../utils/groupStations";
 
@@ -69,26 +66,14 @@ type ReturnValue = {
 };
 
 const useSearchStation = (): ReturnValue => {
-  const [nearbyStations, setNearbyStations] = useState<Station[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
   const prevQueryRef = useRef<string>();
 
-  const { location } = useAtomValue(navigationAtom);
+  const setLocation = useSetAtom(navigationAtom);
   const setStationAtom = useSetAtom(stationAtom);
 
   const router = useRouter();
-
-  const { data: byCoordinatesData, isLoading: isLoadingByCoordinates } =
-    useQuery(
-      getStationsByCoordinates,
-      {
-        latitude: location?.coords.latitude,
-        longitude: location?.coords.longitude,
-        limit: 100,
-      },
-      { enabled: !!location }
-    );
 
   const { data: byNameData, isLoading: isLoadingByName } = useQuery(
     getStationsByName,
@@ -98,24 +83,6 @@ const useSearchStation = (): ReturnValue => {
     },
     { enabled: searchQuery.length > 0 }
   );
-
-  useEffect(() => {
-    const fetchAsync = async () => {
-      if (!location?.coords) {
-        return;
-      }
-
-      if (byCoordinatesData?.stations) {
-        const stations =
-          byCoordinatesData?.stations
-            .filter((s) => !!s)
-            .map((s) => s as Station) || [];
-        setNearbyStations(stations);
-      }
-    };
-
-    fetchAsync();
-  }, [byCoordinatesData?.stations, location?.coords]);
 
   const search = useCallback(
     async (query: string): Promise<Station[] | undefined> => {
@@ -139,14 +106,29 @@ const useSearchStation = (): ReturnValue => {
         ...prev,
         station,
       }));
+      setLocation((prev) => ({
+        ...prev,
+        location: {
+          timestamp: new Date().getTime(),
+          coords: {
+            latitude: station.latitude,
+            longitude: station.longitude,
+            accuracy: 0,
+            altitude: 0,
+            altitudeAccuracy: 0,
+            speed: 0,
+            heading: 0,
+          },
+        },
+      }));
       router.push("/");
     },
-    [router, setStationAtom]
+    [router, setLocation, setStationAtom]
   );
 
   return {
-    stations: groupStations(byNameData?.stations ?? nearbyStations),
-    isLoading: isLoadingByCoordinates || isLoadingByName,
+    stations: groupStations(byNameData?.stations ?? []),
+    isLoading: isLoadingByName,
     search,
     submitStation,
   };
