@@ -18,7 +18,7 @@ const Container = styled.div`
   mask: radial-gradient(1px, #fff 100%, transparent 100%) 0 0/2px 2px;
 `;
 
-const TextContainer = styled.div<{ arrived?: boolean }>`
+const TextContainer = styled.div`
   display: flex;
   width: 100%;
   text-align: center;
@@ -86,11 +86,13 @@ const SwitchedStationText = ({ nextStation, language }: Props) => {
   if (language === "jaBound") {
     return (
       <TextContainer>
-        <OrangeTextContainer>
-          {bound[0]?.name.split("").map((c, i) => (
-            <OrangeText key={`${c}${i}`}>{c}</OrangeText>
-          ))}
-        </OrangeTextContainer>
+        <StationInfoGroup>
+          <OrangeTextContainer>
+            {bound[0]?.name.split("").map((c, i) => (
+              <OrangeText key={`${c}${i}`}>{c}</OrangeText>
+            ))}
+          </OrangeTextContainer>
+        </StationInfoGroup>
         <GreenText bound>行</GreenText>
       </TextContainer>
     );
@@ -117,7 +119,7 @@ const SwitchedStationText = ({ nextStation, language }: Props) => {
 
   if ((arrived || !nextStation) && currentStation) {
     return (
-      <TextContainer arrived>
+      <TextContainer>
         {language === "ja" ? (
           <OrangeTextContainer>
             {currentStation.name.split("").map((c, i) => (
