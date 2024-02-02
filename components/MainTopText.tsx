@@ -31,6 +31,7 @@ const GreenText = styled.p<{ bound?: boolean }>`
   max-width: 22.5%;
   color: green;
   font-size: ${({ bound }) => (bound ? "7.5vw" : "5vv")};
+  margin: 0;
 `;
 
 const StationInfoGroup = styled.div`
@@ -42,6 +43,7 @@ const StateText = styled.p`
   max-width: 22.5%;
   color: green;
   font-size: 5vw;
+  margin: 0;
 `;
 
 const OrangeTextContainer = styled.div`
