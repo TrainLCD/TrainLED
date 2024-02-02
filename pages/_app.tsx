@@ -65,6 +65,13 @@ function MyApp({ Component, pageProps }: AppProps) {
 
         <Head>
           <title>{APP_NAME}</title>
+          <link
+            rel="preload"
+            href="/JF-Dot-jiskan24.woff2"
+            as="font"
+            type="font/woff2"
+            crossOrigin=""
+          />
           <meta name="application-name" content={APP_NAME} />
           <meta name="apple-mobile-web-app-capable" content="yes" />
           <meta
