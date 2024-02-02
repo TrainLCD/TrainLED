@@ -1,9 +1,11 @@
 import { useAtom, useAtomValue } from "jotai";
 import { ChangeEvent, memo, useCallback } from "react";
 import styled from "styled-components";
+import { lineAtom } from "../atoms/line";
 import { navigationAtom } from "../atoms/navigation";
 import { trainTypeAtom } from "../atoms/trainType";
 import { Station, TrainType } from "../generated/proto/stationapi_pb";
+import useBounds from "../hooks/useBounds";
 import useCurrentLine from "../hooks/useCurrentLine";
 import useCurrentStation from "../hooks/useCurrentStation";
 import useTrainTypeLabels from "../hooks/useTrainTypeLabels";
@@ -68,7 +70,6 @@ const ButtonInnerText = styled.span`
 
 type Props = {
   isLoading: boolean;
-  bounds: [Station[], Station[]];
   onSelect: (boundStation: Station, index: number) => void;
   onBack: () => void;
   onTrainTypeSelect: (trainType: TrainType) => void;
@@ -76,17 +77,21 @@ type Props = {
 
 const BoundsPanel = ({
   isLoading,
-  bounds,
   onSelect,
   onBack,
   onTrainTypeSelect,
 }: Props) => {
   const { selectedTrainType, trainTypes } = useAtomValue(trainTypeAtom);
+  const { selectedDirection } = useAtomValue(lineAtom);
   const [{ autoModeEnabled }, setNavigation] = useAtom(navigationAtom);
 
   const station = useCurrentStation();
   const currentLine = useCurrentLine();
   const trainTypeLabels = useTrainTypeLabels(trainTypes);
+  const { bounds } = useBounds();
+
+  const switchedBounds =
+    selectedDirection === "INBOUND" ? bounds.inbound : bounds.outbound;
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLSelectElement>) => {
@@ -101,13 +106,18 @@ const BoundsPanel = ({
   );
 
   const getBoundTypeText = useCallback(
-    (stations: Station[], direction: LineDirection) => {
+    (direction: LineDirection) => {
       if (!currentLine) {
         return "";
       }
+
       const directionName = direction === "INBOUND" ? "右回り" : "左回り";
+      const boundsByDirection =
+        direction === "INBOUND" ? bounds.inbound ?? [] : bounds.outbound ?? [];
       if (getIsMeijoLine(currentLine.id)) {
-        return `${directionName}(${stations.map((s) => s.name).join("・")})`;
+        return `${directionName}(${boundsByDirection
+          .map((s) => s.name)
+          .join("・")}方面)`;
       }
 
       if (
@@ -115,31 +125,29 @@ const BoundsPanel = ({
         (getIsOsakaLoopLine(currentLine.id) && !selectedTrainType)
       ) {
         const directionName = direction === "INBOUND" ? "内回り" : "外回り";
-        return `${directionName}(${stations.map((s) => s.name).join("・")})`;
+        return `${directionName}(${boundsByDirection
+          .map((s) => s.name)
+          .join("・")}方面)`;
       }
 
-      return `${stations.map((s) => s.name).join("・")}方面`;
+      return `${boundsByDirection.map((s) => s.name).join("・")}方面`;
     },
-    [currentLine, selectedTrainType]
+    [bounds.inbound, bounds.outbound, currentLine, selectedTrainType]
   );
 
   const renderBounds = useCallback(
     () =>
-      bounds?.map(
-        (group, index) =>
-          group[0] && (
-            <ListItem key={group[0]?.id}>
-              <Button
-                disabled={isLoading}
-                onClick={() => onSelect(group[0], index)}
-              >
-                <ButtonInnerText>
-                  {getBoundTypeText(group, !index ? "INBOUND" : "OUTBOUND")}
-                </ButtonInnerText>
-              </Button>
-            </ListItem>
-          )
-      ),
+      Object.values(bounds)?.map(([bound], index) => {
+        return (
+          <ListItem key={bound?.id}>
+            <Button disabled={isLoading} onClick={() => onSelect(bound, index)}>
+              <ButtonInnerText>
+                {getBoundTypeText(!index ? "INBOUND" : "OUTBOUND")}
+              </ButtonInnerText>
+            </Button>
+          </ListItem>
+        );
+      }),
     [bounds, getBoundTypeText, isLoading, onSelect]
   );
 

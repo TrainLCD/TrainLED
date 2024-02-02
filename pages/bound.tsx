@@ -9,7 +9,6 @@ import CommonFooter from "../components/CommonFooter";
 import CommonHeader from "../components/CommonHeader";
 import Container from "../components/Container";
 import { Station, TrainType } from "../generated/proto/stationapi_pb";
-import useBounds from "../hooks/useBounds";
 import useUpdateStationList from "../hooks/useUpdateStationList";
 import useWakeLock from "../hooks/useWakeLock";
 
@@ -21,7 +20,6 @@ const BoundPage = () => {
   const { isLoading } = useUpdateStationList();
   const requestWakeLock = useWakeLock();
   const router = useRouter();
-  const { bounds } = useBounds();
 
   useEffect(() => {
     if (!station) {
@@ -61,7 +59,6 @@ const BoundPage = () => {
     <Container>
       <CommonHeader />
       <BoundsPanel
-        bounds={bounds}
         onBack={() => router.replace("/")}
         onSelect={handleSelectedBound}
         onTrainTypeSelect={handleTrainTypeSelect}

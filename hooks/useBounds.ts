@@ -11,7 +11,7 @@ import useCurrentStation from "./useCurrentStation";
 import { useLoopLine } from "./useLoopLine";
 
 const useBounds = (): {
-  bounds: [Station[], Station[]];
+  bounds: { inbound: Station[]; outbound: Station[] };
   boundText: { en: string; ja: string };
 } => {
   const { stations } = useAtomValue(stationAtom);
@@ -27,22 +27,28 @@ const useBounds = (): {
     outboundStationsForLoopLine,
   } = useLoopLine();
 
-  const bounds = useMemo((): [Station[], Station[]] => {
+  const bounds = useMemo((): { inbound: Station[]; outbound: Station[] } => {
     const inboundStation = stations[stations.length - 1];
     const outboundStation = stations[0];
 
     if (isLoopLine && !selectedTrainType) {
-      return [inboundStationsForLoopLine, outboundStationsForLoopLine];
+      return {
+        inbound: inboundStationsForLoopLine,
+        outbound: outboundStationsForLoopLine,
+      };
     }
 
     if (
       inboundStation?.groupId !== currentStation?.groupId ||
       outboundStation?.groupId !== currentStation?.groupId
     ) {
-      return [[inboundStation], [outboundStation]];
+      return {
+        inbound: [inboundStation],
+        outbound: [outboundStation],
+      };
     }
 
-    return [[], []];
+    return { inbound: [], outbound: [] };
   }, [
     currentStation?.groupId,
     inboundStationsForLoopLine,
@@ -53,12 +59,17 @@ const useBounds = (): {
   ]);
 
   const boundText = useMemo(() => {
-    const index = selectedDirection === "INBOUND" ? 0 : 1;
-    const jaText = bounds[index]
+    if (!selectedDirection) {
+      return { en: "", ja: "" };
+    }
+
+    const switchedBounds =
+      selectedDirection === "INBOUND" ? bounds.inbound : bounds.outbound;
+    const jaText = switchedBounds
       .filter((station) => station)
       .map((station) => station.name.replace(parenthesisRegexp, ""))
       .join("・");
-    const enText = bounds[index]
+    const enText = switchedBounds
       .filter((station) => station)
       .map(
         (station) =>
@@ -75,7 +86,13 @@ const useBounds = (): {
       }`,
       en: enText,
     };
-  }, [bounds, currentLine, selectedDirection, selectedTrainType]);
+  }, [
+    bounds.inbound,
+    bounds.outbound,
+    currentLine,
+    selectedDirection,
+    selectedTrainType,
+  ]);
 
   return { bounds, boundText };
 };

@@ -6,7 +6,7 @@ export type LanguageState = "ja" | "jaKana" | "en" | "jaBound" | "enBound";
 
 const useCurrentLanguageState = () => {
   const [language, setLanguage] = useState<LanguageState>("ja");
-  const { approaching } = useAtomValue(navigationAtom);
+  const { approaching, arrived } = useAtomValue(navigationAtom);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -17,7 +17,7 @@ const useCurrentLanguageState = () => {
           case "jaKana":
             return "en";
           case "en":
-            if (approaching) {
+            if (approaching && arrived) {
               return "ja";
             }
             return "jaBound";
@@ -31,7 +31,7 @@ const useCurrentLanguageState = () => {
       });
     }, 3 * 1000);
     return () => clearInterval(interval);
-  }, [approaching]);
+  }, [approaching, arrived]);
 
   return language;
 };
