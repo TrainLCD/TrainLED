@@ -12,7 +12,6 @@ import useBounds from "../hooks/useBounds";
 import useCurrentStation from "../hooks/useCurrentStation";
 import { useIsLastStop } from "../hooks/useIsLastStop";
 import {
-  getIsLoopLine,
   getIsMeijoLine,
   getIsOsakaLoopLine,
   getIsYamanoteLine,
@@ -68,7 +67,7 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
   const { arrived, approaching } = useAtomValue(navigationAtom);
   const { passingStation } = useAtomValue(stationAtom);
 
-  const { bounds } = useBounds();
+  const { boundText } = useBounds();
   const currentStation = useCurrentStation();
   const isLastStop = useIsLastStop();
 
@@ -88,44 +87,22 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
     return computedScrollSpeed;
   })();
 
-  const boundTexts = useMemo(() => {
-    const index = selectedDirection === "INBOUND" ? 0 : 1;
-    const jaText = bounds[index]
-      .filter((station) => station)
-      .map((station) => station.name.replace(parenthesisRegexp, ""))
-      .join("・");
-    const enText = bounds[index]
-      .filter((station) => station)
-      .map(
-        (station) =>
-          `${station.nameRoman?.replace(parenthesisRegexp, "")}${
-            station.stationNumbers[0]?.stationNumber
-              ? `(${station.stationNumbers[0]?.stationNumber})`
-              : ""
-          }`
-      )
-      .join(" and ");
-    return [
-      `${jaText}${getIsLoopLine(line, selectedTrainType) ? "方面" : ""}`,
-      enText,
-    ];
-  }, [bounds, line, selectedDirection, selectedTrainType]);
-
-  const trainTypeTexts = useMemo(() => {
+  const trainTypeText = useMemo<{ ja: string; en: string }>(() => {
     if (
       (getIsYamanoteLine(line.id) || getIsOsakaLoopLine(line.id)) &&
       selectedDirection
     ) {
       if (getIsMeijoLine(line.id)) {
-        return [
-          selectedDirection === "INBOUND" ? "左回り" : "右回り",
-          selectedDirection === "INBOUND" ? "Counterclockwise" : "Clockwise",
-        ];
+        return {
+          ja: selectedDirection === "INBOUND" ? "左回り" : "右回り",
+          en:
+            selectedDirection === "INBOUND" ? "Counterclockwise" : "Clockwise",
+        };
       }
-      return [
-        selectedDirection === "INBOUND" ? "内回り" : "外回り",
-        selectedDirection === "INBOUND" ? "Counterclockwise" : "Clockwise",
-      ];
+      return {
+        ja: selectedDirection === "INBOUND" ? "内回り" : "外回り",
+        en: selectedDirection === "INBOUND" ? "Counterclockwise" : "Clockwise",
+      };
     }
 
     switch (
@@ -133,20 +110,21 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
       getTrainTypeString(line, nextStation, selectedDirection)
     ) {
       case "rapid":
-        return ["快速", "Rapid"];
+        return { ja: "快速", en: "Rapid" };
       case "ltdexp":
-        return ["特急", "Limited Express"];
+        return { ja: "特急", en: "Limited Express" };
       default:
-        return [
-          selectedTrainType?.name?.replace(parenthesisRegexp, "") ?? "",
-          selectedTrainType?.nameRoman?.replace(parenthesisRegexp, "") ?? "",
-        ];
+        return {
+          ja: selectedTrainType?.name?.replace(parenthesisRegexp, "") ?? "",
+          en:
+            selectedTrainType?.nameRoman?.replace(parenthesisRegexp, "") ?? "",
+        };
     }
   }, [line, nextStation, selectedDirection, selectedTrainType]);
 
-  const transferTexts = useMemo(() => {
+  const transferText = useMemo<{ ja: string; en: string }>(() => {
     if (!nextStation) {
-      return "";
+      return { ja: "", en: "" };
     }
 
     const filteredLines = nextStation.lines.filter(
@@ -163,26 +141,26 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
             .join("");
 
     if (filteredLines.length <= 1) {
-      return [
-        filteredLines
+      return {
+        ja: filteredLines
           .map((line) => line.nameShort.replace(parenthesisRegexp, ""))
           .join("、")
           .replace(parenthesisRegexp, ""),
-        headTextForEn,
-      ];
+        en: headTextForEn,
+      };
     }
 
     const tailTextForEn = filteredLines
       .slice(-1)[0]
       ?.nameRoman?.replace(parenthesisRegexp, "");
 
-    return [
-      filteredLines
+    return {
+      ja: filteredLines
         .map((line) => line.nameShort.replace(parenthesisRegexp, ""))
         .join("、")
         .replace(parenthesisRegexp, ""),
-      `${headTextForEn} and the ${tailTextForEn}`,
-    ];
+      en: `${headTextForEn} and the ${tailTextForEn}`,
+    };
   }, [nextStation]);
 
   if (passingStation) {
@@ -233,7 +211,7 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
                 (line) => line.id !== currentStation.line?.id
               ).length > 0 && (
                 <>
-                  <OrangeText>{transferTexts[0]}</OrangeText>
+                  <OrangeText>{transferText.ja}</OrangeText>
                   <HorizontalSpacer />
                   <GreenText>はお乗り換えです。</GreenText>
                 </>
@@ -265,7 +243,7 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
                   <HorizontalSpacer />
                   <GreenText>Please change here for</GreenText>
                   <HorizontalSpacer />
-                  <OrangeText>the {transferTexts[1]}</OrangeText>
+                  <OrangeText>the {transferText.en}</OrangeText>
                   <GreenText>.</GreenText>
                 </>
               )}
@@ -320,7 +298,7 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
                 (line) => line.id !== nextStation.line?.id
               ).length > 0 && (
                 <>
-                  <OrangeText>{transferTexts[0]}</OrangeText>
+                  <OrangeText>{transferText.ja}</OrangeText>
                   <HorizontalSpacer />
                   <GreenText>はお乗り換えです。</GreenText>
                 </>
@@ -373,7 +351,7 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
                   <HorizontalSpacer />
                   <GreenText>Please change here for</GreenText>
                   <HorizontalSpacer />
-                  <OrangeText>the {transferTexts[1]}</OrangeText>
+                  <OrangeText>the {transferText.en}</OrangeText>
                   <GreenText>.</GreenText>
                 </>
               )}
@@ -425,7 +403,7 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
                 (line) => line.id !== nextStation.line?.id
               ).length > 0 && (
                 <>
-                  <OrangeText>{transferTexts[0]}</OrangeText>
+                  <OrangeText>{transferText.ja}</OrangeText>
                   <HorizontalSpacer />
                   <GreenText>はお乗り換えです。</GreenText>
                 </>
@@ -476,7 +454,7 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
                   <HorizontalSpacer />
                   <GreenText>Please change here for</GreenText>
                   <HorizontalSpacer />
-                  <OrangeText>the {transferTexts[1]}</OrangeText>
+                  <OrangeText>the {transferText.en}</OrangeText>
                   <GreenText>.</GreenText>
                 </>
               )}
@@ -496,13 +474,13 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
               この電車は、{line.nameShort.replace(parenthesisRegexp, "")}
             </GreenText>
             <HorizontalSpacer />
-            {trainTypeTexts[0] ? (
+            {trainTypeText.ja ? (
               <>
-                <CrimsonText>{trainTypeTexts[0]}</CrimsonText>
+                <CrimsonText>{trainTypeText.ja}</CrimsonText>
                 <HorizontalSpacer />
               </>
             ) : null}
-            <OrangeText>{boundTexts[0]}</OrangeText>
+            <OrangeText>{boundText.ja}</OrangeText>
             <OrangeText>行き</OrangeText>
             <GreenText>です。</GreenText>
             <HorizontalSpacer wide />
@@ -511,11 +489,11 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
               ""
             )}`}</GreenText>
             <HorizontalSpacer />
-            <CrimsonText>{trainTypeTexts[1]}</CrimsonText>
+            <CrimsonText>{trainTypeText.en}</CrimsonText>
             <HorizontalSpacer />
             <GreenText>train for</GreenText>
             <HorizontalSpacer />
-            <OrangeText>{boundTexts[1]}</OrangeText>
+            <OrangeText>{boundText.en}</OrangeText>
             <GreenText>.</GreenText>
           </TextContainer>
         </InnerContainer>

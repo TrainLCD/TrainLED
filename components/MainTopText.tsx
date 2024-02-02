@@ -3,6 +3,7 @@ import { useAtomValue } from "jotai";
 import styled from "styled-components";
 import { navigationAtom } from "../atoms/navigation";
 import { Station } from "../generated/proto/stationapi_pb";
+import useBounds from "../hooks/useBounds";
 import { LanguageState } from "../hooks/useCurrentLanguageState";
 import useCurrentStation from "../hooks/useCurrentStation";
 
@@ -28,7 +29,7 @@ const GreenText = styled.p`
   width: 100%;
   max-width: 22.5%;
   color: green;
-  font-size: 5vw;
+  font-size: 7.5vw;
 `;
 
 const StationInfoGroup = styled.div`
@@ -38,8 +39,8 @@ const StationInfoGroup = styled.div`
 const StateText = styled.p`
   width: 100%;
   max-width: 22.5%;
-  color: green;
-  font-size: 5vw;
+  color: rgb(0, 128, 0);
+  font-size: 7.5vw;
 `;
 
 const OrangeTextContainer = styled.div`
@@ -62,7 +63,7 @@ const NumberingText = styled.p`
   color: orange;
   margin: 0;
   flex: 1;
-  font-size: 5vw;
+  font-size: 7.5vw;
   white-space: pre-wrap;
 `;
 
@@ -75,6 +76,7 @@ const SwitchedStationText = ({ nextStation, language }: Props) => {
   const { arrived, approaching } = useAtomValue(navigationAtom);
 
   const currentStation = useCurrentStation();
+  const { boundText } = useBounds();
 
   if ((arrived || !nextStation) && currentStation) {
     return (
@@ -108,6 +110,28 @@ const SwitchedStationText = ({ nextStation, language }: Props) => {
             </StationInfoGroup>
           </>
         ) : null}
+      </TextContainer>
+    );
+  }
+
+  if (language === "jaBound") {
+    return (
+      <TextContainer>
+        <OrangeTextContainer>
+          {boundText.ja.split("").map((c, i) => (
+            <OrangeText key={`${c}${i}`}>{c}</OrangeText>
+          ))}
+        </OrangeTextContainer>
+        <GreenText>行</GreenText>
+      </TextContainer>
+    );
+  }
+
+  if (language === "enBound") {
+    return (
+      <TextContainer>
+        <GreenText>For</GreenText>
+        <OrangeText>{boundText.en}</OrangeText>
       </TextContainer>
     );
   }

@@ -44,7 +44,7 @@ const APP_BASE_URL = process.env.NEXT_PUBLIC_APP_BASE_URL ?? "";
 const finalTransport = createGrpcWebTransport({
   baseUrl:
     process.env.NODE_ENV === "development"
-      ? "http://localhost:50051"
+      ? process.env.NEXT_PUBLIC_DEV_SAPI_URL ?? ""
       : process.env.NEXT_PUBLIC_SAPI_URL ?? "",
 });
 
