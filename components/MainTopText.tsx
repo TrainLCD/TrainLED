@@ -1,10 +1,8 @@
 // 対処法が今のところないので一旦無視する
 import { useAtomValue } from "jotai";
 import styled from "styled-components";
-import { lineAtom } from "../atoms/line";
 import { navigationAtom } from "../atoms/navigation";
 import { Station } from "../generated/proto/stationapi_pb";
-import useBounds from "../hooks/useBounds";
 import { LanguageState } from "../hooks/useCurrentLanguageState";
 import useCurrentStation from "../hooks/useCurrentStation";
 
@@ -77,47 +75,8 @@ type Props = {
 
 const SwitchedStationText = ({ nextStation, language }: Props) => {
   const { arrived, approaching } = useAtomValue(navigationAtom);
-  const { selectedDirection } = useAtomValue(lineAtom);
 
   const currentStation = useCurrentStation();
-  const { bounds } = useBounds();
-
-  const bound =
-    selectedDirection === "INBOUND" ? bounds.inbound : bounds.outbound;
-
-  if (language === "jaBound") {
-    return (
-      <TextContainer>
-        <StationInfoGroup>
-          <OrangeTextContainer>
-            {bound[0]?.name.split("").map((c, i) => (
-              <OrangeText key={`${c}${i}`}>{c}</OrangeText>
-            ))}
-          </OrangeTextContainer>
-        </StationInfoGroup>
-        <GreenText bound>行</GreenText>
-      </TextContainer>
-    );
-  }
-
-  if (language === "enBound") {
-    return (
-      <TextContainer>
-        <GreenText bound>For</GreenText>
-        <StationInfoGroup>
-          <OrangeTextContainer>
-            <OrangeText>{bound[0]?.nameRoman}</OrangeText>
-          </OrangeTextContainer>
-
-          <NumberingText>
-            {bound[0]?.stationNumbers.length
-              ? `(${bound[0]?.stationNumbers[0]?.stationNumber})`
-              : ""}
-          </NumberingText>
-        </StationInfoGroup>
-      </TextContainer>
-    );
-  }
 
   if ((arrived || !nextStation) && currentStation) {
     return (

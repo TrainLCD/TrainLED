@@ -2,7 +2,7 @@ import { useAtomValue } from "jotai";
 import { useEffect, useState } from "react";
 import { navigationAtom } from "../atoms/navigation";
 
-export type LanguageState = "ja" | "jaKana" | "en" | "jaBound" | "enBound";
+export type LanguageState = "ja" | "jaKana" | "en";
 
 const useCurrentLanguageState = () => {
   const [language, setLanguage] = useState<LanguageState>("ja");
@@ -17,13 +17,6 @@ const useCurrentLanguageState = () => {
           case "jaKana":
             return "en";
           case "en":
-            if (approaching && arrived) {
-              return "ja";
-            }
-            return "jaBound";
-          case "jaBound":
-            return "enBound";
-          case "enBound":
             return "ja";
           default:
             return prev;
