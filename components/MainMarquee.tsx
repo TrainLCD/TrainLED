@@ -4,6 +4,7 @@ import Marquee from "react-fast-marquee";
 import styled from "styled-components";
 import { lineAtom } from "../atoms/line";
 import { navigationAtom } from "../atoms/navigation";
+import { stationAtom } from "../atoms/station";
 import { trainTypeAtom } from "../atoms/trainType";
 import { parenthesisRegexp } from "../constants/regexp";
 import { Line, Station, StopCondition } from "../generated/proto/stationapi_pb";
@@ -22,6 +23,7 @@ import HorizontalSpacer from "./HorizontalSpacer";
 const InnerContainer = styled.div`
   display: flex;
   mask: radial-gradient(1px, #fff 100%, transparent 100%) 0 0/2px 2px;
+  margin-right: 50vw;
 `;
 
 const TextContainer = styled.div`
@@ -64,6 +66,7 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
   const { selectedTrainType } = useAtomValue(trainTypeAtom);
   const { selectedDirection } = useAtomValue(lineAtom);
   const { arrived, approaching } = useAtomValue(navigationAtom);
+  const { passingStation } = useAtomValue(stationAtom);
 
   const { bounds } = useBounds();
   const currentStation = useCurrentStation();
@@ -182,12 +185,42 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
     ];
   }, [nextStation]);
 
+  if (passingStation) {
+    return (
+      <Container>
+        <Marquee gradient={false} speed={scrollSpeed}>
+          <InnerContainer>
+            <TextContainer>
+              <GreenText>ただいま</GreenText>
+              <HorizontalSpacer />
+              <OrangeText>{passingStation.name}駅</OrangeText>
+              <HorizontalSpacer />
+              <GreenText>を通過。</GreenText>
+            </TextContainer>
+            <LanguageSpacer />
+            <TextContainer>
+              <GreenText>Passing</GreenText>
+              <HorizontalSpacer />
+              <OrangeText>
+                {passingStation.nameRoman}
+                {passingStation.stationNumbers.length
+                  ? `(${passingStation.stationNumbers[0]?.stationNumber})`
+                  : ""}
+              </OrangeText>
+              <HorizontalSpacer />
+              <GreenText>Station.</GreenText>
+            </TextContainer>
+          </InnerContainer>
+        </Marquee>
+      </Container>
+    );
+  }
+
   if (arrived && isLastStop && currentStation) {
     return (
       <Container>
         <Marquee gradient={false} speed={scrollSpeed}>
           <InnerContainer>
-            <LanguageSpacer />
             <TextContainer>
               <GreenText>ただいま</GreenText>
               <OrangeText>{currentStation.name}</OrangeText>
@@ -237,8 +270,6 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
                 </>
               )}
             </TextContainer>
-            <HorizontalSpacer />
-            <LanguageSpacer />
           </InnerContainer>
         </Marquee>
       </Container>
@@ -254,7 +285,6 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
       <Container>
         <Marquee gradient={false} speed={scrollSpeed}>
           <InnerContainer>
-            <LanguageSpacer />
             <TextContainer>
               <GreenText>まもなく</GreenText>
               <HorizontalSpacer />
@@ -348,8 +378,6 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
                 </>
               )}
             </TextContainer>
-            <HorizontalSpacer />
-            <LanguageSpacer />
           </InnerContainer>
         </Marquee>
       </Container>
@@ -361,7 +389,6 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
       <Container>
         <Marquee gradient={false} speed={scrollSpeed}>
           <InnerContainer>
-            <LanguageSpacer />
             <TextContainer>
               <GreenText>次は</GreenText>
               <HorizontalSpacer />
@@ -454,9 +481,7 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
                 </>
               )}
             </TextContainer>
-            <HorizontalSpacer />
           </InnerContainer>
-          <LanguageSpacer />
         </Marquee>
       </Container>
     );
@@ -466,7 +491,6 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
     <Container>
       <Marquee gradient={false} speed={scrollSpeed}>
         <InnerContainer>
-          <LanguageSpacer />
           <TextContainer>
             <GreenText>
               この電車は、{line.nameShort.replace(parenthesisRegexp, "")}
@@ -494,7 +518,6 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
             <OrangeText>{boundTexts[1]}</OrangeText>
             <GreenText>.</GreenText>
           </TextContainer>
-          <LanguageSpacer />
         </InnerContainer>
       </Marquee>
     </Container>

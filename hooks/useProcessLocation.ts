@@ -102,6 +102,20 @@ const useProcessLocation = () => {
     [displayedNextStation, selectedDirection, selectedLine?.lineType, stations]
   );
 
+  const isPassing = useCallback(
+    (nearestStation: Station, avgDistance: number): boolean => {
+      if (!getIsPass(nearestStation) || !nearestStation) {
+        return false;
+      }
+      const ARRIVED_THRESHOLD = getArrivedThreshold(
+        selectedLine?.lineType,
+        avgDistance
+      );
+      return (nearestStation.distance || 0) < ARRIVED_THRESHOLD;
+    },
+    [selectedLine?.lineType]
+  );
+
   useEffect(() => {
     if (!selectedBound || autoModeEnabled) {
       return () => {
@@ -131,8 +145,13 @@ const useProcessLocation = () => {
     const avg = getAvgStationBetweenDistances(stations);
     const arrived = isArrived(station, avg);
     const approaching = isApproaching(station, avg);
+    const passing = isPassing(station, avg);
 
     setNavigationAtom((prev) => ({ ...prev, arrived, approaching }));
+    setStationAtom((prev) => ({
+      ...prev,
+      passingStation: passing ? station : null,
+    }));
 
     if (arrived) {
       setStationAtom((prev) => ({ ...prev, station }));
@@ -140,6 +159,7 @@ const useProcessLocation = () => {
   }, [
     isApproaching,
     isArrived,
+    isPassing,
     location,
     selectedBound,
     setNavigationAtom,
