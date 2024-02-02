@@ -9,7 +9,7 @@ import {
   getNearestStation,
 } from "../utils/distance";
 import getNextStation from "../utils/getNextStation";
-import getIsPass from "../utils/isPass";
+import { getIsPass } from "../utils/isPass";
 import {
   getApproachingThreshold,
   getArrivedThreshold,
@@ -43,7 +43,7 @@ const useProcessLocation = () => {
 
   const isArrived = useCallback(
     (nearestStation: Station, avgDistance: number): boolean => {
-      if (!nearestStation) {
+      if (getIsPass(nearestStation) || !nearestStation) {
         return false;
       }
       const ARRIVED_THRESHOLD = getArrivedThreshold(
@@ -57,7 +57,11 @@ const useProcessLocation = () => {
 
   const isApproaching = useCallback(
     (nearestStation: Station, avgDistance: number): boolean => {
-      if (!displayedNextStation || !nearestStation) {
+      if (
+        getIsPass(nearestStation) ||
+        !displayedNextStation ||
+        !nearestStation
+      ) {
         return false;
       }
       const APPROACHING_THRESHOLD = getApproachingThreshold(

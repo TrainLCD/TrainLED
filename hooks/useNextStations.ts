@@ -5,7 +5,7 @@ import { trainTypeAtom } from "../atoms/trainType";
 import { Line, Station } from "../generated/proto/stationapi_pb";
 import getCurrentStationIndex from "../utils/currentStationIndex";
 import dropEitherJunctionStation from "../utils/dropJunctionStation";
-import getIsPass from "../utils/isPass";
+import { getIsPass } from "../utils/isPass";
 import { getIsLoopLine } from "../utils/loopLine";
 
 const useNextStations = (
