@@ -15,7 +15,7 @@ const CommonHeader = () => {
           ? selectedLine.nameShort.replace(parenthesisRegexp, "")
           : "TrainLED"}
       </Heading>
-      <Heading>{station?.name ?? ""}</Heading>
+      {station && <Heading>{station?.name}</Heading>}
     </>
   );
 };

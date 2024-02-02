@@ -7,6 +7,7 @@ export const List = styled.ul`
   padding: 10px;
   gap: 24px;
   flex-wrap: wrap;
+  margin: 32px 0 0 0;
 `;
 
 export const ListItem = styled.li`

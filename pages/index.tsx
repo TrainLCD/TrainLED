@@ -8,6 +8,7 @@ import Button from "../components/Button";
 import CommonFooter from "../components/CommonFooter";
 import CommonHeader from "../components/CommonHeader";
 import Container from "../components/Container";
+import Heading from "../components/Heading";
 import LinesPanel from "../components/LinesPanel";
 import Loading from "../components/Loading";
 import { Line } from "../generated/proto/stationapi_pb";
@@ -16,14 +17,18 @@ import useUpdateNearbyStation from "../hooks/useUpdateNearbyStation";
 const SearchStationButtonContainer = styled.div<{ padTop?: boolean }>`
   display: flex;
   justify-content: center;
-  margin-top: ${({ padTop }) => (padTop ? "24px" : "0")};
+  margin-top: 32px;
+`;
+
+const StyledHeading = styled(Heading)`
+  margin: 32px 0 0 0;
 `;
 
 const HomePage = () => {
   const { station } = useAtomValue(stationAtom);
   const setLineAtom = useSetAtom(lineAtom);
 
-  const { isLoading, update } = useUpdateNearbyStation();
+  const { isLoading, error, update } = useUpdateNearbyStation();
 
   const router = useRouter();
 
@@ -39,15 +44,19 @@ const HomePage = () => {
     () => router.push("/search"),
     [router]
   );
+
   return (
     <Container>
       <CommonHeader />
       {isLoading && <Loading />}
       <LinesPanel lines={station?.lines ?? []} onSelect={handleSelectLine} />
+      {error && (
+        <StyledHeading>😭駅情報取得時にエラーが発生しよった😭</StyledHeading>
+      )}
       <SearchStationButtonContainer>
         <Button onClick={handleSearchStationClick}>駅を指定</Button>
       </SearchStationButtonContainer>
-      <SearchStationButtonContainer padTop>
+      <SearchStationButtonContainer>
         <Button onClick={update} disabled={isLoading}>
           位置情報を更新
         </Button>
