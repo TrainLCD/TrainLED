@@ -20,7 +20,8 @@ const useProcessLocation = () => {
   const [{ station, stations, selectedBound }, setStationAtom] =
     useAtom(stationAtom);
   const { selectedDirection, selectedLine } = useAtomValue(lineAtom);
-  const [{ location }, setNavigationAtom] = useAtom(navigationAtom);
+  const [{ location, autoModeEnabled }, setNavigationAtom] =
+    useAtom(navigationAtom);
 
   const watchIdRef = useRef<number | null>(null);
 
@@ -98,7 +99,7 @@ const useProcessLocation = () => {
   );
 
   useEffect(() => {
-    if (!selectedBound) {
+    if (!selectedBound || autoModeEnabled) {
       return () => {
         watchIdRef.current &&
           navigator.geolocation.clearWatch(watchIdRef.current);
@@ -110,7 +111,7 @@ const useProcessLocation = () => {
       watchIdRef.current &&
         navigator.geolocation.clearWatch(watchIdRef.current);
     };
-  }, [selectedBound, watchPosition]);
+  }, [autoModeEnabled, selectedBound, watchPosition]);
 
   useEffect(() => {
     if (!location || !selectedBound) {

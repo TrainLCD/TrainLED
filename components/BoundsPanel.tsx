@@ -1,6 +1,7 @@
-import { useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { ChangeEvent, memo, useCallback } from "react";
 import styled from "styled-components";
+import { navigationAtom } from "../atoms/navigation";
 import { trainTypeAtom } from "../atoms/trainType";
 import { Station, TrainType } from "../generated/proto/stationapi_pb";
 import useCurrentLine from "../hooks/useCurrentLine";
@@ -14,22 +15,26 @@ import {
 } from "../utils/loopLine";
 import Button from "./Button";
 import { List, ListItem } from "./List";
+import { Toggle } from "./Toggle";
 
 const Container = styled.div``;
+
 const Title = styled.h3`
   text-align: center;
 `;
 
 const BackButtonContainer = styled.div`
-  margin-top: 24px;
+  margin-top: 48px;
   display: flex;
   justify-content: center;
 `;
 
-const TrainTypeInputContainer = styled.div`
-  margin-bottom: 20px;
+const InputsContainer = styled.div`
   display: flex;
   justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 32px;
 `;
 
 const TrainTypeSelect = styled.select`
@@ -42,11 +47,11 @@ const TrainTypeSelect = styled.select`
   padding: 12px;
   outline: none;
   min-width: 240px;
-  font-family: "JF-Dot-jiskan24";
-  margin-top: 8px;
   text-align: center;
-  max-width: 100%;
-
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   :disabled {
     opacity: 0.5;
   }
@@ -77,6 +82,7 @@ const BoundsPanel = ({
   onTrainTypeSelect,
 }: Props) => {
   const { selectedTrainType, trainTypes } = useAtomValue(trainTypeAtom);
+  const [{ autoModeEnabled }, setNavigation] = useAtom(navigationAtom);
 
   const station = useCurrentStation();
   const currentLine = useCurrentLine();
@@ -137,12 +143,18 @@ const BoundsPanel = ({
     [bounds, getBoundTypeText, isLoading, onSelect]
   );
 
+  const handleAutoModeToggle = () =>
+    setNavigation((prev) => ({
+      ...prev,
+      autoModeEnabled: !prev.autoModeEnabled,
+    }));
+
   return (
     <Container>
       <Title>行き先極度選択（しなさい）</Title>
       <List>{isLoading ? <p>Loading...</p> : renderBounds()}</List>
-      {station?.hasTrainTypes && trainTypes.length > 0 && (
-        <TrainTypeInputContainer>
+      <InputsContainer>
+        {station?.hasTrainTypes && trainTypes.length > 0 && (
           <TrainTypeSelect
             value={selectedTrainType?.id ?? 0}
             onChange={handleChange}
@@ -157,8 +169,14 @@ const BoundsPanel = ({
               </TrainTypeOption>
             ))}
           </TrainTypeSelect>
-        </TrainTypeInputContainer>
-      )}
+        )}
+        <Toggle
+          enabled={autoModeEnabled}
+          onClick={handleAutoModeToggle}
+          text="オートモード"
+        />
+      </InputsContainer>
+
       <BackButtonContainer>
         <Button onClick={onBack}>戻る</Button>
       </BackButtonContainer>
