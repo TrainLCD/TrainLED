@@ -5,18 +5,20 @@ import styled from "styled-components";
 import { lineAtom } from "../atoms/line";
 import { navigationAtom } from "../atoms/navigation";
 import { stationAtom } from "../atoms/station";
-import { trainTypeAtom } from "../atoms/trainType";
 import { parenthesisRegexp } from "../constants/regexp";
 import { Line, Station, StopCondition } from "../generated/proto/stationapi_pb";
 import useBounds from "../hooks/useBounds";
+import useCurrentLine from "../hooks/useCurrentLine";
 import useCurrentStation from "../hooks/useCurrentStation";
+import useCurrentTrainType from "../hooks/useCurrentTrainType";
 import { useIsLastStop } from "../hooks/useIsLastStop";
 import {
+  getIsLoopLine,
   getIsMeijoLine,
   getIsOsakaLoopLine,
   getIsYamanoteLine,
 } from "../utils/loopLine";
-import { getTrainTypeString } from "../utils/trainTypeString";
+import { getIsLocal, getTrainTypeString } from "../utils/trainTypeString";
 import HorizontalSpacer from "./HorizontalSpacer";
 
 const InnerContainer = styled.div`
@@ -62,14 +64,15 @@ const MIN_SCROLL_SPEED = 400;
 const MAX_SCROLL_SPEED = 700;
 
 const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
-  const { selectedTrainType } = useAtomValue(trainTypeAtom);
   const { selectedDirection } = useAtomValue(lineAtom);
   const { arrived, approaching } = useAtomValue(navigationAtom);
   const { passingStation } = useAtomValue(stationAtom);
 
   const { boundText } = useBounds();
   const currentStation = useCurrentStation();
+  const currentLine = useCurrentLine();
   const isLastStop = useIsLastStop();
+  const trainType = useCurrentTrainType();
 
   const scrollSpeed = (() => {
     if (typeof window === "undefined") {
@@ -115,12 +118,11 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
         return { ja: "特急", en: "Limited Express" };
       default:
         return {
-          ja: selectedTrainType?.name?.replace(parenthesisRegexp, "") ?? "",
-          en:
-            selectedTrainType?.nameRoman?.replace(parenthesisRegexp, "") ?? "",
+          ja: trainType?.name?.replace(parenthesisRegexp, "") ?? "",
+          en: trainType?.nameRoman?.replace(parenthesisRegexp, "") ?? "",
         };
     }
-  }, [line, nextStation, selectedDirection, selectedTrainType]);
+  }, [line, nextStation, selectedDirection, trainType]);
 
   const transferText = useMemo<{ ja: string; en: string }>(() => {
     if (!nextStation) {
@@ -162,6 +164,9 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
       en: `${headTextForEn} and the ${tailTextForEn}`,
     };
   }, [nextStation]);
+
+  const isLocal =
+    getIsLocal(trainType) || getIsLoopLine(currentLine, trainType);
 
   if (passingStation) {
     return (
@@ -476,7 +481,11 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
             <HorizontalSpacer />
             {trainTypeText.ja ? (
               <>
-                <CrimsonText>{trainTypeText.ja}</CrimsonText>
+                {isLocal ? (
+                  <OrangeText>{trainTypeText.ja}</OrangeText>
+                ) : (
+                  <CrimsonText>{trainTypeText.ja}</CrimsonText>
+                )}
                 <HorizontalSpacer />
               </>
             ) : null}
@@ -489,7 +498,16 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
               ""
             )}`}</GreenText>
             <HorizontalSpacer />
-            <CrimsonText>{trainTypeText.en}</CrimsonText>
+            {trainTypeText.en ? (
+              <>
+                {isLocal ? (
+                  <OrangeText>{trainTypeText.en}</OrangeText>
+                ) : (
+                  <CrimsonText>{trainTypeText.en}</CrimsonText>
+                )}
+                <HorizontalSpacer />
+              </>
+            ) : null}
             <HorizontalSpacer />
             <GreenText>train for</GreenText>
             <HorizontalSpacer />
