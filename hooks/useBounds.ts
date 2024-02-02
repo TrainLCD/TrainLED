@@ -30,6 +30,9 @@ const useBounds = (): {
   const bounds = useMemo((): { inbound: Station[]; outbound: Station[] } => {
     const inboundStation = stations[stations.length - 1];
     const outboundStation = stations[0];
+    if (!inboundStation || !outboundStation) {
+      return { inbound: [], outbound: [] };
+    }
 
     if (isLoopLine && !selectedTrainType) {
       return {
