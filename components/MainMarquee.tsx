@@ -23,6 +23,8 @@ import HorizontalSpacer from "./HorizontalSpacer";
 
 const InnerContainer = styled.div`
   display: flex;
+  align-items: center;
+  justify-content: center;
   mask: radial-gradient(1px, #fff 100%, transparent 100%) 0 0/2px 2px;
   margin-right: 50vw;
 `;
