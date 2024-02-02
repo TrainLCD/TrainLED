@@ -12,7 +12,7 @@ const Container = styled.div`
   width: 100%;
   height: 50%;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
 
   mask: radial-gradient(1px, #fff 100%, transparent 100%) 0 0/2px 2px;
