@@ -21,7 +21,7 @@ type Props = {
 
 const LinesPanel = ({ lines, onSelect }: Props) => (
   <Container>
-    <Title>路線極度選択（しなさい）</Title>
+    <Title>路線を選択してください</Title>
     {lines.length > 0 ? (
       <List>
         {lines.map((l) => (

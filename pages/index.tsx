@@ -51,7 +51,9 @@ const HomePage = () => {
       {isLoading && <Loading />}
       <LinesPanel lines={station?.lines ?? []} onSelect={handleSelectLine} />
       {error && (
-        <StyledHeading>😭駅情報取得時にエラーが発生しよった😭</StyledHeading>
+        <StyledHeading>
+          駅情報取得に失敗しました。周囲の環境や電波状況をご確認ください。
+        </StyledHeading>
       )}
       <SearchStationButtonContainer>
         <Button onClick={handleSearchStationClick}>駅を指定</Button>

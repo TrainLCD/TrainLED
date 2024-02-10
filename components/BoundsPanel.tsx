@@ -159,7 +159,7 @@ const BoundsPanel = ({
 
   return (
     <Container>
-      <Title>行き先極度選択（しなさい）</Title>
+      <Title>行き先を選択してください</Title>
       <List>{isLoading ? <p>Loading...</p> : renderBounds()}</List>
       <InputsContainer>
         {station?.hasTrainTypes && trainTypes.length > 0 && (
