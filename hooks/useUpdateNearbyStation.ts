@@ -48,7 +48,6 @@ const useUpdateNearbyStation = (): {
   const [{ loading: isUpdateLoading, error: updateError }, update] =
     useAsyncFn(async () => {
       const newPos = await getCurrentPositionAsync();
-      console.log(newPos);
       setNavigationAtom((prev) => ({ ...prev, location: newPos }));
 
       const queryKey = createConnectQueryKey(getStationsByCoordinates);
