@@ -14,7 +14,7 @@ import useCurrentLine from "../../hooks/useCurrentLine";
 import useNextStations from "../../hooks/useNextStations";
 import useProcessLocation from "../../hooks/useProcessLocation";
 
-export const LEDPage = () => {
+const LEDPage = () => {
   const { station, stations } = useAtomValue(stationAtom);
   const { autoModeEnabled } = useAtomValue(navigationAtom);
 
