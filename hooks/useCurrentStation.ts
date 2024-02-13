@@ -1,3 +1,4 @@
+"use client";
 import { useAtomValue } from "jotai";
 import { useEffect, useState } from "react";
 import { stationAtom } from "../atoms/station";

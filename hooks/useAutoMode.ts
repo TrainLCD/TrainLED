@@ -9,7 +9,6 @@ import {
   AUTO_MODE_WHOLE_DURATION,
 } from "../constants/autoMode";
 import dropEitherJunctionStation from "../utils/dropJunctionStation";
-import { useBrowserBack } from "./useBrowserBack";
 import { useLoopLine } from "./useLoopLine";
 import { useValueRef } from "./useValueRef";
 
@@ -44,7 +43,6 @@ const useAutoMode = (enabled: boolean): void => {
       clearInterval(autoModeArriveTimerRef.current);
     }
   };
-  useBrowserBack({ onRouteChangeStart: cleanup });
 
   const startApproachingTimer = useCallback(() => {
     if (
@@ -281,6 +279,10 @@ const useAutoMode = (enabled: boolean): void => {
     startApproachingTimer();
     startArriveTimer();
   }, [startApproachingTimer, startArriveTimer]);
+
+  useEffect(() => {
+    return cleanup;
+  }, []);
 };
 
 export default useAutoMode;

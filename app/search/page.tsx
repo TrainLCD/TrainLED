@@ -1,12 +1,13 @@
-import { useRouter } from "next/router";
+"use client";
+import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useCallback, useRef, useState } from "react";
 import styled from "styled-components";
-import Button from "../components/Button";
-import CommonFooter from "../components/CommonFooter";
-import CommonHeader from "../components/CommonHeader";
-import Container from "../components/Container";
-import Heading from "../components/Heading";
-import useSearchStation from "../hooks/useSearchStation";
+import Button from "../../components/Button";
+import CommonFooter from "../../components/CommonFooter";
+import CommonHeader from "../../components/CommonHeader";
+import Container from "../../components/Container";
+import Heading from "../../components/Heading";
+import useSearchStation from "../../hooks/useSearchStation";
 
 const SearchForm = styled.form`
   display: flex;
@@ -90,7 +91,7 @@ const SearchPage = () => {
         <StationNameInput
           ref={inputRef}
           onChange={handleChange}
-          placeholder="実は入力できるんすよ"
+          placeholder="駅名を入力"
         />
         <SearchResultListContainer>
           {!stations.length &&

@@ -1,6 +1,5 @@
 import { useAtom, useAtomValue } from "jotai";
 import { ChangeEvent, memo, useCallback } from "react";
-import styled from "styled-components";
 import { lineAtom } from "../atoms/line";
 import { navigationAtom } from "../atoms/navigation";
 import { trainTypeAtom } from "../atoms/trainType";
@@ -15,58 +14,18 @@ import {
   getIsOsakaLoopLine,
   getIsYamanoteLine,
 } from "../utils/loopLine";
+import {
+  BackButtonContainer,
+  ButtonInnerText,
+  Container,
+  InputsContainer,
+  Title,
+  TrainTypeOption,
+  TrainTypeSelect,
+} from "./BoundsPanel.styled";
 import Button from "./Button";
 import { List, ListItem } from "./List";
 import { Toggle } from "./Toggle";
-
-const Container = styled.div``;
-
-const Title = styled.h3`
-  text-align: center;
-`;
-
-const BackButtonContainer = styled.div`
-  margin-top: 48px;
-  display: flex;
-  justify-content: center;
-`;
-
-const InputsContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 24px;
-  flex-wrap: wrap;
-  margin-top: 32px;
-`;
-
-const TrainTypeSelect = styled.select`
-  display: block;
-  appearance: none;
-  background-color: transparent;
-  border: 1px solid #fff;
-  color: white;
-  font-size: 1rem;
-  padding: 12px;
-  outline: none;
-  min-width: 240px;
-  text-align: center;
-  max-width: 240px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  :disabled {
-    opacity: 0.5;
-  }
-`;
-
-const TrainTypeOption = styled.option`
-  background-color: ${({ theme }) => theme.bgColor || "#212121"};
-  color: white;
-`;
-
-const ButtonInnerText = styled.span`
-  font-weight: bold;
-`;
 
 type Props = {
   isLoading: boolean;
