@@ -44,7 +44,7 @@ const BoundPage = () => {
         selectedDirection: !index ? "INBOUND" : "OUTBOUND",
       }));
 
-      router.push("/led");
+      router.push("/led", { scroll: false });
     },
     [requestWakeLock, router, setLineAtom, setStationAtom]
   );
