@@ -94,32 +94,56 @@ const BoundsPanel = ({
     [bounds.inbound, bounds.outbound, currentLine, selectedTrainType]
   );
 
-  const renderBounds = useCallback(
-    () =>
-      Object.values(bounds)?.map(([bound], index) => {
-        return (
-          <ListItem key={bound?.id}>
-            <Button disabled={isLoading} onClick={() => onSelect(bound, index)}>
-              <ButtonInnerText>
-                {getBoundTypeText(!index ? "INBOUND" : "OUTBOUND")}
-              </ButtonInnerText>
-            </Button>
-          </ListItem>
-        );
-      }),
-    [bounds, getBoundTypeText, isLoading, onSelect]
-  );
-
   const handleAutoModeToggle = () =>
     setNavigation((prev) => ({
       ...prev,
       autoModeEnabled: !prev.autoModeEnabled,
     }));
 
+  const inboundStations = bounds.inbound ?? [];
+  const outboundStations = bounds.outbound ?? [];
+  const inboundStation = inboundStations.at(-1);
+  const outboundStation = outboundStations.at(-1);
+
   return (
     <Container>
       <Title>行き先を選択してください</Title>
-      <List>{isLoading ? <p>Loading...</p> : renderBounds()}</List>
+      <List>
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : (
+          <>
+            {inboundStation && (
+              <ListItem>
+                <Button
+                  disabled={isLoading}
+                  onClick={() =>
+                    bounds.inbound.at(-1) && onSelect(inboundStation, 0)
+                  }
+                >
+                  <ButtonInnerText>
+                    {getBoundTypeText("INBOUND")}
+                  </ButtonInnerText>
+                </Button>
+              </ListItem>
+            )}
+            {outboundStation && (
+              <ListItem>
+                <Button
+                  disabled={isLoading}
+                  onClick={() =>
+                    bounds.inbound.at(-1) && onSelect(outboundStation, 1)
+                  }
+                >
+                  <ButtonInnerText>
+                    {getBoundTypeText("OUTBOUND")}
+                  </ButtonInnerText>
+                </Button>
+              </ListItem>
+            )}
+          </>
+        )}
+      </List>
       <InputsContainer>
         {station?.hasTrainTypes && trainTypes.length > 0 && (
           <TrainTypeSelect
