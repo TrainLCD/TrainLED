@@ -104,7 +104,7 @@ const SearchPage = () => {
             )}
           {!stations.length && alreadySearched && !isLoading && (
             <SearchResultListContent centering>
-              結果がないゾイ
+              結果がありません
             </SearchResultListContent>
           )}
           {stations.map((station) => (
