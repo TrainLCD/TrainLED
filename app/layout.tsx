@@ -8,7 +8,10 @@ import Provider from "./provider";
 export const metadata: Metadata = {
   title: "TrainLED",
   description: "A joking navigation app.",
-  appleWebApp: true,
+  appleWebApp: {
+    title: "TrainLED",
+    statusBarStyle: "black-translucent",
+  },
 };
 
 const jfDotFont = localFont({
