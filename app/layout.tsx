@@ -1,3 +1,4 @@
+import type { Viewport } from "next";
 import { Metadata } from "next";
 import localFont from "next/font/local";
 import StyledComponentsRegistry from "../lib/registry";
@@ -7,6 +8,7 @@ import Provider from "./provider";
 export const metadata: Metadata = {
   title: "TrainLED",
   description: "A joking navigation app.",
+  appleWebApp: true,
 };
 
 const jfDotFont = localFont({
@@ -14,6 +16,11 @@ const jfDotFont = localFont({
   display: "swap",
   variable: "--font-jfdot",
 });
+
+export const viewport: Viewport = {
+  themeColor: "#212121",
+  viewportFit: "cover",
+};
 
 export default function RootLayout({
   children,
