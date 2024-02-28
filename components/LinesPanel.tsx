@@ -18,7 +18,7 @@ const LinesPanel = () => {
   const handleSelectLine = useCallback(
     (line: Line) => {
       setLineAtom((prev) => ({ ...prev, selectedLine: line }));
-      router.push("/bound");
+      router.push("/bound", { scroll: false });
     },
     [router, setLineAtom]
   );

@@ -122,7 +122,7 @@ const useSearchStation = (): ReturnValue => {
           },
         },
       }));
-      router.push("/");
+      router.push("/", { scroll: false });
     },
     [router, setLocation, setStationAtom]
   );
