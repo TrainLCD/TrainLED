@@ -14,7 +14,7 @@ const useCurrentPosition = ({
     () =>
       new Promise<GeolocationPosition>((resolve, reject) =>
         navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: true,
+          enableHighAccuracy: false,
         })
       ),
     []
