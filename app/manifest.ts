@@ -7,7 +7,7 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "A joking navigation app.",
     start_url: "/",
     theme_color: "#ffffff",
-    background_color: "#212121",
+    background_color: "#000000",
     display: "standalone",
     orientation: "landscape",
     icons: [
