@@ -1,3 +1,4 @@
+"use client";
 import styled from "styled-components";
 
 export default styled.button<{ bgColor?: string }>`
@@ -6,7 +7,7 @@ export default styled.button<{ bgColor?: string }>`
   color: white;
   padding: 12px;
   font-size: 1rem;
-  font-family: "JF-Dot-jiskan24";
+  font-family: var(--font-jfdot);
   background-color: ${({ bgColor }) => bgColor || "#212121"};
   width: 240px;
   cursor: pointer;

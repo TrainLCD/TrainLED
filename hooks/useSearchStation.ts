@@ -1,6 +1,7 @@
+"use client";
 import { useQuery } from "@connectrpc/connect-query";
 import { useSetAtom } from "jotai";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 import { navigationAtom } from "../atoms/navigation";
 import { stationAtom } from "../atoms/station";
@@ -121,7 +122,7 @@ const useSearchStation = (): ReturnValue => {
           },
         },
       }));
-      router.push("/");
+      router.push("/", { scroll: false });
     },
     [router, setLocation, setStationAtom]
   );

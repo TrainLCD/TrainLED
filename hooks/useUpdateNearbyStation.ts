@@ -1,3 +1,4 @@
+"use client";
 import { ConnectError } from "@connectrpc/connect";
 import { createConnectQueryKey, useQuery } from "@connectrpc/connect-query";
 import { useQueryClient } from "@tanstack/react-query";

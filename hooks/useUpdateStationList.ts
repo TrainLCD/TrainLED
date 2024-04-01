@@ -1,3 +1,4 @@
+"use client"; // TODO: 役目的にuse client消せそう。消せるなら消したい
 import { ConnectError } from "@connectrpc/connect";
 import { useQuery } from "@connectrpc/connect-query";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";

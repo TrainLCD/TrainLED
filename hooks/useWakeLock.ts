@@ -1,3 +1,4 @@
+"use client";
 import { useCallback, useEffect, useRef } from "react";
 
 const useWakeLock = (): (() => Promise<void>) => {

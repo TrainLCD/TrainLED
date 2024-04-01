@@ -1,44 +1,51 @@
-import styled from "styled-components";
+import { useAtomValue, useSetAtom } from "jotai";
+import { useRouter } from "next/navigation";
+import { useCallback } from "react";
+import { lineAtom } from "../atoms/line";
+import { stationAtom } from "../atoms/station";
 import { parenthesisRegexp } from "../constants/regexp";
 import { Line } from "../generated/proto/stationapi_pb";
 import Button from "./Button";
+import { Container, Title } from "./LinesPanel.styled";
 import { List, ListItem } from "./List";
 
-const Container = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-`;
-const Title = styled.h3`
-  text-align: center;
-  margin: 16px 0 0 0;
-`;
-type Props = {
-  lines: Line[];
-  onSelect: (line: Line) => void;
-};
+const LinesPanel = () => {
+  const { station } = useAtomValue(stationAtom);
+  const setLineAtom = useSetAtom(lineAtom);
 
-const LinesPanel = ({ lines, onSelect }: Props) => (
-  <Container>
-    <Title>路線を選択してください</Title>
-    {lines.length > 0 ? (
-      <List>
-        {lines.map((l) => (
-          <ListItem key={l.id}>
-            <Button
-              onClick={onSelect.bind(null, l)}
-              bgColor={l.color ?? "#fff"}
-            >
-              {l.lineSymbols.length > 0 &&
-                `[${l.lineSymbols.map((sym) => sym?.symbol).join("/")}]`}
-              {l.nameShort.replace(parenthesisRegexp, "")}
-            </Button>
-          </ListItem>
-        ))}
-      </List>
-    ) : null}
-  </Container>
-);
+  const router = useRouter();
+
+  const handleSelectLine = useCallback(
+    (line: Line) => {
+      setLineAtom((prev) => ({ ...prev, selectedLine: line }));
+      router.push("/bound", { scroll: false });
+    },
+    [router, setLineAtom]
+  );
+
+  const lines = station?.lines ?? [];
+
+  return (
+    <Container>
+      <Title>路線を選択してください</Title>
+      {lines.length > 0 ? (
+        <List>
+          {lines.map((l) => (
+            <ListItem key={l.id}>
+              <Button
+                onClick={() => handleSelectLine(l)}
+                bgColor={l.color ?? "#fff"}
+              >
+                {l.lineSymbols.length > 0 &&
+                  `[${l.lineSymbols.map((sym) => sym?.symbol).join("/")}]`}
+                {l.nameShort.replace(parenthesisRegexp, "")}
+              </Button>
+            </ListItem>
+          ))}
+        </List>
+      ) : null}
+    </Container>
+  );
+};
 
 export default LinesPanel;
