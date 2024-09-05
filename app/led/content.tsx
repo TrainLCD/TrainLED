@@ -3,31 +3,27 @@ import { useAtomValue } from "jotai";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { navigationAtom } from "../../atoms/navigation";
-import { stationAtom } from "../../atoms/station";
 import Container from "../../components/Container";
 import HorizontalSpacer from "../../components/HorizontalSpacer";
 import MainMarquee from "../../components/MainMarquee";
 import MainTopText from "../../components/MainTopText";
-import useAutoMode from "../../hooks/useAutoMode";
+import { useAfterNextStation } from "../../hooks/useAfterNextStation";
+import { useAutoMode } from "../../hooks/useAutoMode";
 import useCurrentLanguageState from "../../hooks/useCurrentLanguageState";
-import useCurrentLine from "../../hooks/useCurrentLine";
-import useNextStations from "../../hooks/useNextStations";
-import useProcessLocation from "../../hooks/useProcessLocation";
+import { useCurrentLine } from "../../hooks/useCurrentLine";
+import { useNextStation } from "../../hooks/useNextStation";
+import { useRefreshStation } from "../../hooks/useRefreshStation";
 
 export const PageContent = () => {
-  const { station, stations } = useAtomValue(stationAtom);
   const { autoModeEnabled } = useAtomValue(navigationAtom);
 
   const currentLine = useCurrentLine();
-  const [, nextStation, afterNextStation] = useNextStations(
-    stations,
-    station,
-    currentLine
-  );
+  const nextStation = useNextStation();
+  const afterNextStation = useAfterNextStation();
   const langState = useCurrentLanguageState();
   const router = useRouter();
 
-  useProcessLocation();
+  useRefreshStation();
   useAutoMode(autoModeEnabled);
 
   useEffect(() => {

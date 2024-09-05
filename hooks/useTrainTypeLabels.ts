@@ -1,7 +1,7 @@
 import { useMemo } from "react";
-import { parenthesisRegexp } from "../constants/regexp";
+import { PARENTHESIS_REGEXP } from "../constants";
 import { Line, TrainType } from "../generated/proto/stationapi_pb";
-import useCurrentLine from "./useCurrentLine";
+import { useCurrentLine } from "./useCurrentLine";
 
 const useTrainTypeLabels = (trainTypes: TrainType[]) => {
   const currentLine = useCurrentLine();
@@ -73,7 +73,7 @@ const useTrainTypeLabels = (trainTypes: TrainType[]) => {
             .filter((line, idx, self) =>
               self.length === 1 ? true : line.id !== currentLine?.id
             )
-            .map((l) => l.nameShort.replace(parenthesisRegexp, ""))
+            .map((l) => l.nameShort.replace(PARENTHESIS_REGEXP, ""))
             .filter((txt, idx, self) => self.indexOf(txt) === idx)
             .join("・");
 
@@ -87,7 +87,7 @@ const useTrainTypeLabels = (trainTypes: TrainType[]) => {
         if (isAllSameTrainType && isAllSameOperator) {
           const otherLinesText = tt.lines
             .filter((l) => l.id !== currentLine?.id)
-            .map((l) => l.nameShort.replace(parenthesisRegexp, ""))
+            .map((l) => l.nameShort.replace(PARENTHESIS_REGEXP, ""))
             .filter((txt, idx, self) => self.indexOf(txt) === idx)
             .join("・");
 
@@ -103,9 +103,9 @@ const useTrainTypeLabels = (trainTypes: TrainType[]) => {
           .map(
             (l) =>
               `${l.nameShort.replace(
-                parenthesisRegexp,
+                PARENTHESIS_REGEXP,
                 ""
-              )} ${l.trainType?.name.replace(parenthesisRegexp, "")}`
+              )} ${l.trainType?.name.replace(PARENTHESIS_REGEXP, "")}`
           )
           .join("・");
         return `${tt.name} ${otherLinesText}`;

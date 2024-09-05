@@ -1,0 +1,2 @@
+export const APPROACHING_MAX_THRESHOLD = 1000;
+export const ARRIVED_MAX_THRESHOLD = 500;

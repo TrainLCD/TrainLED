@@ -1,12 +1,11 @@
 import { useAtom, useAtomValue } from "jotai";
 import { ChangeEvent, memo, useCallback } from "react";
-import { lineAtom } from "../atoms/line";
 import { navigationAtom } from "../atoms/navigation";
 import { trainTypeAtom } from "../atoms/trainType";
 import { Station, TrainType } from "../generated/proto/stationapi_pb";
 import useBounds from "../hooks/useBounds";
-import useCurrentLine from "../hooks/useCurrentLine";
-import useCurrentStation from "../hooks/useCurrentStation";
+import { useCurrentLine } from "../hooks/useCurrentLine";
+import { useCurrentStation } from "../hooks/useCurrentStation";
 import useTrainTypeLabels from "../hooks/useTrainTypeLabels";
 import { LineDirection } from "../models/bound";
 import {
@@ -41,16 +40,14 @@ const BoundsPanel = ({
   onTrainTypeSelect,
 }: Props) => {
   const { selectedTrainType, trainTypes } = useAtomValue(trainTypeAtom);
-  const { selectedDirection } = useAtomValue(lineAtom);
   const [{ autoModeEnabled }, setNavigation] = useAtom(navigationAtom);
 
   const station = useCurrentStation();
   const currentLine = useCurrentLine();
   const trainTypeLabels = useTrainTypeLabels(trainTypes);
-  const { bounds } = useBounds();
-
-  const switchedBounds =
-    selectedDirection === "INBOUND" ? bounds.inbound : bounds.outbound;
+  const {
+    bounds: [inboundStations, outboundStations],
+  } = useBounds();
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLSelectElement>) => {
@@ -72,9 +69,12 @@ const BoundsPanel = ({
 
       const directionName = direction === "INBOUND" ? "右回り" : "左回り";
       const boundsByDirection =
-        direction === "INBOUND" ? bounds.inbound ?? [] : bounds.outbound ?? [];
+        direction === "INBOUND"
+          ? inboundStations ?? []
+          : outboundStations ?? [];
       if (getIsMeijoLine(currentLine.id)) {
         return `${directionName}(${boundsByDirection
+          .slice(0, 2)
           .map((s) => s.name)
           .join("・")}方面)`;
       }
@@ -89,9 +89,12 @@ const BoundsPanel = ({
           .join("・")}方面)`;
       }
 
-      return `${boundsByDirection.map((s) => s.name).join("・")}方面`;
+      return `${boundsByDirection
+        .slice(0, 2)
+        .map((s) => s.name)
+        .join("・")}方面`;
     },
-    [bounds.inbound, bounds.outbound, currentLine, selectedTrainType]
+    [currentLine, inboundStations, outboundStations, selectedTrainType]
   );
 
   const handleAutoModeToggle = () =>
@@ -99,11 +102,6 @@ const BoundsPanel = ({
       ...prev,
       autoModeEnabled: !prev.autoModeEnabled,
     }));
-
-  const inboundStations = bounds.inbound ?? [];
-  const outboundStations = bounds.outbound ?? [];
-  const inboundStation = inboundStations.at(-1);
-  const outboundStation = outboundStations.at(-1);
 
   return (
     <Container>
@@ -113,34 +111,30 @@ const BoundsPanel = ({
           <p>Loading...</p>
         ) : (
           <>
-            {inboundStation && (
+            {inboundStations.length ? (
               <ListItem>
                 <Button
                   disabled={isLoading}
-                  onClick={() =>
-                    bounds.inbound.at(-1) && onSelect(inboundStation, 0)
-                  }
+                  onClick={() => onSelect(inboundStations[0], 0)}
                 >
                   <ButtonInnerText>
                     {getBoundTypeText("INBOUND")}
                   </ButtonInnerText>
                 </Button>
               </ListItem>
-            )}
-            {outboundStation && (
+            ) : null}
+            {outboundStations.length ? (
               <ListItem>
                 <Button
                   disabled={isLoading}
-                  onClick={() =>
-                    bounds.inbound.at(-1) && onSelect(outboundStation, 1)
-                  }
+                  onClick={() => onSelect(outboundStations[0], 1)}
                 >
                   <ButtonInnerText>
                     {getBoundTypeText("OUTBOUND")}
                   </ButtonInnerText>
                 </Button>
               </ListItem>
-            )}
+            ) : null}
           </>
         )}
       </List>

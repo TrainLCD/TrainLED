@@ -3,17 +3,15 @@ import { useMemo } from "react";
 import { stationAtom } from "../atoms/station";
 import {
   MEIJO_LINE_ID,
-  OSASA_LOOP_LINE_ID,
-  YAMANOTE_LINE_ID,
-} from "../constants/line";
-import {
   MEIJO_LINE_MAJOR_STATIONS_ID,
   OSAKA_LOOP_LINE_MAJOR_STATIONS_ID,
+  OSASA_LOOP_LINE_ID,
+  YAMANOTE_LINE_ID,
   YAMANOTE_LINE_MAJOR_STATIONS_ID,
-} from "../constants/station";
+} from "../constants";
 import { Station } from "../generated/proto/stationapi_pb";
-import useCurrentLine from "./useCurrentLine";
-import useCurrentStation from "./useCurrentStation";
+import { useCurrentLine } from "./useCurrentLine";
+import { useCurrentStation } from "./useCurrentStation";
 import useCurrentTrainType from "./useCurrentTrainType";
 
 export const useLoopLine = () => {

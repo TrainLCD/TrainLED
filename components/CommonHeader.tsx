@@ -1,7 +1,7 @@
 import { useAtomValue } from "jotai";
 import { lineAtom } from "../atoms/line";
 import { stationAtom } from "../atoms/station";
-import { parenthesisRegexp } from "../constants/regexp";
+import { PARENTHESIS_REGEXP } from "../constants";
 import Heading from "./Heading";
 
 const CommonHeader = () => {
@@ -12,7 +12,7 @@ const CommonHeader = () => {
     <>
       <Heading>
         {selectedLine
-          ? selectedLine.nameShort.replace(parenthesisRegexp, "")
+          ? selectedLine.nameShort.replace(PARENTHESIS_REGEXP, "")
           : "TrainLED"}
       </Heading>
       {station && <Heading>{station?.name}</Heading>}

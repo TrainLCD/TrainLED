@@ -4,7 +4,7 @@ import styled from "styled-components";
 export const Container = styled.button<{ enabled: boolean }>`
   display: block;
   appearance: none;
-  background-color: ${({ enabled }) => (enabled ? "#fff" : "#212121")};
+  background-color: ${({ enabled }) => (enabled ? "#fff" : "transparent")};
   border: 1px solid #fff;
   color: ${({ enabled }) => (enabled ? "#212121" : "#fff")};
   font-size: 1rem;

@@ -2,9 +2,10 @@
 import { useAtomValue } from "jotai";
 import styled from "styled-components";
 import { navigationAtom } from "../atoms/navigation";
+import { stationAtom } from "../atoms/station";
 import { Station } from "../generated/proto/stationapi_pb";
 import { LanguageState } from "../hooks/useCurrentLanguageState";
-import useCurrentStation from "../hooks/useCurrentStation";
+import { useCurrentStation } from "../hooks/useCurrentStation";
 
 const Container = styled.div`
   width: 100%;
@@ -74,11 +75,12 @@ type Props = {
 };
 
 const SwitchedStationText = ({ nextStation, language }: Props) => {
+  const { passingStation } = useAtomValue(stationAtom);
   const { arrived, approaching } = useAtomValue(navigationAtom);
 
   const currentStation = useCurrentStation();
 
-  if ((arrived || !nextStation) && currentStation) {
+  if ((arrived || !nextStation) && currentStation && !passingStation) {
     return (
       <TextContainer>
         {language === "ja" ? (

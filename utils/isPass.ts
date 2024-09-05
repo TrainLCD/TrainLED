@@ -1,9 +1,10 @@
-import dayjs from "dayjs";
 import { Station, StopCondition } from "../generated/proto/stationapi_pb";
+import { isHoliday } from "./holiday";
 
-const isHoliday = ((): boolean => dayjs().day() === 0 || dayjs().day() === 6)();
-
-export const getIsPass = (station: Station | null): boolean => {
+const getIsPass = (
+  station: Station | null,
+  ignoreDayCondition?: boolean
+): boolean => {
   if (!station) {
     return false;
   }
@@ -17,10 +18,12 @@ export const getIsPass = (station: Station | null): boolean => {
       return true;
     case StopCondition.Weekday:
       // 若干分かりづらい感じはするけど休日に飛ばすという意味
-      return isHoliday;
+      return ignoreDayCondition || isHoliday();
     case StopCondition.Holiday:
-      return !isHoliday;
+      return ignoreDayCondition || !isHoliday();
     default:
       return false;
   }
 };
+
+export default getIsPass;

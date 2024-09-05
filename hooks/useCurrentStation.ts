@@ -1,36 +1,49 @@
-"use client";
 import { useAtomValue } from "jotai";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
+import { lineAtom } from "../atoms/line";
 import { stationAtom } from "../atoms/station";
-import { Station } from "../generated/proto/stationapi_pb";
-import { getIsPass } from "../utils/isPass";
+import getIsPass from "../utils/isPass";
 
-const useCurrentStation = ({
-  withTrainTypes = false,
+export const useCurrentStation = (
   skipPassStation = false,
-} = {}): Station | null => {
-  const { stations, station } = useAtomValue(stationAtom);
-  // stationには通過駅も入るので、通過駅を無視したい時には不都合なのでstateでキャッシュしている
-  const [stationCache, setStationCache] = useState<Station | null>(station);
+  withTrainTypes = false
+) => {
+  const { stations, station: stationFromState } = useAtomValue(stationAtom);
+  const { selectedLine, selectedDirection } = useAtomValue(lineAtom);
 
-  useEffect(() => {
-    if (skipPassStation || withTrainTypes) {
-      const current = stations
-        .filter((s) => (skipPassStation ? !getIsPass(s) : true))
-        .find((rs) => rs.groupId === station?.groupId);
+  // NOTE: 選択した路線と現在の駅の路線を一致させる
+  const station = useMemo(
+    () =>
+      stations.find(
+        (s) =>
+          s.groupId === stationFromState?.groupId ??
+          s.line?.id === selectedLine?.id
+      ),
+    [selectedLine?.id, stationFromState?.groupId, stations]
+  );
 
-      if (current) {
-        setStationCache(current);
-      }
-      return;
+  const withTrainTypeStation = useMemo(() => {
+    const foundStation = stations
+      .filter((s) => (skipPassStation ? !getIsPass(s) : true))
+      .find((rs) => rs.id === station?.id);
+    if (foundStation) {
+      return foundStation;
     }
 
-    // 種別設定がない場合は通過駅がない(skipPassStationがtrueの時点で種別が設定されている必要がある)ため、
-    // そのままステートの駅を返す
-    setStationCache(station);
-  }, [skipPassStation, station, stations, withTrainTypes]);
+    const reversedStations =
+      selectedDirection === "INBOUND" ? stations : stations.slice().reverse();
 
-  return stationCache;
+    const curIndex = reversedStations.findIndex((s) => s.id === station?.id);
+    const stationsFromRange = reversedStations
+      .slice(0, curIndex)
+      .filter((s) => (skipPassStation ? !getIsPass(s) : true));
+    return stationsFromRange[stationsFromRange.length - 1] ?? null;
+  }, [selectedDirection, skipPassStation, station?.id, stations]);
+
+  if (skipPassStation || withTrainTypes) {
+    return withTrainTypeStation;
+  }
+
+  // NOTE: 路線が選択されていない場合stationはnullishになる
+  return station ?? stationFromState;
 };
-
-export default useCurrentStation;

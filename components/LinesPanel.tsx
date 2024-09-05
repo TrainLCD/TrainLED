@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { lineAtom } from "../atoms/line";
 import { stationAtom } from "../atoms/station";
-import { parenthesisRegexp } from "../constants/regexp";
+import { PARENTHESIS_REGEXP } from "../constants";
 import { Line } from "../generated/proto/stationapi_pb";
 import Button from "./Button";
 import { Container, Title } from "./LinesPanel.styled";
@@ -38,7 +38,7 @@ const LinesPanel = () => {
               >
                 {l.lineSymbols.length > 0 &&
                   `[${l.lineSymbols.map((sym) => sym?.symbol).join("/")}]`}
-                {l.nameShort.replace(parenthesisRegexp, "")}
+                {l.nameShort.replace(PARENTHESIS_REGEXP, "")}
               </Button>
             </ListItem>
           ))}
