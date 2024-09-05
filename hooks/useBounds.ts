@@ -93,8 +93,9 @@ const useBounds = (): {
       return { en: "", ja: "" };
     }
 
-    const switchedBounds =
-      selectedDirection === "INBOUND" ? bounds[0] : bounds[1];
+    const switchedBounds = (
+      selectedDirection === "INBOUND" ? bounds[0] : bounds[1]
+    ).slice(0, 2);
     const jaText = switchedBounds
       .filter((station) => station)
       .map((station) => station.name.replace(PARENTHESIS_REGEXP, ""))
