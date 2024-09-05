@@ -8,7 +8,7 @@ export default styled.button<{ bgColor?: string }>`
   padding: 12px;
   font-size: 1rem;
   font-family: var(--font-jfdot);
-  background-color: ${({ bgColor }) => bgColor || "#212121"};
+  background-color: ${({ bgColor }) => bgColor || "transparent"};
   width: 240px;
   cursor: pointer;
 

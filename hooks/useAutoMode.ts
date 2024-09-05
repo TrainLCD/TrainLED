@@ -7,15 +7,20 @@ import { stationAtom } from "../atoms/station";
 import {
   AUTO_MODE_RUNNING_DURATION,
   AUTO_MODE_WHOLE_DURATION,
-} from "../constants/autoMode";
-import dropEitherJunctionStation from "../utils/dropJunctionStation";
+} from "../constants";
+import { dropEitherJunctionStation } from "../utils";
+import { useCurrentLine } from "./useCurrentLine";
+import { useCurrentStation } from "./useCurrentStation";
 import { useLoopLine } from "./useLoopLine";
 import { useValueRef } from "./useValueRef";
 
-const useAutoMode = (enabled: boolean): void => {
-  const { stations: rawStations, station } = useAtomValue(stationAtom);
-  const { selectedLine, selectedDirection } = useAtomValue(lineAtom);
-  const setNavigation = useSetAtom(navigationAtom);
+export const useAutoMode = (enabled: boolean): void => {
+  const { stations: rawStations } = useAtomValue(stationAtom);
+  const { selectedDirection } = useAtomValue(lineAtom);
+  const setNavigationState = useSetAtom(navigationAtom);
+
+  const station = useCurrentStation();
+  const selectedLine = useCurrentLine();
 
   const stations = useMemo(
     () => dropEitherJunctionStation(rawStations, selectedDirection),
@@ -35,15 +40,6 @@ const useAutoMode = (enabled: boolean): void => {
 
   const { isLoopLine } = useLoopLine();
 
-  const cleanup = () => {
-    if (autoModeApproachingTimerRef.current) {
-      clearInterval(autoModeApproachingTimerRef.current);
-    }
-    if (autoModeArriveTimerRef.current) {
-      clearInterval(autoModeArriveTimerRef.current);
-    }
-  };
-
   const startApproachingTimer = useCallback(() => {
     if (
       !enabled ||
@@ -59,7 +55,7 @@ const useAutoMode = (enabled: boolean): void => {
         const index = autoModeInboundIndexRef.current;
 
         if (!index) {
-          setNavigation((prev) => ({
+          setNavigationState((prev) => ({
             ...prev,
             location: {
               timestamp: new Date().getTime(),
@@ -93,7 +89,7 @@ const useAutoMode = (enabled: boolean): void => {
           ]);
 
           if (center) {
-            setNavigation((prev) => ({
+            setNavigationState((prev) => ({
               ...prev,
               location: {
                 timestamp: new Date().getTime(),
@@ -113,7 +109,7 @@ const useAutoMode = (enabled: boolean): void => {
         const index = autoModeOutboundIndexRef.current;
 
         if (index === stations.length - 1) {
-          setNavigation((prev) => ({
+          setNavigationState((prev) => ({
             ...prev,
             location: {
               timestamp: new Date().getTime(),
@@ -128,6 +124,7 @@ const useAutoMode = (enabled: boolean): void => {
               },
             },
           }));
+
           return;
         }
 
@@ -147,7 +144,7 @@ const useAutoMode = (enabled: boolean): void => {
           ]);
 
           if (center) {
-            setNavigation((prev) => ({
+            setNavigationState((prev) => ({
               ...prev,
               location: {
                 timestamp: new Date().getTime(),
@@ -166,19 +163,24 @@ const useAutoMode = (enabled: boolean): void => {
       }
     };
 
+    intervalInternal();
     const interval = setInterval(intervalInternal, AUTO_MODE_RUNNING_DURATION);
 
     autoModeApproachingTimerRef.current = interval;
   }, [
+    autoModeInboundIndexRef,
+    autoModeOutboundIndexRef,
     enabled,
+    isLoopLine,
     selectedDirection,
     selectedLine,
-    autoModeInboundIndexRef,
+    setNavigationState,
     stations,
-    isLoopLine,
-    setNavigation,
-    autoModeOutboundIndexRef,
   ]);
+
+  useEffect(() => {
+    startApproachingTimer();
+  }, [startApproachingTimer]);
 
   const startArriveTimer = useCallback(() => {
     const direction = selectedDirection;
@@ -207,8 +209,9 @@ const useAutoMode = (enabled: boolean): void => {
         if (!index && isLoopLine) {
           setAutoModeInboundIndex(stations.length - 1);
         }
+
         if (next) {
-          setNavigation((prev) => ({
+          setNavigationState((prev) => ({
             ...prev,
             location: {
               timestamp: new Date().getTime(),
@@ -241,7 +244,7 @@ const useAutoMode = (enabled: boolean): void => {
         }
 
         if (next) {
-          setNavigation((prev) => ({
+          setNavigationState((prev) => ({
             ...prev,
             location: {
               timestamp: new Date().getTime(),
@@ -265,24 +268,28 @@ const useAutoMode = (enabled: boolean): void => {
     const interval = setInterval(intervalInternal, AUTO_MODE_WHOLE_DURATION);
     autoModeArriveTimerRef.current = interval;
   }, [
-    selectedDirection,
-    enabled,
-    selectedLine,
     autoModeInboundIndexRef,
-    stations,
-    isLoopLine,
-    setNavigation,
     autoModeOutboundIndexRef,
+    enabled,
+    isLoopLine,
+    selectedDirection,
+    selectedLine,
+    setNavigationState,
+    stations,
   ]);
 
   useEffect(() => {
-    startApproachingTimer();
     startArriveTimer();
-  }, [startApproachingTimer, startArriveTimer]);
+  }, [startArriveTimer]);
 
   useEffect(() => {
-    return cleanup;
-  }, []);
+    if (!selectedDirection) {
+      if (autoModeApproachingTimerRef.current) {
+        clearInterval(autoModeApproachingTimerRef.current);
+      }
+      if (autoModeArriveTimerRef.current) {
+        clearInterval(autoModeArriveTimerRef.current);
+      }
+    }
+  }, [selectedDirection]);
 };
-
-export default useAutoMode;

@@ -5,11 +5,11 @@ import styled from "styled-components";
 import { lineAtom } from "../atoms/line";
 import { navigationAtom } from "../atoms/navigation";
 import { stationAtom } from "../atoms/station";
-import { parenthesisRegexp } from "../constants/regexp";
+import { PARENTHESIS_REGEXP } from "../constants";
 import { Line, Station, StopCondition } from "../generated/proto/stationapi_pb";
 import useBounds from "../hooks/useBounds";
-import useCurrentLine from "../hooks/useCurrentLine";
-import useCurrentStation from "../hooks/useCurrentStation";
+import { useCurrentLine } from "../hooks/useCurrentLine";
+import { useCurrentStation } from "../hooks/useCurrentStation";
 import useCurrentTrainType from "../hooks/useCurrentTrainType";
 import { useIsLastStop } from "../hooks/useIsLastStop";
 import {
@@ -120,8 +120,8 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
         return { ja: "特急", en: "Limited Express" };
       default:
         return {
-          ja: trainType?.name?.replace(parenthesisRegexp, "") ?? "",
-          en: trainType?.nameRoman?.replace(parenthesisRegexp, "") ?? "",
+          ja: trainType?.name?.replace(PARENTHESIS_REGEXP, "") ?? "",
+          en: trainType?.nameRoman?.replace(PARENTHESIS_REGEXP, "") ?? "",
         };
     }
   }, [line, nextStation, selectedDirection, trainType]);
@@ -138,31 +138,31 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
       filteredLines.length > 1
         ? filteredLines
             .slice(0, filteredLines.length - 1)
-            .map((line) => line.nameRoman?.replace(parenthesisRegexp, ""))
+            .map((line) => line.nameRoman?.replace(PARENTHESIS_REGEXP, ""))
             .join(", the ")
         : filteredLines
-            .map((line) => line.nameRoman?.replace(parenthesisRegexp, ""))
+            .map((line) => line.nameRoman?.replace(PARENTHESIS_REGEXP, ""))
             .join("");
 
     if (filteredLines.length <= 1) {
       return {
         ja: filteredLines
-          .map((line) => line.nameShort.replace(parenthesisRegexp, ""))
+          .map((line) => line.nameShort.replace(PARENTHESIS_REGEXP, ""))
           .join("、")
-          .replace(parenthesisRegexp, ""),
+          .replace(PARENTHESIS_REGEXP, ""),
         en: headTextForEn,
       };
     }
 
     const tailTextForEn = filteredLines
       .slice(-1)[0]
-      ?.nameRoman?.replace(parenthesisRegexp, "");
+      ?.nameRoman?.replace(PARENTHESIS_REGEXP, "");
 
     return {
       ja: filteredLines
-        .map((line) => line.nameShort.replace(parenthesisRegexp, ""))
+        .map((line) => line.nameShort.replace(PARENTHESIS_REGEXP, ""))
         .join("、")
-        .replace(parenthesisRegexp, ""),
+        .replace(PARENTHESIS_REGEXP, ""),
       en: `${headTextForEn} and the ${tailTextForEn}`,
     };
   }, [nextStation]);
@@ -478,7 +478,7 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
         <InnerContainer>
           <TextContainer>
             <GreenText>
-              この電車は、{line.nameShort.replace(parenthesisRegexp, "")}
+              この電車は、{line.nameShort.replace(PARENTHESIS_REGEXP, "")}
             </GreenText>
             <HorizontalSpacer />
             {trainTypeText.ja ? (
@@ -496,7 +496,7 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
             <GreenText>です。</GreenText>
             <HorizontalSpacer wide />
             <GreenText>{`This is the ${line?.nameRoman?.replace(
-              parenthesisRegexp,
+              PARENTHESIS_REGEXP,
               ""
             )}`}</GreenText>
             <HorizontalSpacer />

@@ -1,23 +1,21 @@
 import { useAtomValue } from "jotai";
-import { navigationAtom } from "../atoms/navigation";
+import { useMemo } from "react";
 import { stationAtom } from "../atoms/station";
-import useCurrentLine from "./useCurrentLine";
-import useNextStations from "./useNextStations";
+import { useLoopLine } from "./useLoopLine";
+import { useNextStation } from "./useNextStation";
 
-export const useIsLastStop = () => {
-  const { station, stations } = useAtomValue(stationAtom);
-  const { arrived } = useAtomValue(navigationAtom);
+export const useIsLastStop = (): boolean => {
+  const { selectedBound } = useAtomValue(stationAtom);
+  const nextStation = useNextStation();
+  const { isLoopLine } = useLoopLine();
 
-  const currentLine = useCurrentLine();
-  const [, nextStation, afterNextStation] = useNextStations(
-    stations,
-    station,
-    currentLine
-  );
+  const isNextLastStop = useMemo(() => {
+    if (isLoopLine) {
+      return false;
+    }
 
-  if (!nextStation || (nextStation && !afterNextStation && !arrived)) {
-    return true;
-  }
+    return nextStation?.groupId === selectedBound?.groupId;
+  }, [isLoopLine, nextStation?.groupId, selectedBound?.groupId]);
 
-  return false;
+  return isNextLastStop;
 };

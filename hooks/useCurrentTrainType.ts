@@ -2,7 +2,7 @@ import { useAtomValue } from "jotai";
 import { useMemo } from "react";
 import { trainTypeAtom } from "../atoms/trainType";
 import { TrainType, TrainTypeKind } from "../generated/proto/stationapi_pb";
-import useCurrentLine from "./useCurrentLine";
+import { useCurrentLine } from "./useCurrentLine";
 
 const useCurrentTrainType = (): TrainType | null => {
   const { selectedTrainType } = useAtomValue(trainTypeAtom);

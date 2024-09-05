@@ -32,7 +32,7 @@ const useUpdateNearbyStation = (): {
       longitude: location?.coords?.longitude,
       limit: 1,
     },
-    { enabled: !!location?.coords && !station }
+    { enabled: !!location && !station }
   );
 
   const queryClient = useQueryClient();

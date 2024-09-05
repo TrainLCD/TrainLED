@@ -1,4 +1,4 @@
-import { PREFECTURES_JA, PREFECTURES_ROMAN } from "../constants/province";
+import { PREFECTURES_JA, PREFECTURES_ROMAN } from "../constants";
 import { Station } from "../generated/proto/stationapi_pb";
 
 export const groupStations = (stations: Station[]): Station[] => {

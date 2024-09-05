@@ -42,7 +42,7 @@ export const TrainTypeSelect = styled.select`
 `;
 
 export const TrainTypeOption = styled.option`
-  background-color: ${({ theme }) => theme.bgColor || "#212121"};
+  background-color: #212121;
   color: white;
 `;
 

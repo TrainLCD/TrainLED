@@ -11,7 +11,6 @@ export const SearchStationAnchor = styled(Link)`
   padding: 12px;
   font-size: 1rem;
   font-family: var(--font-jfdot);
-  background-color: #212121;
   width: 240px;
   cursor: pointer;
   align-self: center;

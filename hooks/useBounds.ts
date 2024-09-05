@@ -2,22 +2,26 @@ import { useAtomValue } from "jotai";
 import { useMemo } from "react";
 import { lineAtom } from "../atoms/line";
 import { stationAtom } from "../atoms/station";
-import { trainTypeAtom } from "../atoms/trainType";
-import { parenthesisRegexp } from "../constants/regexp";
+import {
+  PARENTHESIS_REGEXP,
+  TOEI_OEDO_LINE_ID,
+  TOEI_OEDO_LINE_MAJOR_STATIONS_ID,
+} from "../constants";
 import { Station } from "../generated/proto/stationapi_pb";
 import { getIsLoopLine } from "../utils/loopLine";
-import useCurrentLine from "./useCurrentLine";
-import useCurrentStation from "./useCurrentStation";
+import { useCurrentLine } from "./useCurrentLine";
+import { useCurrentStation } from "./useCurrentStation";
+import useCurrentTrainType from "./useCurrentTrainType";
 import { useLoopLine } from "./useLoopLine";
 
 const useBounds = (): {
-  bounds: { inbound: Station[]; outbound: Station[] };
-  boundText: { en: string; ja: string };
+  bounds: [Station[], Station[]];
+  directionalStops: Station[];
+  boundText: { ja: string; en: string };
 } => {
-  const { stations } = useAtomValue(stationAtom);
+  const { stations, selectedBound } = useAtomValue(stationAtom);
   const { selectedDirection } = useAtomValue(lineAtom);
-  const { selectedTrainType } = useAtomValue(trainTypeAtom);
-
+  const trainType = useCurrentTrainType();
   const currentStation = useCurrentStation();
   const currentLine = useCurrentLine();
 
@@ -27,38 +31,61 @@ const useBounds = (): {
     outboundStationsForLoopLine,
   } = useLoopLine();
 
-  const bounds = useMemo((): { inbound: Station[]; outbound: Station[] } => {
+  const bounds = useMemo((): [Station[], Station[]] => {
     const inboundStation = stations[stations.length - 1];
     const outboundStation = stations[0];
-    if (!inboundStation || !outboundStation) {
-      return { inbound: [], outbound: [] };
+
+    if (TOEI_OEDO_LINE_ID === currentLine?.id) {
+      const stationIndex = stations.findIndex(
+        (s) => s.groupId === currentStation?.groupId
+      );
+      const oedoLineInboundStops = stations
+        .slice(stationIndex - 1, stations.length)
+        .filter(
+          (s) =>
+            s.groupId !== currentStation?.groupId &&
+            TOEI_OEDO_LINE_MAJOR_STATIONS_ID.includes(s.id)
+        );
+      const oedoLineOutboundStops = stations
+        .slice(0, stationIndex - 1)
+        .reverse()
+        .filter(
+          (s) =>
+            s.groupId !== currentStation?.groupId &&
+            TOEI_OEDO_LINE_MAJOR_STATIONS_ID.includes(s.id)
+        );
+
+      return [oedoLineInboundStops, oedoLineOutboundStops];
     }
 
-    if (isLoopLine && !selectedTrainType) {
-      return {
-        inbound: inboundStationsForLoopLine,
-        outbound: outboundStationsForLoopLine,
-      };
+    if (isLoopLine && !trainType) {
+      return [inboundStationsForLoopLine, outboundStationsForLoopLine];
     }
 
     if (
-      inboundStation?.groupId !== currentStation?.groupId ||
+      inboundStation?.groupId !== currentStation?.groupId &&
       outboundStation?.groupId !== currentStation?.groupId
     ) {
-      return {
-        inbound: [inboundStation],
-        outbound: [outboundStation],
-      };
+      return [[inboundStation], [outboundStation]];
     }
 
-    return { inbound: [], outbound: [] };
+    if (inboundStation?.groupId !== currentStation?.groupId) {
+      return [[inboundStation], []];
+    }
+
+    if (outboundStation?.groupId !== currentStation?.groupId) {
+      return [[], [outboundStation]];
+    }
+
+    return [[], []];
   }, [
+    currentLine?.id,
     currentStation?.groupId,
     inboundStationsForLoopLine,
     isLoopLine,
     outboundStationsForLoopLine,
-    selectedTrainType,
     stations,
+    trainType,
   ]);
 
   const boundText = useMemo(() => {
@@ -67,16 +94,16 @@ const useBounds = (): {
     }
 
     const switchedBounds =
-      selectedDirection === "INBOUND" ? bounds.inbound : bounds.outbound;
+      selectedDirection === "INBOUND" ? bounds[0] : bounds[1];
     const jaText = switchedBounds
       .filter((station) => station)
-      .map((station) => station.name.replace(parenthesisRegexp, ""))
+      .map((station) => station.name.replace(PARENTHESIS_REGEXP, ""))
       .join("・");
     const enText = switchedBounds
       .filter((station) => station)
       .map(
         (station) =>
-          `${station.nameRoman?.replace(parenthesisRegexp, "")}${
+          `${station.nameRoman?.replace(PARENTHESIS_REGEXP, "")}${
             station.stationNumbers[0]?.stationNumber
               ? `(${station.stationNumbers[0]?.stationNumber})`
               : ""
@@ -84,20 +111,22 @@ const useBounds = (): {
       )
       .join(" and ");
     return {
-      ja: `${jaText}${
-        getIsLoopLine(currentLine, selectedTrainType) ? "方面" : ""
-      }`,
+      ja: `${jaText}${getIsLoopLine(currentLine, trainType) ? "方面" : ""}`,
       en: enText,
     };
-  }, [
-    bounds.inbound,
-    bounds.outbound,
-    currentLine,
-    selectedDirection,
-    selectedTrainType,
-  ]);
+  }, [bounds, currentLine, selectedDirection, trainType]);
 
-  return { bounds, boundText };
+  const directionalStops = useMemo(() => {
+    const slicedBounds = bounds[selectedDirection === "INBOUND" ? 0 : 1]
+      .filter((s) => !!s)
+      .slice(0, 2);
+    if (selectedBound && !slicedBounds.length) {
+      return [selectedBound];
+    }
+    return slicedBounds;
+  }, [bounds, selectedBound, selectedDirection]);
+
+  return { bounds, directionalStops, boundText };
 };
 
 export default useBounds;

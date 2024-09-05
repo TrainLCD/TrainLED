@@ -1,1 +1,1 @@
-export const parenthesisRegexp = /\([^()]*\)/g;
+export const PARENTHESIS_REGEXP = /\([^()]*\)/g;
