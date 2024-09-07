@@ -7,6 +7,7 @@ import Container from "../../components/Container";
 import HorizontalSpacer from "../../components/HorizontalSpacer";
 import MainMarquee from "../../components/MainMarquee";
 import MainTopText from "../../components/MainTopText";
+import { useUpdateLocation } from "../../components/useUpdateLocation";
 import { useAfterNextStation } from "../../hooks/useAfterNextStation";
 import { useAutoMode } from "../../hooks/useAutoMode";
 import useCurrentLanguageState from "../../hooks/useCurrentLanguageState";
@@ -23,6 +24,7 @@ export const PageContent = () => {
   const langState = useCurrentLanguageState();
   const router = useRouter();
 
+  useUpdateLocation();
   useRefreshStation();
   useAutoMode(autoModeEnabled);
 
