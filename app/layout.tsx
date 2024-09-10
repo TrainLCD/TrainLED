@@ -7,7 +7,8 @@ import Provider from "./provider";
 
 export const metadata: Metadata = {
   title: "TrainLED",
-  description: "A joking navigation app.",
+  description:
+    "TrainLEDは、日本全国の鉄道路線で使える新感覚のナビゲーションウェブアプリです。",
   appleWebApp: {
     title: "TrainLED",
     statusBarStyle: "black-translucent",

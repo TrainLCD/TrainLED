@@ -4,7 +4,8 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "TrainLED",
     short_name: "TrainLED",
-    description: "A joking navigation app.",
+    description:
+      "TrainLEDは、日本全国の鉄道路線で使える新感覚のナビゲーションウェブアプリです。",
     start_url: "/",
     theme_color: "#ffffff",
     background_color: "#000000",
