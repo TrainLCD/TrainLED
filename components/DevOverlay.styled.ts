@@ -11,6 +11,6 @@ export const Container = styled.div`
 
 export const Typography = styled.p`
   line-height:0.5;
-  font-size: 14px;
-  padding: 0 14px
+  font-size: 8px;
+  padding: 0 8px;
 `;
