@@ -3,6 +3,7 @@ import { useAtom, useSetAtom } from "jotai";
 import { useEffect, useMemo } from "react";
 import { navigationAtom } from "../atoms/navigation";
 import { stationAtom } from "../atoms/station";
+import { ARRIVED_MAXIMUM_SPEED } from "../constants/threshold";
 import getIsPass from "../utils/isPass";
 import { useNearestStation } from "./useNearestStation";
 import { useNextStation } from "./useNextStation";
@@ -22,8 +23,22 @@ export const useRefreshStation = (): void => {
     }
 
     const {
-      coords: { latitude, longitude },
+      coords: { latitude, longitude, speed },
     } = location;
+
+    if (speed && !getIsPass(nearestStation)) {
+      const speedKMH = (speed * 3600) / 1000;
+      return (
+        isPointWithinRadius(
+          { latitude, longitude },
+          {
+            latitude: nearestStation.latitude,
+            longitude: nearestStation.longitude,
+          },
+          arrivedThreshold,
+        ) && speedKMH < ARRIVED_MAXIMUM_SPEED
+      );
+    }
 
     return isPointWithinRadius(
       { latitude, longitude },
@@ -31,7 +46,7 @@ export const useRefreshStation = (): void => {
         latitude: nearestStation.latitude,
         longitude: nearestStation.longitude,
       },
-      arrivedThreshold
+      arrivedThreshold,
     );
   }, [arrivedThreshold, location, nearestStation]);
 
@@ -50,7 +65,7 @@ export const useRefreshStation = (): void => {
         latitude: nextStation.latitude,
         longitude: nextStation.longitude,
       },
-      approachingThreshold
+      approachingThreshold,
     );
   }, [approachingThreshold, location, nextStation]);
 
@@ -61,10 +76,12 @@ export const useRefreshStation = (): void => {
 
     setStation((prev) => ({
       ...prev,
-      passingStation:
-        isArrived && getIsPass(nearestStation) ? nearestStation : null,
-      station:
-        isArrived && !getIsPass(nearestStation) ? nearestStation : prev.station,
+      passingStation: isArrived && getIsPass(nearestStation)
+        ? nearestStation
+        : null,
+      station: isArrived && !getIsPass(nearestStation)
+        ? nearestStation
+        : prev.station,
     }));
     setNavigation((prev) => ({
       ...prev,
