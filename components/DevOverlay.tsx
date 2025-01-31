@@ -1,15 +1,12 @@
 "use client";
 import { useAtomValue } from "jotai";
-import { useMemo } from "react";
+import { FC, useMemo } from "react";
 import { navigationAtom } from "../atoms/navigation";
 import { useThreshold } from "../hooks/useThreshold";
 import { Container, Typography } from "./DevOverlay.styled";
 
 export const DevOverlay: FC = () => {
     const { location } = useAtomValue(navigationAtom);
-    if (!location) {
-        return null; // または適切なローディング/エラー表示
-    }
 
     const { approachingThreshold, arrivedThreshold } = useThreshold();
     const speedKMH = useMemo(
