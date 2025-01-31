@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { useAtomValue } from "jotai";
 import { useMemo } from "react";
 import { navigationAtom } from "../atoms/navigation";
@@ -11,37 +11,34 @@ export const DevOverlay = () => {
     const { approachingThreshold, arrivedThreshold } = useThreshold();
 
     const speedKMH = useMemo(
-        () =>
-            (location?.coords.speed &&
-                Math.round((location.coords.speed * 3600) / 1000)) ?? 0,
+        () => (location?.coords.speed &&
+            Math.round((location.coords.speed * 3600) / 1000)),
         [location?.coords.speed],
     );
 
     return (
         <Container>
-            <Typography>
+            <Typography role="heading" aria-level={1}>
                 TrainLED DO
             </Typography>
-            <Typography>
-                {`Latitude: ${location?.coords.latitude ?? ""}`}
-            </Typography>
-            <Typography>
-                {`Longitude: ${location?.coords.longitude ?? ""}`}
+
+            <Typography aria-label="Latitude">
+                Latitude: {location?.coords.latitude ?? "N/A"}
             </Typography>
 
-            <Typography>
-                {`Accuracy: ${location?.coords.accuracy ?? ""}m`}
+            <Typography aria-label="Longitude">
+                Longitude: {location?.coords.longitude ?? "N/A"}
             </Typography>
 
-            <Typography>
-                Speed: {speedKMH}
-                km/h
+            <Typography aria-label="Speed(km/h)">
+                Speed: {speedKMH ? `${speedKMH}km/h` : "N/A"}
             </Typography>
 
-            <Typography>
+            <Typography aria-label="Approaching threshold(m)">
                 Approaching: {approachingThreshold.toLocaleString()}m
             </Typography>
-            <Typography>
+
+            <Typography aria-label="Arrived threshold(m)">
                 Arrived: {arrivedThreshold.toLocaleString()}m
             </Typography>
         </Container>
