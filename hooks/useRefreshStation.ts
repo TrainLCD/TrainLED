@@ -26,7 +26,7 @@ export const useRefreshStation = (): void => {
       coords: { latitude, longitude, speed },
     } = location;
 
-    const speedKMH = (speed ?? 0 * 3600) / 1000;
+    const speedKMH = ((speed ?? 0) * 3600) / 1000;
 
     if (!getIsPass(nearestStation)) {
       return (
