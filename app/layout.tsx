@@ -1,6 +1,7 @@
 import type { Viewport } from "next";
 import { Metadata } from "next";
 import localFont from "next/font/local";
+import { DevOverlay } from "../components/DevOverlay";
 import StyledComponentsRegistry from "../lib/registry";
 import "./global.css";
 import Provider from "./provider";
@@ -35,7 +36,10 @@ export default function RootLayout({
     <html lang="ja" className={jfDotFont.className}>
       <body>
         <Provider>
-          <StyledComponentsRegistry>{children}</StyledComponentsRegistry>
+          <StyledComponentsRegistry>
+            <DevOverlay />
+            {children}
+          </StyledComponentsRegistry>
         </Provider>
       </body>
     </html>
