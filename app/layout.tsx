@@ -36,7 +36,10 @@ export default function RootLayout({
     <html lang="ja" className={jfDotFont.className}>
       <body>
         <Provider>
-          <StyledComponentsRegistry><DevOverlay />{children}</StyledComponentsRegistry>
+          <StyledComponentsRegistry>
+            <DevOverlay />
+            {children}
+          </StyledComponentsRegistry>
         </Provider>
       </body>
     </html>
