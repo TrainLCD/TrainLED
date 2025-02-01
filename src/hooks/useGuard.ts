@@ -13,7 +13,8 @@ export const useGuard = () => {
   useEffect(() => {
     if (!station) {
       setIsLoading(true);
-      router.replace('/')
+      router
+        .replace('/')
         .catch((error) => {
           console.error('Navigation failed:', error);
           // エラー処理を追加

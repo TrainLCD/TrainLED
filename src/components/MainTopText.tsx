@@ -1,12 +1,11 @@
-import type { Station } from '@/generated/src/proto/stationapi_pb';
-import { useAtomValue } from 'jotai';
-import { nanoid } from 'nanoid';
-import { useMemo } from 'react';
-import styled from 'styled-components';
-import { navigationAtom } from '../atoms/navigation';
-import { stationAtom } from '../atoms/station';
-import type { LanguageState } from '../hooks/useCurrentLanguageState';
-import { useCurrentStation } from '../hooks/useCurrentStation';
+import type { Station } from "@/generated/src/proto/stationapi_pb";
+import { useAtomValue } from "jotai";
+import { useMemo } from "react";
+import styled from "styled-components";
+import { navigationAtom } from "../atoms/navigation";
+import { stationAtom } from "../atoms/station";
+import type { LanguageState } from "../hooks/useCurrentLanguageState";
+import { useCurrentStation } from "../hooks/useCurrentStation";
 
 const Container = styled.div`
   width: 100%;
@@ -30,7 +29,7 @@ const GreenText = styled.p<{ bound?: boolean }>`
   width: 100%;
   max-width: 22.5%;
   color: green;
-  font-size: ${({ bound }) => (bound ? '7.5vw' : '5vv')};
+  font-size: ${({ bound }) => (bound ? "7.5vw" : "5vv")};
   margin: 0;
 `;
 
@@ -83,64 +82,77 @@ const SwitchedStationText = ({ nextStation, language }: Props) => {
 
   const currentStationNameWithKey = useMemo(
     () =>
-      currentStation.name.split('').map((c, i) => ({
+      currentStation.name.split("").map((c, i) => ({
         key: `${currentStation.name}-${i}`,
         value: c,
       })),
-    [currentStation.name]
+    [currentStation.name],
   );
   const currentStationNameKWithKey = useMemo(
     () =>
       currentStation.nameKatakana
-        .split('')
-        .map((c) => ({ key: nanoid(), value: c })),
-    [currentStation.nameKatakana]
+        .split("")
+        .map((c, i) => ({
+          key: `${currentStation.nameKatakana}-${i}`,
+          value: c,
+        })),
+    [currentStation.nameKatakana],
   );
   const nextStationNameWithKey = useMemo(
-    () => nextStation.name.split('').map((c) => ({ key: nanoid(), value: c })),
-    [nextStation.name]
+    () =>
+      nextStation.name.split("").map((c, i) => ({
+        key: `${nextStation.name}-${i}`,
+        value: c,
+      })),
+    [nextStation.name],
   );
   const nextStationNameKWithKey = useMemo(
     () =>
-      nextStation.nameKatakana.split('').map((c) => ({
-        key: nanoid(),
+      nextStation.nameKatakana.split("").map((c, i) => ({
+        key: `${nextStation.nameKatakana}-${i}`,
         value: c,
       })),
-    [nextStation.nameKatakana]
+    [nextStation.nameKatakana],
   );
 
   if ((arrived || !nextStation) && currentStation && !passingStation) {
     return (
       <TextContainer>
-        {language === 'ja' ? (
-          <OrangeTextContainer>
-            {currentStationNameWithKey.map(({ key, value }) => (
-              <OrangeText key={key}>{value}</OrangeText>
-            ))}
-          </OrangeTextContainer>
-        ) : null}
-        {language === 'jaKana' ? (
-          <OrangeTextContainer>
-            {currentStationNameKWithKey.map(({ key, value }) => (
-              <OrangeText key={key}>{value}</OrangeText>
-            ))}
-          </OrangeTextContainer>
-        ) : null}
-        {language === 'en' ? (
-          <>
-            <StationInfoGroup>
-              <OrangeTextContainer>
-                <OrangeText>{currentStation.nameRoman}</OrangeText>
-              </OrangeTextContainer>
+        {language === "ja"
+          ? (
+            <OrangeTextContainer>
+              {currentStationNameWithKey.map(({ key, value }) => (
+                <OrangeText key={key}>{value}</OrangeText>
+              ))}
+            </OrangeTextContainer>
+          )
+          : null}
+        {language === "jaKana"
+          ? (
+            <OrangeTextContainer>
+              {currentStationNameKWithKey.map(({ key, value }) => (
+                <OrangeText key={key}>{value}</OrangeText>
+              ))}
+            </OrangeTextContainer>
+          )
+          : null}
+        {language === "en"
+          ? (
+            <>
+              <StationInfoGroup>
+                <OrangeTextContainer>
+                  <OrangeText>{currentStation.nameRoman}</OrangeText>
+                </OrangeTextContainer>
 
-              <NumberingText>
-                {currentStation.stationNumbers.length
-                  ? `(${currentStation.stationNumbers[0]?.stationNumber})`
-                  : ''}
-              </NumberingText>
-            </StationInfoGroup>
-          </>
-        ) : null}
+                <NumberingText>
+                  {currentStation.stationNumbers.length
+                    ? `(${currentStation.stationNumbers[0]?.stationNumber})`
+                    : ""}
+                </NumberingText>
+              </StationInfoGroup>
+            </>
+          )
+          : null}
       </TextContainer>
     );
   }
@@ -148,42 +160,48 @@ const SwitchedStationText = ({ nextStation, language }: Props) => {
   if (approaching && nextStation) {
     return (
       <TextContainer>
-        {language === 'ja' ? (
-          <>
-            <StateText>まもなく</StateText>
-            <OrangeTextContainer>
-              {nextStationNameWithKey.map(({ key, value }) => (
-                <OrangeText key={key}>{value}</OrangeText>
-              ))}
-            </OrangeTextContainer>
-          </>
-        ) : null}
-        {language === 'jaKana' ? (
-          <>
-            <StateText>まもなく</StateText>
-            <OrangeTextContainer>
-              {nextStationNameKWithKey.map(({ key, value }) => (
-                <OrangeText key={key}>{value}</OrangeText>
-              ))}
-            </OrangeTextContainer>
-          </>
-        ) : null}
-        {language === 'en' ? (
-          <>
-            <StateText>Soon</StateText>
-            <StationInfoGroup>
+        {language === "ja"
+          ? (
+            <>
+              <StateText>まもなく</StateText>
               <OrangeTextContainer>
-                <OrangeText>{nextStation.nameRoman}</OrangeText>
+                {nextStationNameWithKey.map(({ key, value }) => (
+                  <OrangeText key={key}>{value}</OrangeText>
+                ))}
               </OrangeTextContainer>
+            </>
+          )
+          : null}
+        {language === "jaKana"
+          ? (
+            <>
+              <StateText>まもなく</StateText>
+              <OrangeTextContainer>
+                {nextStationNameKWithKey.map(({ key, value }) => (
+                  <OrangeText key={key}>{value}</OrangeText>
+                ))}
+              </OrangeTextContainer>
+            </>
+          )
+          : null}
+        {language === "en"
+          ? (
+            <>
+              <StateText>Soon</StateText>
+              <StationInfoGroup>
+                <OrangeTextContainer>
+                  <OrangeText>{nextStation.nameRoman}</OrangeText>
+                </OrangeTextContainer>
 
-              <NumberingText>
-                {nextStation.stationNumbers.length
-                  ? `(${nextStation.stationNumbers[0]?.stationNumber})`
-                  : ''}
-              </NumberingText>
-            </StationInfoGroup>
-          </>
-        ) : null}
+                <NumberingText>
+                  {nextStation.stationNumbers.length
+                    ? `(${nextStation.stationNumbers[0]?.stationNumber})`
+                    : ""}
+                </NumberingText>
+              </StationInfoGroup>
+            </>
+          )
+          : null}
       </TextContainer>
     );
   }
@@ -193,42 +211,48 @@ const SwitchedStationText = ({ nextStation, language }: Props) => {
   }
   return (
     <TextContainer>
-      {language === 'ja' ? (
-        <>
-          <StateText>次は</StateText>
-          <OrangeTextContainer>
-            {nextStationNameWithKey.map(({ key, value }) => (
-              <OrangeText key={key}>{value}</OrangeText>
-            ))}
-          </OrangeTextContainer>
-        </>
-      ) : null}
-      {language === 'jaKana' ? (
-        <>
-          <StateText>次は</StateText>
-          <OrangeTextContainer>
-            {nextStationNameKWithKey.map(({ key, value }) => (
-              <OrangeText key={key}>{value}</OrangeText>
-            ))}
-          </OrangeTextContainer>
-        </>
-      ) : null}
-      {language === 'en' ? (
-        <>
-          <StateText>Next</StateText>
-          <StationInfoGroup>
+      {language === "ja"
+        ? (
+          <>
+            <StateText>次は</StateText>
             <OrangeTextContainer>
-              <OrangeText>{nextStation.nameRoman}</OrangeText>
+              {nextStationNameWithKey.map(({ key, value }) => (
+                <OrangeText key={key}>{value}</OrangeText>
+              ))}
             </OrangeTextContainer>
+          </>
+        )
+        : null}
+      {language === "jaKana"
+        ? (
+          <>
+            <StateText>次は</StateText>
+            <OrangeTextContainer>
+              {nextStationNameKWithKey.map(({ key, value }) => (
+                <OrangeText key={key}>{value}</OrangeText>
+              ))}
+            </OrangeTextContainer>
+          </>
+        )
+        : null}
+      {language === "en"
+        ? (
+          <>
+            <StateText>Next</StateText>
+            <StationInfoGroup>
+              <OrangeTextContainer>
+                <OrangeText>{nextStation.nameRoman}</OrangeText>
+              </OrangeTextContainer>
 
-            <NumberingText>
-              {nextStation.stationNumbers.length
-                ? `(${nextStation.stationNumbers[0]?.stationNumber})`
-                : ''}
-            </NumberingText>
-          </StationInfoGroup>
-        </>
-      ) : null}
+              <NumberingText>
+                {nextStation.stationNumbers.length
+                  ? `(${nextStation.stationNumbers[0]?.stationNumber})`
+                  : ""}
+              </NumberingText>
+            </StationInfoGroup>
+          </>
+        )
+        : null}
     </TextContainer>
   );
 };
