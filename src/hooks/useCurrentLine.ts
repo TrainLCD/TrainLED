@@ -14,12 +14,8 @@ export const useCurrentLine = () => {
       (selectedDirection === 'INBOUND'
         ? stations.slice().reverse()
         : stations
-      ).find(
-        (rs) =>
-          rs.groupId === currentStation?.groupId ||
-          rs.line?.id === selectedLine?.id
-      ),
-    [currentStation?.groupId, selectedDirection, selectedLine?.id, stations]
+      ).find((rs) => rs.groupId === currentStation?.groupId),
+    [currentStation?.groupId, selectedDirection, stations]
   );
 
   // NOTE: selectedLineがnullishの時はcurrentLineもnullishであってほしい
