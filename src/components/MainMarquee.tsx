@@ -2,28 +2,28 @@ import {
   type Line,
   type Station,
   StopCondition,
-} from "@/generated/src/proto/stationapi_pb";
-import { useAtomValue } from "jotai";
-import { useMemo } from "react";
-import Marquee from "react-fast-marquee";
-import styled from "styled-components";
-import { lineAtom } from "../atoms/line";
-import { navigationAtom } from "../atoms/navigation";
-import { stationAtom } from "../atoms/station";
-import { PARENTHESIS_REGEXP } from "../constants";
-import useBounds from "../hooks/useBounds";
-import { useCurrentLine } from "../hooks/useCurrentLine";
-import { useCurrentStation } from "../hooks/useCurrentStation";
-import useCurrentTrainType from "../hooks/useCurrentTrainType";
-import { useIsLastStop } from "../hooks/useIsLastStop";
+} from '@/generated/src/proto/stationapi_pb';
+import { useAtomValue } from 'jotai';
+import { useMemo } from 'react';
+import Marquee from 'react-fast-marquee';
+import styled from 'styled-components';
+import { lineAtom } from '../atoms/line';
+import { navigationAtom } from '../atoms/navigation';
+import { stationAtom } from '../atoms/station';
+import { PARENTHESIS_REGEXP } from '../constants';
+import useBounds from '../hooks/useBounds';
+import { useCurrentLine } from '../hooks/useCurrentLine';
+import { useCurrentStation } from '../hooks/useCurrentStation';
+import useCurrentTrainType from '../hooks/useCurrentTrainType';
+import { useIsLastStop } from '../hooks/useIsLastStop';
 import {
   getIsLoopLine,
   getIsMeijoLine,
   getIsOsakaLoopLine,
   getIsYamanoteLine,
-} from "../utils/loopLine";
-import { getIsLocal, getTrainTypeString } from "../utils/trainTypeString";
-import HorizontalSpacer from "./HorizontalSpacer";
+} from '../utils/loopLine';
+import { getIsLocal, getTrainTypeString } from '../utils/trainTypeString';
+import HorizontalSpacer from './HorizontalSpacer';
 
 const InnerContainer = styled.div`
   display: flex;
@@ -81,7 +81,7 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
   const trainType = useCurrentTrainType();
 
   const scrollSpeed = (() => {
-    if (typeof window === "undefined") {
+    if (typeof window === 'undefined') {
       return;
     }
     const computedScrollSpeed = window.innerWidth / 2;
@@ -103,15 +103,14 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
     ) {
       if (getIsMeijoLine(line.id)) {
         return {
-          ja: selectedDirection === "INBOUND" ? "左回り" : "右回り",
-          en: selectedDirection === "INBOUND"
-            ? "Counterclockwise"
-            : "Clockwise",
+          ja: selectedDirection === 'INBOUND' ? '左回り' : '右回り',
+          en:
+            selectedDirection === 'INBOUND' ? 'Counterclockwise' : 'Clockwise',
         };
       }
       return {
-        ja: selectedDirection === "INBOUND" ? "内回り" : "外回り",
-        en: selectedDirection === "INBOUND" ? "Counterclockwise" : "Clockwise",
+        ja: selectedDirection === 'INBOUND' ? '内回り' : '外回り',
+        en: selectedDirection === 'INBOUND' ? 'Counterclockwise' : 'Clockwise',
       };
     }
 
@@ -119,60 +118,61 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
       nextStation &&
       getTrainTypeString(line, nextStation, selectedDirection)
     ) {
-      case "rapid":
-        return { ja: "快速", en: "Rapid" };
-      case "ltdexp":
-        return { ja: "特急", en: "Limited Express" };
+      case 'rapid':
+        return { ja: '快速', en: 'Rapid' };
+      case 'ltdexp':
+        return { ja: '特急', en: 'Limited Express' };
       default:
         return {
-          ja: trainType?.name?.replace(PARENTHESIS_REGEXP, "") ?? "",
-          en: trainType?.nameRoman?.replace(PARENTHESIS_REGEXP, "") ?? "",
+          ja: trainType?.name?.replace(PARENTHESIS_REGEXP, '') ?? '',
+          en: trainType?.nameRoman?.replace(PARENTHESIS_REGEXP, '') ?? '',
         };
     }
   }, [line, nextStation, selectedDirection, trainType]);
 
   const transferText = useMemo<{ ja: string; en: string }>(() => {
     if (!nextStation) {
-      return { ja: "", en: "" };
+      return { ja: '', en: '' };
     }
 
     const filteredLines = nextStation.lines.filter(
-      (line) => line.id !== nextStation.line?.id,
+      (line) => line.id !== nextStation.line?.id
     );
-    const headTextForEn = filteredLines.length > 1
-      ? filteredLines
-        .slice(0, filteredLines.length - 1)
-        .map((line) => line.nameRoman?.replace(PARENTHESIS_REGEXP, ""))
-        .join(", the ")
-      : filteredLines
-        .map((line) => line.nameRoman?.replace(PARENTHESIS_REGEXP, ""))
-        .join("");
+    const headTextForEn =
+      filteredLines.length > 1
+        ? filteredLines
+            .slice(0, filteredLines.length - 1)
+            .map((line) => line.nameRoman?.replace(PARENTHESIS_REGEXP, ''))
+            .join(', the ')
+        : filteredLines
+            .map((line) => line.nameRoman?.replace(PARENTHESIS_REGEXP, ''))
+            .join('');
 
     if (filteredLines.length <= 1) {
       return {
         ja: filteredLines
-          .map((line) => line.nameShort.replace(PARENTHESIS_REGEXP, ""))
-          .join("、")
-          .replace(PARENTHESIS_REGEXP, ""),
+          .map((line) => line.nameShort.replace(PARENTHESIS_REGEXP, ''))
+          .join('、')
+          .replace(PARENTHESIS_REGEXP, ''),
         en: headTextForEn,
       };
     }
 
     const tailTextForEn = filteredLines
       .slice(-1)[0]
-      ?.nameRoman?.replace(PARENTHESIS_REGEXP, "");
+      ?.nameRoman?.replace(PARENTHESIS_REGEXP, '');
 
     return {
       ja: filteredLines
-        .map((line) => line.nameShort.replace(PARENTHESIS_REGEXP, ""))
-        .join("、")
-        .replace(PARENTHESIS_REGEXP, ""),
+        .map((line) => line.nameShort.replace(PARENTHESIS_REGEXP, ''))
+        .join('、')
+        .replace(PARENTHESIS_REGEXP, ''),
       en: `${headTextForEn} and the ${tailTextForEn}`,
     };
   }, [nextStation]);
 
-  const isLocal = getIsLocal(trainType) ||
-    getIsLoopLine(currentLine, trainType);
+  const isLocal =
+    getIsLocal(trainType) || getIsLoopLine(currentLine, trainType);
 
   if (passingStation) {
     return (
@@ -194,7 +194,7 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
                 {passingStation.nameRoman}
                 {passingStation.stationNumbers.length
                   ? `(${passingStation.stationNumbers[0]?.stationNumber})`
-                  : ""}
+                  : ''}
               </OrangeText>
               <HorizontalSpacer />
               <GreenText>Station.</GreenText>
@@ -219,8 +219,8 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
               <GreenText>です。</GreenText>
               <HorizontalSpacer />
               {currentStation.lines.filter(
-                    (line) => line.id !== currentStation.line?.id,
-                  ).length > 0 && (
+                (line) => line.id !== currentStation.line?.id
+              ).length > 0 && (
                 <>
                   <OrangeText>{transferText.ja}</OrangeText>
                   <HorizontalSpacer />
@@ -242,14 +242,14 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
                 {currentStation.nameRoman}
                 {currentStation.stationNumbers.length
                   ? `(${currentStation.stationNumbers[0]?.stationNumber})`
-                  : ""}
+                  : ''}
               </OrangeText>
               <HorizontalSpacer />
               <CrimsonText>last stop</CrimsonText>
               <GreenText>.</GreenText>
               {currentStation.lines.filter(
-                    (line) => line.id !== currentStation.line?.id,
-                  ).length > 0 && (
+                (line) => line.id !== currentStation.line?.id
+              ).length > 0 && (
                 <>
                   <HorizontalSpacer />
                   <GreenText>Please change here for</GreenText>
@@ -279,39 +279,35 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
               <HorizontalSpacer />
               <OrangeText>{nextStation.name}</OrangeText>
               <HorizontalSpacer />
-              {!afterNextStation
-                ? (
-                  <>
-                    <HorizontalSpacer />
-                    <CrimsonText>終点</CrimsonText>
-                    <HorizontalSpacer />
-                  </>
-                )
-                : null}
+              {!afterNextStation ? (
+                <>
+                  <HorizontalSpacer />
+                  <CrimsonText>終点</CrimsonText>
+                  <HorizontalSpacer />
+                </>
+              ) : null}
               <GreenText>です。</GreenText>
-              {afterNextStation
-                ? (
-                  <>
-                    <OrangeText>{nextStation.name}</OrangeText>
-                    <GreenText>の次は</GreenText>
-                    <OrangeText>{afterNextStation.name}</OrangeText>
-                    <GreenText>に停車いたします。</GreenText>
-                    {nextStation.stopCondition !== StopCondition.All && (
-                      <>
-                        <CrimsonText>
-                          {nextStation.name}
-                          は一部列車は通過いたします。
-                        </CrimsonText>
-                        <OrangeText>ご注意ください。</OrangeText>
-                      </>
-                    )}
-                  </>
-                )
-                : null}
+              {afterNextStation ? (
+                <>
+                  <OrangeText>{nextStation.name}</OrangeText>
+                  <GreenText>の次は</GreenText>
+                  <OrangeText>{afterNextStation.name}</OrangeText>
+                  <GreenText>に停車いたします。</GreenText>
+                  {nextStation.stopCondition !== StopCondition.All && (
+                    <>
+                      <CrimsonText>
+                        {nextStation.name}
+                        は一部列車は通過いたします。
+                      </CrimsonText>
+                      <OrangeText>ご注意ください。</OrangeText>
+                    </>
+                  )}
+                </>
+              ) : null}
               <HorizontalSpacer />
               {nextStation.lines.filter(
-                    (line) => line.id !== nextStation.line?.id,
-                  ).length > 0 && (
+                (line) => line.id !== nextStation.line?.id
+              ).length > 0 && (
                 <>
                   <OrangeText>{transferText.ja}</OrangeText>
                   <HorizontalSpacer />
@@ -327,45 +323,41 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
                 {nextStation.nameRoman}
                 {nextStation.stationNumbers.length
                   ? `(${nextStation.stationNumbers[0]?.stationNumber})`
-                  : ""}
+                  : ''}
               </OrangeText>
-              {!afterNextStation
-                ? (
-                  <>
-                    <HorizontalSpacer />
-                    <CrimsonText>last stop</CrimsonText>
-                    <GreenText>.</GreenText>
-                  </>
-                )
-                : null}
-              {afterNextStation
-                ? (
-                  <>
-                    <GreenText>. The stop after</GreenText>
-                    <HorizontalSpacer />
-                    <OrangeText>
-                      {nextStation.nameRoman}
-                      {nextStation.stationNumbers.length
-                        ? `(${nextStation.stationNumbers[0]?.stationNumber})`
-                        : ""}
-                    </OrangeText>
-                    <GreenText>, will be</GreenText>
-                    <HorizontalSpacer />
-                    <OrangeText>
-                      {afterNextStation.nameRoman}
-                      {afterNextStation.stationNumbers.length
-                        ? `(${
-                          afterNextStation.stationNumbers[0]?.stationNumber
-                        })`
-                        : ""}
-                    </OrangeText>
-                    <GreenText>.</GreenText>
-                  </>
-                )
-                : <GreenText>.</GreenText>}
+              {!afterNextStation ? (
+                <>
+                  <HorizontalSpacer />
+                  <CrimsonText>last stop</CrimsonText>
+                  <GreenText>.</GreenText>
+                </>
+              ) : null}
+              {afterNextStation ? (
+                <>
+                  <GreenText>. The stop after</GreenText>
+                  <HorizontalSpacer />
+                  <OrangeText>
+                    {nextStation.nameRoman}
+                    {nextStation.stationNumbers.length
+                      ? `(${nextStation.stationNumbers[0]?.stationNumber})`
+                      : ''}
+                  </OrangeText>
+                  <GreenText>, will be</GreenText>
+                  <HorizontalSpacer />
+                  <OrangeText>
+                    {afterNextStation.nameRoman}
+                    {afterNextStation.stationNumbers.length
+                      ? `(${afterNextStation.stationNumbers[0]?.stationNumber})`
+                      : ''}
+                  </OrangeText>
+                  <GreenText>.</GreenText>
+                </>
+              ) : (
+                <GreenText>.</GreenText>
+              )}
               {nextStation.lines.filter(
-                    (line) => line.id !== nextStation.line?.id,
-                  ).length > 0 && (
+                (line) => line.id !== nextStation.line?.id
+              ).length > 0 && (
                 <>
                   <HorizontalSpacer />
                   <GreenText>Please change here for</GreenText>
@@ -390,41 +382,37 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
               <GreenText>次は</GreenText>
               <HorizontalSpacer />
               <OrangeText>{nextStation.name}</OrangeText>
-              {!afterNextStation
-                ? (
-                  <>
-                    <HorizontalSpacer />
-                    <CrimsonText>終点</CrimsonText>
-                    <HorizontalSpacer />
-                  </>
-                )
-                : null}
+              {!afterNextStation ? (
+                <>
+                  <HorizontalSpacer />
+                  <CrimsonText>終点</CrimsonText>
+                  <HorizontalSpacer />
+                </>
+              ) : null}
               <GreenText>です。</GreenText>
-              {afterNextStation
-                ? (
-                  <>
-                    <OrangeText>{nextStation.name}</OrangeText>
-                    <GreenText>の次は</GreenText>
-                    <HorizontalSpacer />
-                    <OrangeText>{afterNextStation.name}</OrangeText>
-                    <HorizontalSpacer />
-                    <GreenText>に停車いたします。</GreenText>
-                    {nextStation.stopCondition !== StopCondition.All && (
-                      <>
-                        <CrimsonText>
-                          {nextStation.name}
-                          は一部列車は通過いたします。
-                        </CrimsonText>
-                        <OrangeText>ご注意ください。</OrangeText>
-                      </>
-                    )}
-                  </>
-                )
-                : null}
+              {afterNextStation ? (
+                <>
+                  <OrangeText>{nextStation.name}</OrangeText>
+                  <GreenText>の次は</GreenText>
+                  <HorizontalSpacer />
+                  <OrangeText>{afterNextStation.name}</OrangeText>
+                  <HorizontalSpacer />
+                  <GreenText>に停車いたします。</GreenText>
+                  {nextStation.stopCondition !== StopCondition.All && (
+                    <>
+                      <CrimsonText>
+                        {nextStation.name}
+                        は一部列車は通過いたします。
+                      </CrimsonText>
+                      <OrangeText>ご注意ください。</OrangeText>
+                    </>
+                  )}
+                </>
+              ) : null}
               <HorizontalSpacer />
               {nextStation.lines.filter(
-                    (line) => line.id !== nextStation.line?.id,
-                  ).length > 0 && (
+                (line) => line.id !== nextStation.line?.id
+              ).length > 0 && (
                 <>
                   <OrangeText>{transferText.ja}</OrangeText>
                   <HorizontalSpacer />
@@ -440,45 +428,39 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
                 {nextStation.nameRoman}
                 {nextStation.stationNumbers.length
                   ? `(${nextStation.stationNumbers[0]?.stationNumber})`
-                  : ""}
+                  : ''}
               </OrangeText>
-              {!afterNextStation
-                ? (
-                  <>
-                    <HorizontalSpacer />
-                    <CrimsonText>last stop</CrimsonText>
-                    <GreenText>.</GreenText>
-                  </>
-                )
-                : null}
-              {afterNextStation
-                ? (
-                  <>
-                    <GreenText>. The stop after</GreenText>
-                    <HorizontalSpacer />
-                    <OrangeText>
-                      {nextStation.nameRoman}
-                      {nextStation.stationNumbers.length
-                        ? `(${nextStation.stationNumbers[0]?.stationNumber})`
-                        : ""}
-                    </OrangeText>
-                    <GreenText>, will be</GreenText>
-                    <HorizontalSpacer />
-                    <OrangeText>
-                      {afterNextStation.nameRoman}
-                      {afterNextStation.stationNumbers.length
-                        ? `(${
-                          afterNextStation.stationNumbers[0]?.stationNumber
-                        })`
-                        : ""}
-                    </OrangeText>
-                    <GreenText>.</GreenText>
-                  </>
-                )
-                : null}
+              {!afterNextStation ? (
+                <>
+                  <HorizontalSpacer />
+                  <CrimsonText>last stop</CrimsonText>
+                  <GreenText>.</GreenText>
+                </>
+              ) : null}
+              {afterNextStation ? (
+                <>
+                  <GreenText>. The stop after</GreenText>
+                  <HorizontalSpacer />
+                  <OrangeText>
+                    {nextStation.nameRoman}
+                    {nextStation.stationNumbers.length
+                      ? `(${nextStation.stationNumbers[0]?.stationNumber})`
+                      : ''}
+                  </OrangeText>
+                  <GreenText>, will be</GreenText>
+                  <HorizontalSpacer />
+                  <OrangeText>
+                    {afterNextStation.nameRoman}
+                    {afterNextStation.stationNumbers.length
+                      ? `(${afterNextStation.stationNumbers[0]?.stationNumber})`
+                      : ''}
+                  </OrangeText>
+                  <GreenText>.</GreenText>
+                </>
+              ) : null}
               {nextStation.lines.filter(
-                    (line) => line.id !== nextStation.line?.id,
-                  ).length > 0 && (
+                (line) => line.id !== nextStation.line?.id
+              ).length > 0 && (
                 <>
                   <HorizontalSpacer />
                   <GreenText>Please change here for</GreenText>
@@ -500,42 +482,40 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
         <InnerContainer>
           <TextContainer>
             <GreenText>
-              この電車は、{line.nameShort.replace(PARENTHESIS_REGEXP, "")}
+              この電車は、{line.nameShort.replace(PARENTHESIS_REGEXP, '')}
             </GreenText>
             <HorizontalSpacer />
-            {trainTypeText.ja
-              ? (
-                <>
-                  {isLocal
-                    ? <OrangeText>{trainTypeText.ja}</OrangeText>
-                    : <CrimsonText>{trainTypeText.ja}</CrimsonText>}
-                  <HorizontalSpacer />
-                </>
-              )
-              : null}
+            {trainTypeText.ja ? (
+              <>
+                {isLocal ? (
+                  <OrangeText>{trainTypeText.ja}</OrangeText>
+                ) : (
+                  <CrimsonText>{trainTypeText.ja}</CrimsonText>
+                )}
+                <HorizontalSpacer />
+              </>
+            ) : null}
             <OrangeText>{boundText.ja}</OrangeText>
             <OrangeText>行き</OrangeText>
             <GreenText>です。</GreenText>
             <HorizontalSpacer wide />
             <GreenText>
-              {`This is the ${
-                line?.nameRoman?.replace(
-                  PARENTHESIS_REGEXP,
-                  "",
-                )
-              }`}
+              {`This is the ${line?.nameRoman?.replace(
+                PARENTHESIS_REGEXP,
+                ''
+              )}`}
             </GreenText>
             <HorizontalSpacer />
-            {trainTypeText.en
-              ? (
-                <>
-                  {isLocal
-                    ? <OrangeText>{trainTypeText.en}</OrangeText>
-                    : <CrimsonText>{trainTypeText.en}</CrimsonText>}
-                  <HorizontalSpacer />
-                </>
-              )
-              : null}
+            {trainTypeText.en ? (
+              <>
+                {isLocal ? (
+                  <OrangeText>{trainTypeText.en}</OrangeText>
+                ) : (
+                  <CrimsonText>{trainTypeText.en}</CrimsonText>
+                )}
+                <HorizontalSpacer />
+              </>
+            ) : null}
             <HorizontalSpacer />
             <GreenText>train for</GreenText>
             <HorizontalSpacer />

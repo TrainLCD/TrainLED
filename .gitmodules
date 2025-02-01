@@ -1,3 +1,6 @@
 [submodule "proto"]
 	path = proto
 	url = https://github.com/TrainLCD/gRPCProto.git
+[submodule "src/proto"]
+	path = src/proto
+	url = https://github.com/TrainLCD/gRPCProto.git

@@ -1,2 +1,0 @@
-# gRPCProto
-Protocol buffers

@@ -1,4 +1,3 @@
-'use client'; // TODO: 役目的にuse client消せそう。消せるなら消したい
 import {
   getStationsByLineGroupId,
   getStationsByLineId,
@@ -6,7 +5,7 @@ import {
 } from '@/generated/src/proto/stationapi-StationAPI_connectquery';
 import {
   TrainDirection,
-  TrainType,
+  type TrainType,
   TrainTypeKind,
 } from '@/generated/src/proto/stationapi_pb';
 import type { ConnectError } from '@connectrpc/connect';
@@ -85,7 +84,8 @@ const useUpdateStationList = (): {
         (findBranchLine(trainTypesList) && !findLocalType(trainTypesList))
       )
     ) {
-      const localType = new TrainType({
+      const localType: TrainType = {
+        $typeName: 'app.trainlcd.grpc.TrainType',
         id: 0,
         typeId: 0,
         groupId: 0,
@@ -98,7 +98,7 @@ const useUpdateStationList = (): {
         lines: [],
         direction: TrainDirection.Both,
         kind: TrainTypeKind.Default,
-      });
+      };
 
       setTrainTypeState((prev) => ({
         ...prev,
