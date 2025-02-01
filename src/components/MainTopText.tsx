@@ -29,7 +29,7 @@ const GreenText = styled.p<{ bound?: boolean }>`
   width: 100%;
   max-width: 22.5%;
   color: green;
-  font-size: ${({ bound }) => (bound ? "7.5vw" : "5vv")};
+  font-size: ${({ bound }) => (bound ? "7.5vw" : "5vw")};
   margin: 0;
 `;
 
