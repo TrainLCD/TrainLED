@@ -35,8 +35,8 @@ export const useAutoMode = (enabled: boolean): void => {
   );
   const autoModeInboundIndexRef = useValueRef(autoModeInboundIndex);
   const autoModeOutboundIndexRef = useValueRef(autoModeOutboundIndex);
-  const autoModeApproachingTimerRef = useRef<NodeJS.Timer>();
-  const autoModeArriveTimerRef = useRef<NodeJS.Timer>();
+  const autoModeApproachingTimerRef = useRef<NodeJS.Timeout>(null);
+  const autoModeArriveTimerRef = useRef<NodeJS.Timeout>(null);
 
   const { isLoopLine } = useLoopLine();
 
@@ -67,7 +67,37 @@ export const useAutoMode = (enabled: boolean): void => {
                 altitudeAccuracy: 0,
                 speed: 0,
                 heading: 0,
+                toJSON: () => ({
+                  latitude: stations[0].latitude,
+                  longitude: stations[0].longitude,
+                  accuracy: 0,
+                  altitude: 0,
+                  altitudeAccuracy: 0,
+                  speed: 0,
+                  heading: 0,
+                }),
               },
+              toJSON: () => ({
+                timestamp: new Date().getTime(),
+                coords: {
+                  latitude: stations[0].latitude,
+                  longitude: stations[0].longitude,
+                  accuracy: 0,
+                  altitude: 0,
+                  altitudeAccuracy: 0,
+                  speed: 0,
+                  heading: 0,
+                  toJSON: () => ({
+                    latitude: stations[0].latitude,
+                    longitude: stations[0].longitude,
+                    accuracy: 0,
+                    altitude: 0,
+                    altitudeAccuracy: 0,
+                    speed: 0,
+                    heading: 0,
+                  }),
+                },
+              }),
             },
           }));
           return;
@@ -87,7 +117,6 @@ export const useAutoMode = (enabled: boolean): void => {
               longitude: next.longitude,
             },
           ]);
-
           if (center) {
             setNavigationState((prev) => ({
               ...prev,
@@ -100,14 +129,32 @@ export const useAutoMode = (enabled: boolean): void => {
                   altitudeAccuracy: 0,
                   speed: 0,
                   heading: 0,
+                  toJSON: () => ({
+                    ...center,
+                    accuracy: 0,
+                    altitude: 0,
+                    altitudeAccuracy: 0,
+                    speed: 0,
+                    heading: 0,
+                  }),
                 },
+                toJSON: () => ({
+                  timestamp: new Date().getTime(),
+                  coords: {
+                    ...center,
+                    accuracy: 0,
+                    altitude: 0,
+                    altitudeAccuracy: 0,
+                    speed: 0,
+                    heading: 0,
+                  },
+                }),
               },
             }));
           }
         }
       } else {
         const index = autoModeOutboundIndexRef.current;
-
         if (index === stations.length - 1) {
           setNavigationState((prev) => ({
             ...prev,
@@ -121,7 +168,28 @@ export const useAutoMode = (enabled: boolean): void => {
                 altitudeAccuracy: 0,
                 speed: 0,
                 heading: 0,
+                toJSON: () => ({
+                  latitude: stations[stations.length - 1].latitude,
+                  longitude: stations[stations.length - 1].longitude,
+                  accuracy: 0,
+                  altitude: 0,
+                  altitudeAccuracy: 0,
+                  speed: 0,
+                  heading: 0,
+                }),
               },
+              toJSON: () => ({
+                timestamp: new Date().getTime(),
+                coords: {
+                  latitude: stations[stations.length - 1].latitude,
+                  longitude: stations[stations.length - 1].longitude,
+                  accuracy: 0,
+                  altitude: 0,
+                  altitudeAccuracy: 0,
+                  speed: 0,
+                  heading: 0,
+                },
+              }),
             },
           }));
 
@@ -142,7 +210,6 @@ export const useAutoMode = (enabled: boolean): void => {
               longitude: next.longitude,
             },
           ]);
-
           if (center) {
             setNavigationState((prev) => ({
               ...prev,
@@ -155,7 +222,26 @@ export const useAutoMode = (enabled: boolean): void => {
                   altitudeAccuracy: 0,
                   speed: 0,
                   heading: 0,
+                  toJSON: () => ({
+                    ...center,
+                    accuracy: 0,
+                    altitude: 0,
+                    altitudeAccuracy: 0,
+                    speed: 0,
+                    heading: 0,
+                  }),
                 },
+                toJSON: () => ({
+                  timestamp: new Date().getTime(),
+                  coords: {
+                    ...center,
+                    accuracy: 0,
+                    altitude: 0,
+                    altitudeAccuracy: 0,
+                    speed: 0,
+                    heading: 0,
+                  },
+                }),
               },
             }));
           }
@@ -209,7 +295,6 @@ export const useAutoMode = (enabled: boolean): void => {
         if (!index && isLoopLine) {
           setAutoModeInboundIndex(stations.length - 1);
         }
-
         if (next) {
           setNavigationState((prev) => ({
             ...prev,
@@ -223,7 +308,37 @@ export const useAutoMode = (enabled: boolean): void => {
                 altitudeAccuracy: 0,
                 speed: 0,
                 heading: 0,
+                toJSON: () => ({
+                  latitude: next.latitude,
+                  longitude: next.longitude,
+                  accuracy: 0,
+                  altitude: 0,
+                  altitudeAccuracy: 0,
+                  speed: 0,
+                  heading: 0,
+                }),
               },
+              toJSON: () => ({
+                timestamp: new Date().getTime(),
+                coords: {
+                  latitude: next.latitude,
+                  longitude: next.longitude,
+                  accuracy: 0,
+                  altitude: 0,
+                  altitudeAccuracy: 0,
+                  speed: 0,
+                  heading: 0,
+                  toJSON: () => ({
+                    latitude: next.latitude,
+                    longitude: next.longitude,
+                    accuracy: 0,
+                    altitude: 0,
+                    altitudeAccuracy: 0,
+                    speed: 0,
+                    heading: 0,
+                  }),
+                },
+              }),
             },
           }));
         }
@@ -242,7 +357,6 @@ export const useAutoMode = (enabled: boolean): void => {
         if (index === stations.length - 1 && isLoopLine) {
           setAutoModeOutboundIndex(0);
         }
-
         if (next) {
           setNavigationState((prev) => ({
             ...prev,
@@ -256,7 +370,37 @@ export const useAutoMode = (enabled: boolean): void => {
                 altitudeAccuracy: 0,
                 speed: 0,
                 heading: 0,
+                toJSON: () => ({
+                  latitude: next.latitude,
+                  longitude: next.longitude,
+                  accuracy: 0,
+                  altitude: 0,
+                  altitudeAccuracy: 0,
+                  speed: 0,
+                  heading: 0,
+                }),
               },
+              toJSON: () => ({
+                timestamp: new Date().getTime(),
+                coords: {
+                  latitude: next.latitude,
+                  longitude: next.longitude,
+                  accuracy: 0,
+                  altitude: 0,
+                  altitudeAccuracy: 0,
+                  speed: 0,
+                  heading: 0,
+                  toJSON: () => ({
+                    latitude: next.latitude,
+                    longitude: next.longitude,
+                    accuracy: 0,
+                    altitude: 0,
+                    altitudeAccuracy: 0,
+                    speed: 0,
+                    heading: 0,
+                  }),
+                },
+              }),
             },
           }));
         }
