@@ -63,7 +63,7 @@ export const PREFECTURES_ROMAN = [
   'Chiba',
   'Tokyo',
   'Kanagawa',
-  'Nigata',
+  'Niigata',
   'Toyama',
   'Ishikawa',
   'Fukui',
