@@ -8,14 +8,19 @@ import getIsPass from '../utils/isPass';
 export const useCurrentStation = (
   skipPassStation = false,
   withTrainTypes = false
-): Station => {
+): Station | null => {
   const { stations, station: stationFromState } = useAtomValue(stationAtom);
-  const { selectedDirection } = useAtomValue(lineAtom);
+  const { selectedDirection, selectedLine } = useAtomValue(lineAtom);
 
   // NOTE: 選択した路線と現在の駅の路線を一致させる
   const station = useMemo(
-    () => stations.find((s) => s.groupId === stationFromState?.groupId),
-    [stationFromState?.groupId, stations]
+    () =>
+      stations.find(
+        (s) =>
+          s.groupId === stationFromState?.groupId ||
+          s.line?.id === selectedLine?.id
+      ),
+    [selectedLine?.id, stationFromState?.groupId, stations]
   );
 
   const withTrainTypeStation = useMemo(() => {

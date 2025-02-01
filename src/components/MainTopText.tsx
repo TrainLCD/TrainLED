@@ -82,21 +82,19 @@ const SwitchedStationText = ({ nextStation, language }: Props) => {
 
   const currentStationNameWithKey = useMemo(
     () =>
-      currentStation.name.split("").map((c, i) => ({
+      currentStation?.name.split("").map((c, i) => ({
         key: `${currentStation.name}-${i}`,
         value: c,
       })),
-    [currentStation.name],
+    [currentStation],
   );
   const currentStationNameKWithKey = useMemo(
     () =>
-      currentStation.nameKatakana
-        .split("")
-        .map((c, i) => ({
-          key: `${currentStation.nameKatakana}-${i}`,
-          value: c,
-        })),
-    [currentStation.nameKatakana],
+      currentStation?.nameKatakana.split("").map((c, i) => ({
+        key: `${currentStation.nameKatakana}-${i}`,
+        value: c,
+      })),
+    [currentStation],
   );
   const nextStationNameWithKey = useMemo(
     () =>
@@ -121,7 +119,7 @@ const SwitchedStationText = ({ nextStation, language }: Props) => {
         {language === "ja"
           ? (
             <OrangeTextContainer>
-              {currentStationNameWithKey.map(({ key, value }) => (
+              {currentStationNameWithKey?.map(({ key, value }) => (
                 <OrangeText key={key}>{value}</OrangeText>
               ))}
             </OrangeTextContainer>
@@ -130,7 +128,7 @@ const SwitchedStationText = ({ nextStation, language }: Props) => {
         {language === "jaKana"
           ? (
             <OrangeTextContainer>
-              {currentStationNameKWithKey.map(({ key, value }) => (
+              {currentStationNameKWithKey?.map(({ key, value }) => (
                 <OrangeText key={key}>{value}</OrangeText>
               ))}
             </OrangeTextContainer>
