@@ -8,9 +8,21 @@ export const useGuard = () => {
   const router = useRouter();
   const { station } = useAtomValue(stationAtom);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     if (!station) {
-      router.replace('/');
+      setIsLoading(true);
+      router.replace('/')
+        .catch((error) => {
+          console.error('Navigation failed:', error);
+          // エラー処理を追加
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
     }
   }, [router, station]);
+
+  return { isLoading };
 };
