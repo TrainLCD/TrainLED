@@ -3,7 +3,12 @@
 # dependencies
 /node_modules
 /.pnp
-.pnp.js
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
 
 # testing
 /coverage
@@ -31,6 +36,10 @@ yarn-error.log*
 # vercel
 .vercel
 
-## gRPC
-generated/*
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# gRPC
+/src/generated
 !.gitkeep
