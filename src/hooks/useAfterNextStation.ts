@@ -1,4 +1,3 @@
-import { Station } from '@/generated/src/proto/stationapi_pb';
 import { useMemo } from 'react';
 import getIsPass from '../utils/isPass';
 import { useCurrentStation } from './useCurrentStation';
@@ -15,8 +14,7 @@ export const useAfterNextStation = () => {
     () =>
       Array.from(new Set(slicedStationsOrigin.map((s) => s.groupId)))
         .map((gid) => slicedStationsOrigin.find((s) => s.groupId === gid))
-        .filter((s) => !!s)
-        .map((s) => new Station(s)),
+        .filter((s) => !!s),
     [slicedStationsOrigin]
   );
 

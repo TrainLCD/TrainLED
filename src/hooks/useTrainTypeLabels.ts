@@ -1,4 +1,4 @@
-import { Line, type TrainType } from '@/generated/src/proto/stationapi_pb';
+import type { Line, TrainType } from '@/generated/src/proto/stationapi_pb';
 import { useMemo } from 'react';
 import { PARENTHESIS_REGEXP } from '../constants';
 import { useCurrentLine } from './useCurrentLine';
@@ -52,13 +52,11 @@ const useTrainTypeLabels = (trainTypes: TrainType[]) => {
 
             if (hasSameCompanySameTypeLine) {
               line.company &&
-                lines.push(
-                  new Line({
-                    ...line,
-                    nameShort: `${line.company?.nameShort}線`,
-                    nameRoman: `${line.company?.nameEnglishShort} Line`,
-                  })
-                );
+                lines.push({
+                  ...line,
+                  nameShort: `${line.company?.nameShort}線`,
+                  nameRoman: `${line.company?.nameEnglishShort} Line`,
+                });
               return lines;
             }
 

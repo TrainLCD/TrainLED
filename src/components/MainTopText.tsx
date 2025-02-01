@@ -70,7 +70,7 @@ const NumberingText = styled.p`
 `;
 
 type Props = {
-  nextStation: Station;
+  nextStation: Station | undefined;
   language: LanguageState;
 };
 
@@ -100,19 +100,19 @@ const SwitchedStationText = ({ nextStation, language }: Props) => {
   );
   const nextStationNameWithKey = useMemo(
     () =>
-      nextStation.name.split("").map((c, i) => ({
+      nextStation?.name.split("").map((c, i) => ({
         key: `${nextStation.name}-${i}`,
         value: c,
       })),
-    [nextStation.name],
+    [nextStation],
   );
   const nextStationNameKWithKey = useMemo(
     () =>
-      nextStation.nameKatakana.split("").map((c, i) => ({
-        key: `${nextStation.nameKatakana}-${i}`,
+      nextStation?.nameKatakana.split("").map((c, i) => ({
+        key: `${nextStation?.nameKatakana}-${i}`,
         value: c,
       })),
-    [nextStation.nameKatakana],
+    [nextStation],
   );
 
   if ((arrived || !nextStation) && currentStation && !passingStation) {
@@ -165,7 +165,7 @@ const SwitchedStationText = ({ nextStation, language }: Props) => {
             <>
               <StateText>まもなく</StateText>
               <OrangeTextContainer>
-                {nextStationNameWithKey.map(({ key, value }) => (
+                {nextStationNameWithKey?.map(({ key, value }) => (
                   <OrangeText key={key}>{value}</OrangeText>
                 ))}
               </OrangeTextContainer>
@@ -177,7 +177,7 @@ const SwitchedStationText = ({ nextStation, language }: Props) => {
             <>
               <StateText>まもなく</StateText>
               <OrangeTextContainer>
-                {nextStationNameKWithKey.map(({ key, value }) => (
+                {nextStationNameKWithKey?.map(({ key, value }) => (
                   <OrangeText key={key}>{value}</OrangeText>
                 ))}
               </OrangeTextContainer>
@@ -216,7 +216,7 @@ const SwitchedStationText = ({ nextStation, language }: Props) => {
           <>
             <StateText>次は</StateText>
             <OrangeTextContainer>
-              {nextStationNameWithKey.map(({ key, value }) => (
+              {nextStationNameWithKey?.map(({ key, value }) => (
                 <OrangeText key={key}>{value}</OrangeText>
               ))}
             </OrangeTextContainer>
@@ -228,7 +228,7 @@ const SwitchedStationText = ({ nextStation, language }: Props) => {
           <>
             <StateText>次は</StateText>
             <OrangeTextContainer>
-              {nextStationNameKWithKey.map(({ key, value }) => (
+              {nextStationNameKWithKey?.map(({ key, value }) => (
                 <OrangeText key={key}>{value}</OrangeText>
               ))}
             </OrangeTextContainer>
