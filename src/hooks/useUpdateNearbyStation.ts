@@ -51,7 +51,10 @@ const useUpdateNearbyStation = (): {
       const newPos = await getCurrentPositionAsync();
       setNavigationAtom((prev) => ({ ...prev, location: newPos }));
 
-      const queryKey = createConnectQueryKey(getStationsByCoordinates);
+      const queryKey = createConnectQueryKey({
+        schema: getStationsByCoordinates,
+        cardinality: 'finite',
+      });
       await queryClient.invalidateQueries({ queryKey });
       await refetch();
 
