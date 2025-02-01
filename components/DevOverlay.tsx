@@ -15,6 +15,10 @@ export const DevOverlay: FC = () => {
         [location?.coords.speed],
     );
 
+    if (!process.env.NEXT_PUBLIC_CANARY) {
+        return null;
+    }
+
     return (
         <Container>
             <Typography role="heading" aria-level={1}>
