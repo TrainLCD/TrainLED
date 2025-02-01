@@ -83,8 +83,8 @@ const SwitchedStationText = ({ nextStation, language }: Props) => {
 
   const currentStationNameWithKey = useMemo(
     () =>
-      currentStation.name.split('').map((c) => ({
-        key: nanoid(),
+      currentStation.name.split('').map((c, i) => ({
+        key: `${currentStation.name}-${i}`,
         value: c,
       })),
     [currentStation.name]
