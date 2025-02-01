@@ -1,9 +1,9 @@
-'use client';
-import { useAtomValue } from 'jotai';
-import { type FC, useMemo } from 'react';
-import { navigationAtom } from '../atoms/navigation';
-import { useThreshold } from '../hooks/useThreshold';
-import { Container, Typography } from './DevOverlay.styled';
+"use client";
+import { useAtomValue } from "jotai";
+import { type FC, useMemo } from "react";
+import { navigationAtom } from "../atoms/navigation";
+import { useThreshold } from "../hooks/useThreshold";
+import { Container, Typography } from "./DevOverlay.styled";
 
 /**
  * 開発用オーバーレイコンポーネント
@@ -20,10 +20,10 @@ export const DevOverlay: FC = () => {
     () =>
       location?.coords.speed &&
       Math.round((location.coords.speed * 3600) / 1000),
-    [location?.coords.speed]
+    [location?.coords.speed],
   );
 
-  const isCanary = process.env.NEXT_PUBLIC_CANARY === 'true';
+  const isCanary = process.env.NEXT_PUBLIC_CANARY === "true";
   if (!isCanary) {
     return null;
   }
@@ -33,15 +33,15 @@ export const DevOverlay: FC = () => {
       <Typography aria-level={1}>TrainLED DO</Typography>
 
       <Typography aria-label="Latitude">
-        Latitude: {location?.coords.latitude ?? 'N/A'}
+        Latitude: {location?.coords.latitude ?? "N/A"}
       </Typography>
 
       <Typography aria-label="Longitude">
-        Longitude: {location?.coords.longitude ?? 'N/A'}
+        Longitude: {location?.coords.longitude ?? "N/A"}
       </Typography>
 
       <Typography aria-label="Speed(km/h)">
-        Speed: {speedKMH ? `${speedKMH}km/h` : 'N/A'}
+        Speed: {!Number.isNaN(speedKMH) ? `${speedKMH}km/h` : "N/A"}
       </Typography>
 
       <Typography aria-label="Approaching threshold(m)">
