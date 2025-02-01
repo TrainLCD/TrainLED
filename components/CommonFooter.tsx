@@ -5,7 +5,8 @@ import {
 } from "./CommonFooter.styled";
 
 const CommonFooter = () => {
-  if (!process.env.CANARY) {
+  const isCanary = process.env.NEXT_PUBLIC_CANARY === "true";
+  if (!isCanary) {
     return null;
   }
 
