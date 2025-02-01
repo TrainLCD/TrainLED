@@ -1,0 +1,228 @@
+syntax = "proto3";
+
+package app.trainlcd.grpc;
+
+service StationAPI {
+  rpc GetStationById(GetStationByIdRequest) returns (SingleStationResponse) {}
+  rpc GetStationByIdList(GetStationByIdListRequest)
+      returns (MultipleStationResponse) {}
+  rpc GetStationsByGroupId(GetStationByGroupIdRequest)
+      returns (MultipleStationResponse) {}
+  rpc GetStationsByCoordinates(GetStationByCoordinatesRequest)
+      returns (MultipleStationResponse) {}
+  rpc GetStationsByLineId(GetStationByLineIdRequest)
+      returns (MultipleStationResponse) {}
+  rpc GetStationsByName(GetStationsByNameRequest)
+      returns (MultipleStationResponse) {}
+  rpc GetStationsByLineGroupId(GetStationsByLineGroupIdRequest)
+      returns (MultipleStationResponse) {}
+  rpc GetTrainTypesByStationId(GetTrainTypesByStationIdRequest)
+      returns (MultipleTrainTypeResponse) {}
+  rpc GetTrainTypesByStationIdList(GetTrainTypesByStationIdListRequest)
+      returns (MultipleTrainTypeResponse) {}
+  rpc GetDistanceForClosestStationFromCoordinates(CoordinatesRequest)
+      returns (DistanceResponse) {}
+  rpc GetRoutes(GetRouteRequest) returns (RouteResponse) {}
+}
+
+message GetStationByIdRequest { uint32 id = 1; }
+
+message GetStationByIdListRequest { repeated uint32 ids = 1; }
+
+message GetStationByGroupIdRequest { uint32 group_id = 1; }
+
+message GetStationByCoordinatesRequest {
+  double latitude = 1;
+  double longitude = 2;
+  optional uint32 limit = 3;
+}
+
+message GetStationByLineIdRequest {
+  uint32 line_id = 1;
+  optional uint32 station_id = 2;
+}
+
+message GetStationsByNameRequest {
+  string station_name = 1;
+  optional uint32 limit = 2;
+  optional uint32 from_station_group_id = 3;
+}
+
+message GetRouteRequest {
+  uint32 from_station_group_id = 1;
+  uint32 to_station_group_id = 2;
+}
+
+message GetStationsByLineGroupIdRequest { uint32 line_group_id = 1; }
+
+message GetTrainTypesByStationIdRequest { uint32 station_id = 1; }
+
+message GetTrainTypesByStationIdListRequest { repeated uint32 station_ids = 1; }
+
+message CoordinatesRequest {
+  double latitude = 1;
+  double longitude = 2;
+  optional uint32 line_id = 3;
+}
+
+enum OperationStatus {
+  InOperation = 0;
+  NotOpened = 1;
+  Closed = 2;
+}
+
+message StationNumber {
+  string line_symbol = 1;
+  string line_symbol_color = 2;
+  string line_symbol_shape = 3;
+  string station_number = 4;
+}
+
+enum StopCondition {
+  All = 0;
+  Not = 1;
+  Partial = 2;
+  Weekday = 3;
+  Holiday = 4;
+  PartialStop = 5;
+}
+
+enum TrainDirection {
+  Both = 0;
+  Inbound = 1;
+  Outbound = 2;
+}
+
+enum TrainTypeKind {
+  Default = 0;
+  Branch = 1;
+  Rapid = 2;
+  Express = 3;
+  LimitedExpress = 4;
+}
+
+message TrainType {
+  uint32 id = 1;
+  uint32 type_id = 2;
+  uint32 group_id = 3;
+  string name = 4;
+  string name_katakana = 5;
+  optional string name_roman = 6;
+  optional string name_chinese = 7;
+  optional string name_korean = 8;
+  string color = 9;
+  repeated Line lines = 10;
+  optional Line line = 11;
+  TrainDirection direction = 12;
+  TrainTypeKind kind = 13;
+}
+
+message Station {
+  uint32 id = 1;
+  uint32 group_id = 2;
+  string name = 3;
+  string name_katakana = 4;
+  optional string name_roman = 5;
+  optional string name_chinese = 6;
+  optional string name_korean = 7;
+  optional string three_letter_code = 8;
+  repeated Line lines = 9;
+  optional Line line = 10;
+  uint32 prefecture_id = 11;
+  string postal_code = 12;
+  string address = 13;
+  double latitude = 14;
+  double longitude = 15;
+  string opened_at = 16;
+  string closed_at = 17;
+  OperationStatus status = 18;
+  repeated StationNumber station_numbers = 19;
+  StopCondition stop_condition = 20;
+  optional double distance = 21;
+  optional bool has_train_types = 22;
+  optional TrainType train_type = 23;
+}
+
+message SingleStationResponse { Station station = 1; }
+
+message MultipleStationResponse { repeated Station stations = 1; }
+
+message MultipleTrainTypeResponse { repeated TrainType train_types = 1; }
+
+enum DistanceResponseState {
+  Away = 0;
+  Arrived = 1;
+  Approaching = 2;
+}
+
+message DistanceResponse {
+  uint32 station_id = 1;
+  double distance = 2;
+  DistanceResponseState state = 3;
+}
+
+message RouteResponse { repeated Route routes = 1; }
+
+enum LineType {
+  OtherLineType = 0;
+  BulletTrain = 1;
+  Normal = 2;
+  Subway = 3;
+  Tram = 4;
+  MonorailOrAGT = 5;
+}
+
+message LineSymbol {
+  string symbol = 1;
+  string color = 2;
+  string shape = 3;
+}
+
+enum CompanyType {
+  OtherCompany = 0;
+  JR = 1;
+  Private = 2;
+  Major = 3;
+  SemiMajor = 4;
+}
+
+message Company {
+  uint32 id = 1;
+  uint32 railroad_id = 2;
+  string name_short = 3;
+  string name_katakana = 4;
+  string name_full = 5;
+  string name_english_short = 6;
+  string name_english_full = 7;
+  optional string url = 8;
+  CompanyType type = 9;
+  OperationStatus status = 10;
+  string name = 11;
+}
+
+message Line {
+  uint32 id = 1;
+  string name_short = 2;
+  string name_katakana = 3;
+  string name_full = 4;
+  optional string name_roman = 5;
+  optional string name_chinese = 6;
+  optional string name_korean = 7;
+  string color = 8;
+  LineType line_type = 9;
+  repeated LineSymbol line_symbols = 10;
+  OperationStatus status = 11;
+  optional Station station = 12;
+  optional Company company = 13;
+  optional TrainType train_type = 14; // 同一種別のリクエストの場合出力する
+  double average_distance = 15;
+}
+
+message SingleLine { Line line = 1; }
+
+message MultipleLine { repeated Line lines = 1; }
+
+message Route {
+  uint32 id = 1;
+  repeated Station stops = 2;
+}

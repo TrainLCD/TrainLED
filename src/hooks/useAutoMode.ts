@@ -1,0 +1,295 @@
+import getCenter from 'geolib/es/getCenter';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { lineAtom } from '../atoms/line';
+import { navigationAtom } from '../atoms/navigation';
+import { stationAtom } from '../atoms/station';
+import {
+  AUTO_MODE_RUNNING_DURATION,
+  AUTO_MODE_WHOLE_DURATION,
+} from '../constants';
+import { dropEitherJunctionStation } from '../utils';
+import { useCurrentLine } from './useCurrentLine';
+import { useCurrentStation } from './useCurrentStation';
+import { useLoopLine } from './useLoopLine';
+import { useValueRef } from './useValueRef';
+
+export const useAutoMode = (enabled: boolean): void => {
+  const { stations: rawStations } = useAtomValue(stationAtom);
+  const { selectedDirection } = useAtomValue(lineAtom);
+  const setNavigationState = useSetAtom(navigationAtom);
+
+  const station = useCurrentStation();
+  const selectedLine = useCurrentLine();
+
+  const stations = useMemo(
+    () => dropEitherJunctionStation(rawStations, selectedDirection),
+    [rawStations, selectedDirection]
+  );
+
+  const [autoModeInboundIndex, setAutoModeInboundIndex] = useState(
+    stations.findIndex((s) => s.groupId === station?.groupId)
+  );
+  const [autoModeOutboundIndex, setAutoModeOutboundIndex] = useState(
+    stations.findIndex((s) => s.groupId === station?.groupId)
+  );
+  const autoModeInboundIndexRef = useValueRef(autoModeInboundIndex);
+  const autoModeOutboundIndexRef = useValueRef(autoModeOutboundIndex);
+  const autoModeApproachingTimerRef = useRef<NodeJS.Timer>();
+  const autoModeArriveTimerRef = useRef<NodeJS.Timer>();
+
+  const { isLoopLine } = useLoopLine();
+
+  const startApproachingTimer = useCallback(() => {
+    if (
+      !enabled ||
+      autoModeApproachingTimerRef.current ||
+      !selectedDirection ||
+      !selectedLine
+    ) {
+      return;
+    }
+
+    const intervalInternal = () => {
+      if (selectedDirection === 'INBOUND') {
+        const index = autoModeInboundIndexRef.current;
+
+        if (!index) {
+          setNavigationState((prev) => ({
+            ...prev,
+            location: {
+              timestamp: new Date().getTime(),
+              coords: {
+                latitude: stations[0].latitude,
+                longitude: stations[0].longitude,
+                accuracy: 0,
+                altitude: 0,
+                altitudeAccuracy: 0,
+                speed: 0,
+                heading: 0,
+              },
+            },
+          }));
+          return;
+        }
+
+        const cur = stations[index];
+        const next = isLoopLine ? stations[index - 1] : stations[index + 1];
+
+        if (cur && next) {
+          const center = getCenter([
+            {
+              latitude: cur.latitude,
+              longitude: cur.longitude,
+            },
+            {
+              latitude: next.latitude,
+              longitude: next.longitude,
+            },
+          ]);
+
+          if (center) {
+            setNavigationState((prev) => ({
+              ...prev,
+              location: {
+                timestamp: new Date().getTime(),
+                coords: {
+                  ...center,
+                  accuracy: 0,
+                  altitude: 0,
+                  altitudeAccuracy: 0,
+                  speed: 0,
+                  heading: 0,
+                },
+              },
+            }));
+          }
+        }
+      } else {
+        const index = autoModeOutboundIndexRef.current;
+
+        if (index === stations.length - 1) {
+          setNavigationState((prev) => ({
+            ...prev,
+            location: {
+              timestamp: new Date().getTime(),
+              coords: {
+                latitude: stations[stations.length - 1].latitude,
+                longitude: stations[stations.length - 1].longitude,
+                accuracy: 0,
+                altitude: 0,
+                altitudeAccuracy: 0,
+                speed: 0,
+                heading: 0,
+              },
+            },
+          }));
+
+          return;
+        }
+
+        const cur = stations[index];
+        const next = isLoopLine ? stations[index + 1] : stations[index - 1];
+
+        if (cur && next) {
+          const center = getCenter([
+            {
+              latitude: cur.latitude,
+              longitude: cur.longitude,
+            },
+            {
+              latitude: next.latitude,
+              longitude: next.longitude,
+            },
+          ]);
+
+          if (center) {
+            setNavigationState((prev) => ({
+              ...prev,
+              location: {
+                timestamp: new Date().getTime(),
+                coords: {
+                  ...center,
+                  accuracy: 0,
+                  altitude: 0,
+                  altitudeAccuracy: 0,
+                  speed: 0,
+                  heading: 0,
+                },
+              },
+            }));
+          }
+        }
+      }
+    };
+
+    intervalInternal();
+    const interval = setInterval(intervalInternal, AUTO_MODE_RUNNING_DURATION);
+
+    autoModeApproachingTimerRef.current = interval;
+  }, [
+    autoModeInboundIndexRef,
+    autoModeOutboundIndexRef,
+    enabled,
+    isLoopLine,
+    selectedDirection,
+    selectedLine,
+    setNavigationState,
+    stations,
+  ]);
+
+  useEffect(() => {
+    startApproachingTimer();
+  }, [startApproachingTimer]);
+
+  const startArriveTimer = useCallback(() => {
+    const direction = selectedDirection;
+
+    if (
+      !enabled ||
+      autoModeArriveTimerRef.current ||
+      !direction ||
+      !selectedLine
+    ) {
+      return;
+    }
+
+    const intervalInternal = () => {
+      if (direction === 'INBOUND') {
+        const index = autoModeInboundIndexRef.current;
+
+        const next = stations[index];
+
+        if (!isLoopLine && index === stations.length - 1) {
+          setAutoModeInboundIndex(0);
+        } else {
+          setAutoModeInboundIndex((prev) => (isLoopLine ? prev - 1 : prev + 1));
+        }
+
+        if (!index && isLoopLine) {
+          setAutoModeInboundIndex(stations.length - 1);
+        }
+
+        if (next) {
+          setNavigationState((prev) => ({
+            ...prev,
+            location: {
+              timestamp: new Date().getTime(),
+              coords: {
+                latitude: next.latitude,
+                longitude: next.longitude,
+                accuracy: 0,
+                altitude: 0,
+                altitudeAccuracy: 0,
+                speed: 0,
+                heading: 0,
+              },
+            },
+          }));
+        }
+      } else if (direction === 'OUTBOUND') {
+        const index = autoModeOutboundIndexRef.current;
+
+        const next = stations[index];
+        if (!isLoopLine && !index) {
+          setAutoModeOutboundIndex(stations.length);
+        } else {
+          setAutoModeOutboundIndex((prev) =>
+            isLoopLine ? prev + 1 : prev - 1
+          );
+        }
+
+        if (index === stations.length - 1 && isLoopLine) {
+          setAutoModeOutboundIndex(0);
+        }
+
+        if (next) {
+          setNavigationState((prev) => ({
+            ...prev,
+            location: {
+              timestamp: new Date().getTime(),
+              coords: {
+                latitude: next.latitude,
+                longitude: next.longitude,
+                accuracy: 0,
+                altitude: 0,
+                altitudeAccuracy: 0,
+                speed: 0,
+                heading: 0,
+              },
+            },
+          }));
+        }
+      }
+    };
+
+    intervalInternal();
+
+    const interval = setInterval(intervalInternal, AUTO_MODE_WHOLE_DURATION);
+    autoModeArriveTimerRef.current = interval;
+  }, [
+    autoModeInboundIndexRef,
+    autoModeOutboundIndexRef,
+    enabled,
+    isLoopLine,
+    selectedDirection,
+    selectedLine,
+    setNavigationState,
+    stations,
+  ]);
+
+  useEffect(() => {
+    startArriveTimer();
+  }, [startArriveTimer]);
+
+  useEffect(() => {
+    if (!selectedDirection) {
+      if (autoModeApproachingTimerRef.current) {
+        clearInterval(autoModeApproachingTimerRef.current);
+      }
+      if (autoModeArriveTimerRef.current) {
+        clearInterval(autoModeArriveTimerRef.current);
+      }
+    }
+  }, [selectedDirection]);
+};
