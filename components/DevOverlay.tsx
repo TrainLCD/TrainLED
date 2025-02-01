@@ -5,6 +5,13 @@ import { navigationAtom } from "../atoms/navigation";
 import { useThreshold } from "../hooks/useThreshold";
 import { Container, Typography } from "./DevOverlay.styled";
 
+/**
+ * 開発用オーバーレイコンポーネント
+ *
+ * @remarks
+ * このコンポーネントは NEXT_PUBLIC_CANARY が true の場合のみ表示されます。
+ * 開発環境での位置情報やスピード、閾値などのデバッグ情報を表示します。
+ */
 export const DevOverlay: FC = () => {
     const { location } = useAtomValue(navigationAtom);
 
@@ -14,6 +21,11 @@ export const DevOverlay: FC = () => {
             Math.round((location.coords.speed * 3600) / 1000)),
         [location?.coords.speed],
     );
+
+    const isCanary = process.env.NEXT_PUBLIC_CANARY === "true";
+    if (!isCanary) {
+        return null;
+    }
 
     return (
         <Container>
