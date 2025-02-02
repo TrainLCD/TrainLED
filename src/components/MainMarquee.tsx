@@ -334,7 +334,7 @@ const MainMarquee = ({ nextStation, line, afterNextStation }: Props) => {
               ) : null}
               {afterNextStation ? (
                 <>
-                  <GreenText>. The stop after</GreenText>
+                  <GreenText>The stop after</GreenText>
                   <HorizontalSpacer />
                   <OrangeText>
                     {nextStation.nameRoman}
