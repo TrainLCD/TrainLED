@@ -16,7 +16,7 @@
     "geolib": "^3.3.3",
     "jotai": "^2.6.4",
     "lodash": "^4.17.21",
-    "next": "15.1.6",
+    "next": "15.1.11",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-fast-marquee": "^1.6.3",
